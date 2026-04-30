@@ -1,0 +1,12 @@
+{
+  "techDocBlueprint": {
+    "type": "blueprint",
+    "isRequired": false,
+    "label": "Tech Doc blueprint"
+  },
+  "techdocsSourceBlueprint": {
+    "type": "blueprint",
+    "isRequired": false,
+    "label": "Tech docs source blueprint"
+  }
+}
