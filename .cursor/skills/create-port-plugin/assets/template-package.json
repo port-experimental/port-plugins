@@ -1,0 +1,36 @@
+{
+  "name": "port-WIDGET_NAME-plugin",
+  "version": "0.1.0",
+  "private": true,
+  "description": "WIDGET_DESCRIPTION — Port custom widget",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "build": "webpack --mode production",
+    "dev": "webpack serve --mode development"
+  },
+  "dependencies": {
+    "@port-labs/plugins-sdk": "^0.1.0",
+    "@tanstack/react-query": "^5.95.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "css-loader": "^7.1.4",
+    "html-webpack-plugin": "^5.6.6",
+    "postcss": "^8.5.0",
+    "postcss-loader": "^8.1.0",
+    "postcss-preset-env": "^10.0.0",
+    "react-dev-utils": "^12.0.1",
+    "style-loader": "^4.0.0",
+    "terser-webpack-plugin": "^5.3.10",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.7.0",
+    "webpack": "^5.97.0",
+    "webpack-cli": "^6.0.0",
+    "webpack-dev-server": "^5.1.0"
+  }
+}
