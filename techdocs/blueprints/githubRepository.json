@@ -1,0 +1,40 @@
+{
+  "identifier": "githubRepository",
+  "title": "Repository",
+  "icon": "Github",
+  "schema": {
+    "properties": {
+      "readme": {
+        "title": "README",
+        "type": "string",
+        "format": "markdown"
+      },
+      "url": {
+        "title": "Repository URL",
+        "type": "string",
+        "format": "url"
+      },
+      "defaultBranch": {
+        "title": "Default branch",
+        "type": "string"
+      },
+      "description": {
+        "title": "Description",
+        "type": "string"
+      },
+      "visibility": {
+        "title": "Visibility",
+        "type": "string"
+      },
+      "language": {
+        "title": "Language",
+        "type": "string"
+      }
+    },
+    "required": []
+  },
+  "mirrorProperties": {},
+  "calculationProperties": {},
+  "aggregationProperties": {},
+  "relations": {}
+}
