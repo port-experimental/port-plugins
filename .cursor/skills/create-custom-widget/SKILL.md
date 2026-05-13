@@ -1,6 +1,6 @@
 ---
 name: create-custom-widget
-description: Scaffold and build Port custom plugins (widgets) — self-contained React/TypeScript apps embedded as iframes in Port dashboards and entity pages. Survey existing plugins in the project before duplicating work; prefer @port-labs/plugins-sdk, native blueprint params, and @port-labs/port-plugins-cli per Port docs. Use when creating or extending a Port custom widget or plugin.
+description: Scaffold, extend, or bring up to standard Port custom plugins (widgets) — self-contained React/TypeScript apps in iframes. Survey the project before duplicating work; prefer @port-labs/plugins-sdk, native blueprint params, per-plugin README structure (§8), and @port-labs/port-plugins-cli per Port docs. Use when creating, adapting, or auditing a Port custom widget or plugin.
 ---
 
 # Create a Port Custom Widget
@@ -30,6 +30,35 @@ Minimal starter: [port-plugin-sample](https://github.com/port-labs/port-plugin-s
 Port widgets are single-file React/TypeScript apps compiled by webpack into a self-contained `dist/index.html` (all JS/CSS inlined). They run inside an `<iframe>` in Port dashboards or entity pages and communicate with the host via `postMessage`.
 
 Each widget can define **params** (metadata in `upload-params.json`) that admins fill when they add a custom widget. Params often include **blueprints**, **relation keys** (string params), and **property identifiers** (string params). **Multiple widgets can target the same catalog concepts** when you keep naming consistent inside your org.
+
+## Bringing an existing plugin up to standard
+
+Use this path when the goal is **not** greenfield scaffolding but to **audit and align** an existing plugin directory with the conventions in this skill (README, params, SDK/host bridge, build output, upload docs, API usage).
+
+### When to use
+
+- Per-plugin **`README.md`** is missing, thin, or out of order versus **§8 Per-plugin `README.md` standard (required)** later in this skill (preview image, parameters table before setup, canonical upload command, troubleshooting, and so on).
+- **`upload-params.json`** drifted from **`src/types.ts`**, overuses `string` where **`type: "blueprint"`** fits, or ignores the five-blueprint-param cap (see [CLI metadata](https://www.npmjs.com/package/@port-labs/port-plugins-cli)).
+- **`@port-labs/plugins-sdk`** is outdated or the host bridge omits **`applyThemeCss()`**, **`usePortPluginData`**, or dashboard **`mergePageFilters`** when page filters should apply.
+- **Build / runtime** issues covered in **Critical Configuration Requirements** and [plugin-architecture.md](references/plugin-architecture.md) (Webpack `inject: "body"`, root height, entity search `{ query: { ... } }`, error surfacing).
+- **Upload** instructions missing the canonical **`port-plugins upload`** line or contradicting current CLI/auth.
+
+### Workflow
+
+1. **Read** — `README.md`, `upload-params.json`, `package.json` (`engines`, dependencies), `src/types.ts`, host hook (`usePostMessageData` / `usePortPluginData`), main UI entry, any API modules, `webpack.config.js`, root CSS.
+2. **Gap analysis** — Compare against §8 README order, params guidance in **§5 Define parameters (`upload-params.json`)**, **Theming**, **Build & deploy**, and [widget-conventions.md](references/widget-conventions.md) / [plugin-architecture.md](references/plugin-architecture.md).
+3. **Prioritize** — Correctness first (Port API request shapes, token usage, theme), then operator docs (README, param table), then polish (badges, screenshots, structure tree).
+4. **Patch** — Keep diffs focused: bump SDK with hook changes; keep `PluginConfig` and `upload-params.json` in lockstep; rewrite README sections rather than deleting useful catalog/integration detail.
+5. **Verify** — `npm ci` / `npm install`, `npm run build`, smoke in **Local development** mode and/or in Port; update the **repo-level** widgets table row (step 7 under scaffolding) if the public description or behaviour changed materially.
+
+### PR checklist (copy into description)
+
+- [ ] **`README.md`** matches §8 section order and quality bar (preview asset, params before setup, local dev, canonical upload command + CLI link, troubleshooting).
+- [ ] **`upload-params.json`** ↔ **`types.ts`** aligned; **`blueprint`** types used where admins pick blueprints; ≤5 blueprint params.
+- [ ] **SDK** current enough for your needs (see [plugins-sdk on npm](https://www.npmjs.com/package/@port-labs/plugins-sdk)); theme applied when host sends `theme.css`.
+- [ ] **Webpack / CSS** meet **Critical Configuration Requirements** in this skill.
+- [ ] **Entity search** bodies use `{ query: { combinator, rules } }` where applicable; errors surfaced with response body text.
+- [ ] **`npm run build`** succeeds; **`dist/index.html`** is the upload artifact.
 
 ## CRITICAL: Check for Reusable Implementations FIRST
 
@@ -171,6 +200,8 @@ Later examples use **placeholder-style** folder names (for example `task-comment
 
 ## Quick Decision Tree
 
+**Align an existing plugin?** If the task is to **audit or bring a current plugin up to** this skill’s standard (README §8, params, SDK, build, docs), follow **Bringing an existing plugin up to standard** (section above) and skip the tree below. **Otherwise:**
+
 ```
 User requests a widget
         ↓
@@ -198,8 +229,8 @@ User requests a widget
 └───────────────────────────────────────────────┘
         ↓
 ┌───────────────────────────────────────────────┐
-│ 5. Scaffold from templates                    │
-│    (see "Scaffolding a New Widget")           │
+│ 5. Scaffold new OR upgrade existing           │
+│    (see "Scaffolding" / "Bringing existing…") │
 └───────────────────────────────────────────────┘
 ```
 
