@@ -2,7 +2,7 @@
 
 ## Placement and naming (required)
 
-- **Root directory only:** Each widget is a **folder at the repository root** of `port-custom-widgets` (same level as `README.md`, `.github/`, `task-comment-chat/`, etc.). Do not scaffold new widgets under `widgets/` or other nested paths unless the maintainers have standardized that layout.
+- **Root directory only:** Each widget is typically a **folder at the repository root** of your plugins repo (same level as `README.md` and sibling plugin folders). Do not scaffold new widgets under arbitrary nested paths unless your team has standardized that layout.
 - **Lowercase, hyphen-separated names:** The folder name must be **kebab-case**: all lowercase, words joined with single hyphens, no spaces. Derive it from the widget title (for example, "Service Health Panel" → `service-health-panel`).
 
 ## Repository Structure
@@ -10,18 +10,15 @@
 Each widget lives in its own top-level directory:
 
 ```
-port-custom-widgets/
-├── .github/
-│   └── workflows/
-│       └── deploy-widgets.yml    # Auto-deploys changed widgets on merge to main
-├── README.md                     # Lists all widgets — update when adding a new one
-├── .cursor/
+<plugins-repo>/
+├── README.md                     # Lists plugins — update when adding one
+├── .cursor/                      # Optional — e.g. editor skills / templates
 │   └── skills/
-│       └── create-custom-widget/ # Skill: scaffold & build Port custom widgets
+│       └── create-custom-widget/
 │           ├── SKILL.md
-│           ├── references/       # Architecture docs
-│           └── assets/           # Template files for scaffolding new widgets
-├── task-comment-chat/            # Reference widget — follow its structure
+│           ├── references/
+│           └── assets/
+├── your-existing-widget/         # Example plugin — each plugin mirrors this shape
 │   ├── src/
 │   │   ├── index.html
 │   │   ├── index.tsx
@@ -35,25 +32,23 @@ port-custom-widgets/
 │   ├── upload-params.json
 │   ├── webpack.config.js
 │   └── tsconfig.json
-├── hierarchy-pages/              # Reference widget for drag-and-drop hierarchies
-│   └── ...                       # Folder tree with cross-container + in-folder reorder
-│                                 # State stored in `pages` blueprint entity (JSON property)
-└── your-new-widget/              # New widget — same structure
+└── your-new-widget/              # New plugin — same structure
 ```
 
-## Reference Widgets
+## Reference plugins in *your* repo
 
-| Widget | Best reference for |
+Pick **existing** sibling plugins as references when they match what you are building. The table below is **illustrative** — fill in real directory names from your `README.md`.
+
+| Plugin folder (example) | Often useful when you need |
 |---|---|
-| `task-comment-chat` | General structure, postMessage hook, basic API calls |
-| `page-favorites` | Drag-to-reorder lists (simple single-list DnD), TanStack Query mutations |
-| `hierarchy-pages` | Multi-container DnD with in-container reordering + insert indicators; optimistic local state; storing structured JSON on a blueprint entity |
+| `your-existing-widget` | Baseline layout, host hook, simple Port API calls |
+| another sibling plugin | Patterns you already use (DnD, mutations, JSON property editors, …) |
 
 ## Naming Conventions
 
 | Item | Convention | Example |
 |---|---|---|
-| Directory location | Repo root (`port-custom-widgets/<name>/`) | `port-custom-widgets/service-health-panel/` |
+| Directory location | Repo root (`<plugins-repo>/<name>/`) | `<plugins-repo>/service-health-panel/` |
 | Directory name | kebab-case (lowercase + hyphens) | `service-health-panel` |
 | Port plugin identifier | same as directory | `service-health-panel` |
 | `package.json` name | `port-{dir-name}-plugin` | `port-service-health-panel-plugin` |
@@ -94,22 +89,24 @@ design tokens). Widget CSS should use **`var(--background-primary, …)`**-style
 - **Scaffold defaults:** `assets/template-usePostMessageData.ts` calls **`applyThemeCss()`**;
   `assets/template-App.css` shows token mapping.
 
-## CI/CD Pipeline (`deploy-widgets.yml`)
+## Upload automation (optional)
 
-On every merge to `main`:
-1. Detects which widget directories changed
-2. Runs `npm ci && npm run build` in each changed directory
-3. Uploads `dist/index.html` to Port: `port-plugins upload --upsert`
-4. Creates a GitHub release for each deployed widget
+Publishing a plugin **does not require** GitHub Actions or any other pipeline. Many teams run **`npm run build`** locally and upload **`dist/index.html`** with the [Port plugins CLI](https://www.npmjs.com/package/@port-labs/port-plugins-cli) from a laptop or from a one-off job in whatever CI they already use.
 
-### Secrets Required
+If you add a **build-and-upload** workflow (for example under `.github/workflows/`), a common pattern on merge to `main` is:
+
+1. Detect which plugin directories changed
+2. Run `npm ci && npm run build` in each changed directory
+3. Upload `dist/index.html` with `port-plugins upload --upsert` (see npm docs for auth: token or client ID + secret)
+
+### Secrets (only if you automate uploads)
 
 | Secret | Source |
 |---|---|
 | `PORT_CLIENT_ID` | Port → Settings → Credentials |
 | `PORT_CLIENT_SECRET` | Port → Settings → Credentials |
 
-### Optional Variable
+### Optional variable
 
 | Variable | Default |
 |---|---|

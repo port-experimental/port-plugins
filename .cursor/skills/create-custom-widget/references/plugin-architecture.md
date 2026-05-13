@@ -242,7 +242,7 @@ theme.
 
 ### Common design tokens in `theme.css`
 
-These names are what widgets in this repo map to; the exact set is defined by
+These names are commonly mapped in plugin CSS; the exact set is defined by
 the host CSS string:
 
 | Variable | Purpose |
@@ -260,9 +260,7 @@ running outside Port's iframe (local webpack dev).
 
 ## Drag-and-Drop (Reorder + Cross-Container)
 
-Reference widget: `hierarchy-pages`
-
-Use native HTML5 drag events — no library needed. The pattern below supports both reordering within a container and moving items between containers, with a blue insert-indicator line showing the drop position.
+The pattern below uses **native HTML5 drag events** (no specific library required). It supports reordering within a container and moving items between containers, with a visual insert indicator for the drop position. Adapt types and persistence to your plugin’s data model.
 
 ### State
 

@@ -1,9 +1,19 @@
 ---
 name: create-custom-widget
-description: Scaffold and build Port custom widgets (plugins) — self-contained React/TypeScript apps embedded as iframes in Port dashboards and entity pages. ALWAYS check existing widgets for reusable blueprints and patterns before creating new ones. Use when creating a new Port widget, custom plugin, or when asked to add a new widget to the port-custom-widgets repository. Prioritizes reusability and extensibility.
+description: Scaffold and build Port custom plugins (widgets) — self-contained React/TypeScript apps embedded as iframes in Port dashboards and entity pages. Survey existing plugins in the project before duplicating work; prefer @port-labs/plugins-sdk, native blueprint params, and @port-labs/port-plugins-cli per Port docs. Use when creating or extending a Port custom widget or plugin.
 ---
 
 # Create a Port Custom Widget
+
+## Official documentation (source of truth)
+
+Platform rules (CSP, upload limits, param metadata), SDK APIs, and CLI behavior are defined by Port. **Treat the docs and npm readmes as authoritative** and keep dependency versions current.
+
+- **Plugins overview:** [Plugins — Port Docs](https://docs.getport.io/customize-pages-dashboards-and-plugins/plugins)
+- **SDK:** [`@port-labs/plugins-sdk` on npm](https://www.npmjs.com/package/@port-labs/plugins-sdk) — host bridge, `usePortPluginData`, theming, `mergePageFilters`
+- **CLI:** [`@port-labs/port-plugins-cli` on npm](https://www.npmjs.com/package/@port-labs/port-plugins-cli) — upload, list, update, delete, plugin metadata
+
+Minimal starter: [port-plugin-sample](https://github.com/port-labs/port-plugin-sample).
 
 ## Core Principles: Reusability and Extensibility
 
@@ -19,7 +29,7 @@ description: Scaffold and build Port custom widgets (plugins) — self-contained
 
 Port widgets are single-file React/TypeScript apps compiled by webpack into a self-contained `dist/index.html` (all JS/CSS inlined). They run inside an `<iframe>` in Port dashboards or entity pages and communicate with the host via `postMessage`.
 
-Each widget can define configurable parameters (like `commentBlueprint`, `taskBlueprint`) that reference Port blueprints. **Multiple widgets can share the same blueprints**, creating a composable ecosystem of widgets that work together.
+Each widget can define **params** (metadata in `upload-params.json`) that admins fill when they add a custom widget. Params often include **blueprints**, **relation keys** (string params), and **property identifiers** (string params). **Multiple widgets can target the same catalog concepts** when you keep naming consistent inside your org.
 
 ## CRITICAL: Check for Reusable Implementations FIRST
 
@@ -27,17 +37,18 @@ Each widget can define configurable parameters (like `commentBlueprint`, `taskBl
 
 ### Step 1: Analyze the Request for Port Abstractions
 
-Identify which "Port abstractions" (blueprints, properties, relations) the requested widget needs:
+Identify which **catalog concepts** (blueprints, properties, relations, user-scoped data) the widget needs. Naming is **organization-specific** — do not assume every Port customer uses the same blueprint IDs or relation keys.
 
-- **Comments system** → Likely uses a comment blueprint with relations to tasks/users
-- **Task management** → May involve task, iteration, team blueprints
-- **Favorites/bookmarks** → May use properties on the `_user` entity
-- **Status tracking** → May use status properties, relations between entities
-- **Team collaboration** → May involve `_team` blueprint and user relations
+Examples of **domains** (map each to *their* blueprints, not fixed names):
+
+- **Threaded discussion / comments** → Often a dedicated blueprint plus relations to a parent entity and to users
+- **Work tracking** → Often one or more blueprints for items, timeboxes, ownership
+- **Personalization / bookmarks** → Often properties or relations on the user entity
+- **Status / lifecycle** → Properties and relations as modeled in *their* data model
 
 ### Step 2: Survey Existing Widgets
 
-Read the repository's `README.md` to see all existing widgets. For each potentially related widget:
+Read the project’s `README.md` (or equivalent index) to see existing widgets. For each potentially related widget:
 
 1. **Read `upload-params.json`** to understand which blueprints it references
 2. **Read `src/types.ts`** to see the data model (PluginConfig interface)
@@ -45,9 +56,9 @@ Read the repository's `README.md` to see all existing widgets. For each potentia
 
 **Example workflow:**
 - User requests: "Create a task comment widget"
-- Check README → Find `task-comment-chat` widget exists
-- Read `task-comment-chat/upload-params.json` → Uses `commentBlueprint`, `taskRelation`, etc.
-- **Decision**: This widget already implements exactly what's needed. Suggest using it directly or adapting it.
+- Check README → Find an existing widget (e.g. a comment-thread widget) that already covers the use case
+- Read that widget’s `upload-params.json` → See which blueprint / relation / property params it exposes
+- **Decision**: If it already matches, recommend configuring that plugin; otherwise adapt or scaffold
 
 ### Step 3: Assess Reusability
 
@@ -76,7 +87,9 @@ If you're creating a new widget that builds on existing functionality:
 - Reinvent property names (use existing conventions)
 - Build from scratch when adapting an existing widget is faster
 
-### Examples of Reuse Decisions
+### Examples of reuse decisions
+
+The steps below use **sample folder and param names** for clarity. In a real project, use the directories and `upload-params.json` definitions that actually exist in **your** codebase.
 
 #### Example 1: Request for "comment widget on tasks"
 ```
@@ -132,62 +145,29 @@ const response = await fetch(
 const blueprints = await response.json();
 ```
 
-However, for skill execution, **always check existing widgets first** as they document the intended blueprint usage.
+However, when working inside an existing plugin repo, **survey that project’s plugins first** — they show how params and APIs are already wired.
 
-## Common Blueprint Patterns in This Repository
+## Discovering patterns in your codebase
 
-As you analyze existing widgets, you'll discover recurring blueprint patterns. **Always check for these before creating new blueprints:**
+As you analyze widgets **in the project you are changing**, you will often see **recurring param names** and combinations (discussion + parent entity, work items + team, user-scoped lists, and so on). Use that to **avoid duplicate plugins** and to keep params **consistent within the same codebase and catalog**.
 
-### Known Blueprints (as of repository analysis)
+Sample names in this skill are **illustrative**; blueprint identifiers and relations always come from **your** Port catalog. For platform rules (param types, limits, CSP, upload flow), use [Port Plugins docs](https://docs.getport.io/customize-pages-dashboards-and-plugins/plugins) and the [CLI metadata reference](https://www.npmjs.com/package/@port-labs/port-plugins-cli).
 
-| Blueprint Pattern | Used In Widget | Purpose | Key Properties/Relations |
-|-------------------|----------------|---------|--------------------------|
-| `commentBlueprint` | `task-comment-chat` | User comments on entities | `messageProperty`, `authorProperty`, `tagsProperty`, `taskRelation`, `commentorRelation` |
-| `taskBlueprint` | `current-iteration` | Task/work item tracking | Relations to iteration, team |
-| `iterationBlueprint` | `current-iteration` | Sprint/iteration cycles | Relations to tasks, team |
-| `teamBlueprint` (default: `_team`) | `current-iteration` | Team organization | Relations to tasks, iterations |
-| `_user` entity | `page-favorites` | User-specific data | `favourite_pages` property |
+### Principles
 
-### Blueprint Abstraction Principles
+1. **Survey existing `upload-params.json` files** in the project before inventing a second param for the same concept.
+2. **Name params by semantic role** (what the value *means* in your UI), not by incidental sample data.
+3. **Prefer Port’s native `type: "blueprint"`** when the admin should pick a blueprint — see [Define parameters](#5-define-parameters-upload-paramsjson). Use `string` (and similar) for relation identifiers, property keys, labels, and other non-blueprint configuration.
+4. **Composite widgets:** list related existing widgets, reuse compatible param shapes, and document lineage in the PR.
 
-When you identify that a user wants a widget involving one of these abstractions:
+### Illustrated examples
 
-1. **Comments/Discussion** → Check if `task-comment-chat` pattern applies
-   - Reuse: `commentBlueprint`, `taskRelation`, `commentorRelation`
-   - Adapt: Change the parent entity type (task → bug, task → PR, etc.)
-
-2. **Work Tracking** → Check if `current-iteration` pattern applies
-   - Reuse: `taskBlueprint`, `iterationBlueprint`, `teamBlueprint`
-   - Adapt: Add new status flows, custom properties
-
-3. **User Personalization** → Check if `page-favorites` pattern applies
-   - Reuse: `_user` entity with custom properties
-   - Adapt: Add new user-specific properties
-
-4. **Status/State Management** → Look for existing status properties
-   - Reuse: Status property patterns from existing widgets
-   - Adapt: Define new states for your domain
-
-### Cross-Widget Blueprint Compatibility
-
-Some blueprints are designed to work together:
-
-- **Comments + Tasks**: `task-comment-chat` + `current-iteration` both work with tasks
-  - A new widget can use both `commentBlueprint` AND `taskBlueprint` to show comments on tasks
-  
-- **Tasks + Teams + Iterations**: `current-iteration` combines all three
-  - A new reporting widget could reuse all three blueprints for team analytics
-
-**When creating a composite widget** (combines multiple existing concepts):
-1. List all relevant existing widgets
-2. Extract their blueprint parameters
-3. Combine them in your new `upload-params.json`
-4. Document the reuse in comments
+Later examples use **placeholder-style** folder names (for example `task-comment-chat`, `current-iteration`). They show **how to reason about reuse**; substitute the widgets and params listed in **your** project’s `README.md` and filesystem.
 
 ### Where widgets live and how they are named
 
-- **Location:** Create every widget as a **directory at the repository root** (sibling of `README.md`, `.github/`, and other widgets). Do **not** put new widgets under `widgets/`, `packages/`, or other nested folders unless the repo explicitly adopts a different layout.
-- **Directory name:** Use **lowercase words separated by hyphens** (kebab-case). Translate a human title into that form (for example, "Specific Entity Page" → `specific-entity-page`, "Task Comment Chat" → `task-comment-chat`). Avoid spaces, camelCase, PascalCase, and mixed caps in the folder name.
+- **Location:** A common layout is **one directory per plugin at the repository root** (sibling of `README.md`, CI config, and other plugins). If your team uses a different layout (for example `packages/*`), follow that convention consistently.
+- **Directory name:** Use **lowercase words separated by hyphens** (kebab-case). Translate a human title into that form (for example, "Specific Entity Page" → `specific-entity-page`). Avoid spaces, camelCase, PascalCase, and mixed caps in the folder name.
 
 ## Quick Decision Tree
 
@@ -211,10 +191,10 @@ User requests a widget
 └───────────────────────────────────────────────┘
         ↓
 ┌───────────────────────────────────────────────┐
-│ 4. Request involves known blueprints?         │
-│    (Check upload-params.json files)           │
-│    YES → Reuse blueprint params in new widget │
-│    NO → Define new blueprint params           │
+│ 4. Catalog overlap with existing widgets?     │
+│    (Check upload-params.json in your project)  │
+│    YES → Reuse / align param shapes           │
+│    NO → Define params from the data model     │
 └───────────────────────────────────────────────┘
         ↓
 ┌───────────────────────────────────────────────┐
@@ -225,9 +205,16 @@ User requests a widget
 
 ## References
 
-For detailed architecture and conventions, read these files first:
-- [Plugin architecture](references/plugin-architecture.md) — postMessage protocol, **`PLUGIN_DATA.theme`**, token flow, theming, API calls, build requirements, deployment
-- [Widget conventions](references/widget-conventions.md) — repo structure, naming conventions, required files, CI/CD pipeline
+**Port (authoritative):**
+
+- [Plugins — Port Docs](https://docs.getport.io/customize-pages-dashboards-and-plugins/plugins)
+- [`@port-labs/plugins-sdk` on npm](https://www.npmjs.com/package/@port-labs/plugins-sdk)
+- [`@port-labs/port-plugins-cli` on npm](https://www.npmjs.com/package/@port-labs/port-plugins-cli)
+
+**Bundled with this skill:**
+
+- [Plugin architecture](references/plugin-architecture.md) — postMessage protocol, **`PLUGIN_DATA.theme`**, token flow, theming, API calls, build output
+- [Widget conventions](references/widget-conventions.md) — suggested repo layout, naming, required files, **optional** build-and-upload automation
 
 ## Widget Reuse Checklist
 
@@ -235,7 +222,7 @@ Before proceeding with scaffolding, complete this checklist:
 
 - [ ] Read `README.md` to identify all existing widgets
 - [ ] For potentially related widgets, read their `upload-params.json` and `src/types.ts`
-- [ ] Identify which blueprints are already in use (e.g., commentBlueprint, taskBlueprint)
+- [ ] Identify which blueprint (and related) params existing widgets already expose
 - [ ] Determine if the request can be fulfilled by:
   - Using an existing widget as-is
   - Extending an existing widget
@@ -344,10 +331,10 @@ Even when creating a new widget, look for **reusable code patterns** in existing
    - Error handling patterns
 
 2. **UI Component Patterns**
-   - List rendering with loading states (from `task-comment-chat`)
-   - Drag-and-drop interfaces (from `current-iteration`)
-   - Property editors (from `page-favorites`)
-   - Theme-aware styling (from any widget)
+   - List rendering with loading states (from widgets that already do lists + queries)
+   - Drag-and-drop interfaces (from widgets that implement DnD)
+   - Property editors and forms (from widgets that edit entity JSON or similar)
+   - Theme-aware styling (any widget using `applyThemeCss` / host tokens)
 
 3. **Data Transformation Patterns**
    - Entity property extraction
@@ -462,10 +449,10 @@ Use this approach when creating a completely new widget with no close existing m
 
 ### 1. Create the directory
 
-From the **repo root** (`port-custom-widgets/`), create a single top-level folder:
+From the **root of the repository** where plugins are maintained, create a folder for the new widget:
 
 ```bash
-# Run from repository root — not inside widgets/ or another subfolder
+# Run from that root — not inside an unrelated subfolder unless your layout requires it
 mkdir <widget-name>   # lowercase + hyphens only, e.g. service-health-panel
 ```
 
@@ -481,7 +468,7 @@ Copy these from `.cursor/skills/create-custom-widget/assets/` — do not modify 
 | `template-index.tsx` | `<widget>/src/index.tsx` |
 | `template-usePostMessageData.ts` | `<widget>/src/hooks/usePostMessageData.ts` |
 
-> The `usePostMessageData` template uses `@port-labs/plugins-sdk` which handles the postMessage protocol **and** theme injection via `applyThemeCss()`. The template already calls this on mount.
+> **SDK:** The bundled template wraps **`usePortPluginData`** from **`@port-labs/plugins-sdk/react`** (see [plugins-sdk on npm](https://www.npmjs.com/package/@port-labs/plugins-sdk)). That hook exposes **`portToken`**, **`portApiBaseUrl`**, **`params`**, **`entity`**, **`page`**, **`user`**, **`theme`**, and **`applyThemeCss`**. The wrapper adds a **local dev mock** when the bundle runs outside Port’s iframe; keep **`applyThemeCss()`** on the real host path so light/dark stays in sync. Prefer **`@port-labs/plugins-sdk` ≥ 0.1.1** (link/navigation behavior and docs alignment per [Port Plugins](https://docs.getport.io/customize-pages-dashboards-and-plugins/plugins)).
 
 ### 3. Adapt these files
 
@@ -496,10 +483,12 @@ Copy these from `.cursor/skills/create-custom-widget/assets/` — do not modify 
 ### 4. Implement the widget
 
 In `App.tsx`:
-- Use `usePostMessageData()` to get `params`, `entity`, `portToken`, `portApiBaseUrl`
-- Call Port APIs with `Authorization: Bearer ${portToken}` using `portApiBaseUrl`
-- Use TanStack React Query for data fetching (`enabled: !!portToken && !!portApiBaseUrl`)
-- Remove the entity guard block if the widget is for dashboards (not entity pages)
+
+- Prefer **`usePortPluginData()`** from **`@port-labs/plugins-sdk/react`** for new code (same host data as the skill’s `usePostMessageData()` template wrapper, without the mock layer), **or** keep **`usePostMessageData()`** from the template for consistency with other widgets in the same project.
+- Call Port APIs with `Authorization: Bearer ${portToken}` using `portApiBaseUrl`.
+- Use TanStack React Query for data fetching (`enabled: !!portToken && !!portApiBaseUrl`).
+- When search results must respect **dashboard page filters**, merge with **`mergePageFilters`** from **`@port-labs/plugins-sdk`** (see npm docs).
+- Remove the entity guard block if the widget is for dashboards (not entity pages).
 
 #### Searching blueprint entities (correct endpoint)
 
@@ -536,47 +525,66 @@ if (!response.ok) {
 
 ### 5. Define parameters (`upload-params.json`)
 
+Each key is a param name; each value describes how it appears in the Port UI. Allowed **`type`** values (see [port-plugins-cli — Plugin metadata reference](https://www.npmjs.com/package/@port-labs/port-plugins-cli)): **`string`**, **`number`**, **`boolean`**, **`object`**, **`array`**, **`blueprint`**.
+
 ```json
 {
-  "paramKey": {
+  "exampleRelation": {
     "type": "string",
     "isRequired": true,
-    "label": "Human-readable label shown in Port UI"
+    "label": "Relation identifier on the parent entity"
   }
 }
 ```
 
-Types: `string`, `number`, `boolean`, `object`, `array`, `blueprint`
+#### Prefer native **`blueprint`** params when selecting a blueprint
+
+When the admin should **pick a blueprint** (not type a free-form ID), use **`"type": "blueprint"`**. Port renders the native blueprint control. At runtime the value is still the blueprint identifier your code already expects (treat it as a **string** in `PluginConfig` / API paths).
+
+**Limits (CLI / platform):** at most **five** params may use `"type": "blueprint"` per plugin — see the [CLI metadata table](https://www.npmjs.com/package/@port-labs/port-plugins-cli).
+
+```json
+{
+  "discussionBlueprint": {
+    "type": "blueprint",
+    "isRequired": true,
+    "label": "Blueprint that stores discussion threads"
+  }
+}
+```
+
+Use **`string`** (and other scalar types) for **relation identifiers**, **property keys**, enums, labels, URLs, and anything that is **not** “choose a blueprint from the catalog.”
 
 ### Blueprint Parameter Design for Reusability
 
-Design your `upload-params.json` to be **composable and reusable**:
+Design `upload-params.json` to be **composable inside your organization**:
 
-**Good: Flexible, composable parameters**
+**Good: blueprint picker + configurable keys**
 ```json
 {
-  "commentBlueprint": {
-    "type": "string",
+  "discussionBlueprint": {
+    "type": "blueprint",
     "isRequired": true,
-    "label": "Comment blueprint ID"
+    "label": "Discussion / comment blueprint"
   },
-  "taskRelation": {
+  "parentRelation": {
     "type": "string",
     "isRequired": false,
-    "label": "Relation from comment to task (default: task)"
+    "label": "Relation from discussion entity to parent (default: parent)"
   },
-  "messageProperty": {
+  "bodyProperty": {
     "type": "string",
     "isRequired": false,
-    "label": "Text property key (default: body)"
+    "label": "Property key for message text (default: body)"
   }
 }
 ```
-✅ Other widgets can reuse `commentBlueprint`  
-✅ Flexible enough to work with different relation names  
-✅ Property names are configurable
+✅ Native blueprint selection in Port  
+✅ Relation / property identifiers stay explicit and reusable across plugins
 
-**Bad: Hardcoded, inflexible**
+**Avoid:** encoding “which blueprint” only as an unstructured string when a **`blueprint`** param is clearer for admins — unless you have a deliberate reason (e.g. dynamic lists beyond the blueprint picker).
+
+**Bad: vague catch-all**
 ```json
 {
   "blueprintId": {
@@ -586,16 +594,15 @@ Design your `upload-params.json` to be **composable and reusable**:
   }
 }
 ```
-❌ Unclear what kind of blueprint  
-❌ Can't compose with other blueprints  
-❌ Forces hardcoded property names in code
+❌ Unclear semantic role  
+❌ Misses the native **`blueprint`** UX when the intent is catalog selection
 
 **Design principles:**
-1. **Name parameters by their semantic role** (e.g., `commentBlueprint`, not `blueprint1`)
-2. **Make property/relation names configurable** when they might vary (e.g., `messageProperty`)
-3. **Use defaults for common cases** but allow overrides (e.g., `"default: body"`)
-4. **Document cross-widget compatibility** in the label (e.g., "Comment blueprint ID (compatible with task-comment-chat)")
-5. **Separate concerns** (one parameter per blueprint type, not a single catch-all)
+1. **Name parameters by semantic role** (e.g. `discussionBlueprint`, not `blueprint1`).
+2. **Use `type: "blueprint"`** for blueprint selection (subject to the five-param cap); use **`string`** for relation/property identifiers and similar.
+3. **Make property/relation names configurable** when they might vary between catalogs.
+4. **Document compatibility** with sibling widgets in the same codebase in the label or PR when it helps operators.
+5. **Separate concerns** — one param per concept, not one opaque blob.
 
 ### 6. Document blueprint reuse
 
@@ -604,17 +611,17 @@ If your widget reuses blueprints from other widgets, document this in your widge
 ```typescript
 // types.ts
 /**
- * This widget reuses blueprints from:
- * - commentBlueprint: defined in task-comment-chat widget
- * - taskBlueprint: defined in current-iteration widget
- * 
- * New blueprints introduced:
- * - milestoneBlueprint: tracks project milestones
+ * Param lineage (update names to match sibling widgets in your project):
+ * - discussionBlueprint: align with existing discussion-style widgets if any
+ * - workItemBlueprint: align with existing planning widgets if any
+ *
+ * New concepts introduced by this widget:
+ * - milestoneBlueprint — example only; use type: "blueprint" in upload-params.json
  */
 export type PluginConfig = {
-  commentBlueprint: string;  // from task-comment-chat
-  taskBlueprint: string;      // from current-iteration
-  milestoneBlueprint: string; // NEW
+  discussionBlueprint: string;
+  workItemBlueprint: string;
+  milestoneBlueprint: string;
 };
 ```
 
@@ -629,8 +636,52 @@ Add a row to the widgets table:
 If the widget reuses or extends existing blueprints, mention this in the description:
 
 ```markdown
-| [Project Dashboard](./project-dashboard) | Complete project view combining tasks (from current-iteration), comments (from task-comment-chat), and milestones |
+| [Project Dashboard](./project-dashboard) | Example: combines work-tracking and discussion plugins already in the same project, plus any new blueprint-backed features |
 ```
+
+### 8. Per-plugin `README.md` standard (required)
+
+Each **plugin directory must** include a `README.md` that follows **this section order**. The repo-level widgets table (step 7) is only an index; the per-plugin README is the **authoritative** operator and maintainer guide. If a section does not apply, include it with a one-line **`N/A —`** explanation so readers know it was considered.
+
+1. **`#` Title + summary** — Human title; one paragraph describing behaviour, a link to [Port](https://app.getport.io), and which catalog concepts apply (blueprints, relations, dashboard vs entity page).
+
+2. **Preview image** — At least **one** screenshot or short GIF of the widget running inside Port (dashboard and/or entity page, whichever the widget supports). Commit the asset under e.g. `docs/` or `assets/` and reference it with a relative path, **or** use a stable hosted URL. Always add **alt text** for accessibility.
+
+3. **Badges (optional)** — e.g. widget surface (dashboard / entity), React and TypeScript versions; link to [Plugins](https://docs.getport.io/customize-pages-dashboards-and-plugins/plugins) where helpful.
+
+4. **Features** — Bullet list of user-visible capabilities.
+
+5. **Prerequisites** — What must exist before the widget works (Port access, integrations, blueprints, relations). State the **Node.js** range from `package.json` `engines` (and align with the [port-plugins-cli](https://www.npmjs.com/package/@port-labs/port-plugins-cli) Node requirement if operators run the CLI from the same machine).
+
+6. **Widget parameters** — Table mirroring **`upload-params.json`**: key, type, required, default, description (use the same types Port expects, including `blueprint`). Place this **before** deploy steps so operators and implementers see what the custom widget will expose **before** catalog work and **Add in Port** (which references the same keys and defaults).
+
+7. **Local development** — `npm run dev`, dev server URL, dev mock behaviour and which files to edit; Port **Local development** toggle. Document the inner loop **before** production upload so contributors do not have to scroll past release steps.
+
+8. **Setup** — Numbered substeps, **only** what this widget needs. Typical substeps (drop those that do not apply):
+   - **Catalog** — Blueprint definitions (e.g. files under `blueprints/`), table mapping file → identifier, required relations.
+   - **Ingestion / integration** — Ocean or other mapping paths, resync, scoping, known pitfalls.
+   - **Build** — `npm install`, `npm run build`, artifact path **`dist/index.html`**.
+   - **Upload** — Document the **canonical upload command** for this plugin (copy-pasteable), for example:
+
+     ```bash
+     port-plugins upload \
+       --file dist/index.html \
+       --identifier <plugin-directory-name> \
+       --title "<widget title in Port>" \
+       --params "$(cat upload-params.json)" \
+       --upsert
+     ```
+
+     Do **not** duplicate the full CLI tutorial here. For install, `port-plugins config`, tokens vs client credentials, and `--port-api-base-url` / region, link once to [@port-labs/port-plugins-cli on npm](https://www.npmjs.com/package/@port-labs/port-plugins-cli) (and [Port Plugins](https://docs.getport.io/customize-pages-dashboards-and-plugins/plugins) where relevant).
+
+   - **Add in Port** — Short steps: custom widget → pick plugin → params defaults vs overrides (cross-reference **Widget parameters** above).
+   - **Entity-page behaviour** — When behaviour differs from dashboards: blueprints, relations, any **Get entity** (or other) calls required because host `PLUGIN_DATA` is incomplete.
+
+9. **Project structure** — Directory tree for this plugin (`src/`, optional `blueprints/`, `upload-params.json`, webpack, `tsconfig.json`, and so on).
+
+10. **Troubleshooting** — Markdown table **Symptom | Cause | Fix** (search 422 / `query` nesting, theme / `applyThemeCss`, empty data, auth, wrong API host).
+
+**Quality bar:** A reader can follow **what the widget accepts (widget parameters) → how to run it locally (local development) → how to ship it (setup)** without reversing context. Port admins still complete **catalog (if any) → build → upload → add widget** from the Setup substeps plus the linked CLI/docs—not by reading application source.
 
 ## Theming — Matching Port's Look & Feel
 
@@ -639,12 +690,11 @@ The **`theme.css`** string is injected into the iframe by **`applyThemeCss()`** 
 **`@port-labs/plugins-sdk`** (as `<style id="port-plugin-theme">`). It usually defines
 design tokens such as `--background-primary` and `--text-high` on `:root`.
 
-The template hook (`template-usePostMessageData.ts`) calls **`applyThemeCss()`** when the
-SDK's theme updates (not only on first mount), so light/dark switches in the portal stay
+The template hook (`template-usePostMessageData.ts`) delegates to **`usePortPluginData()`** and calls **`applyThemeCss()`** when the SDK’s theme updates (not only on first mount), so light/dark switches in the portal stay
 in sync. The template CSS (`template-App.css`) maps those tokens to your own variables.
 
-1. **Keep `applyThemeCss()` in the effect that depends on the SDK's theme** — Do not strip
-   this when customizing `usePostMessageData`; without it, the widget ignores the host theme.
+1. **Keep `applyThemeCss()` in an effect that tracks the SDK** — e.g. `useEffect(..., [applyThemeCss])` from **`usePortPluginData`** per [plugins-sdk on npm](https://www.npmjs.com/package/@port-labs/plugins-sdk). Do not strip
+   this when customizing the hook; without it, the widget ignores the host theme.
 2. **Map tokens with fallbacks** — define local variables that reference Port's with a
    hardcoded fallback for local dev (no `PLUGIN_DATA` / no injection):
 
@@ -675,7 +725,7 @@ in sync. The template CSS (`template-App.css`) maps those tokens to your own var
 
 | Item | Convention | Example |
 |------|-----------|---------|
-| Directory path | **Repo root** + kebab-case folder | `port-custom-widgets/service-health-panel` |
+| Directory path | Root of plugins repo + kebab-case folder | `<plugins-repo>/service-health-panel` |
 | Directory | kebab-case (lowercase, hyphen-separated) | `service-health-panel` |
 | Port plugin identifier | same as directory | `service-health-panel` |
 | `package.json` name | `port-{dir-name}-plugin` | `port-service-health-panel-plugin` |
@@ -721,13 +771,16 @@ export async function fetchData(...) {
 
 In Port: add/edit a custom widget → toggle **"Local development"** → loads `localhost:9000`.
 
-## Build & Deploy
+## Build & deploy
 
 ```bash
 npm run build   # outputs dist/index.html (single self-contained file)
+```
 
-# Upload to Port
-port-plugins upload \
+Upload with the **Port plugins CLI** ([`@port-labs/port-plugins-cli` on npm](https://www.npmjs.com/package/@port-labs/port-plugins-cli); Node **22+** per package `engines`). Install globally or run via **`npx`**:
+
+```bash
+npx @port-labs/port-plugins-cli upload \
   --file dist/index.html \
   --identifier <widget-name> \
   --title "<Widget Title>" \
@@ -735,7 +788,9 @@ port-plugins upload \
   --upsert
 ```
 
-CI/CD auto-deploys on merge to `main` for any changed widget directories.
+Use `port-plugins config` / env vars for auth as described on npm (`PORT_TOKEN`, `PORT_CLIENT_ID` + `PORT_CLIENT_SECRET`, or project `.port/config`).
+
+**Upload automation:** Wrapping the above in GitHub Actions (or another runner) is **optional**. Your repository may include a workflow that builds and uploads changed plugins on merge to `main`; that is **team convenience**, not a Port platform requirement. See [widget-conventions.md](references/widget-conventions.md) for a typical layout.
 
 ## Critical Configuration Requirements
 
