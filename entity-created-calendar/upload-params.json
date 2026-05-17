@@ -1,0 +1,12 @@
+{
+  "blueprint": {
+    "type": "blueprint",
+    "isRequired": true,
+    "label": "Blueprint"
+  },
+  "createdDateProperty": {
+    "type": "string",
+    "isRequired": false,
+    "label": "Created date property (optional)"
+  }
+}
