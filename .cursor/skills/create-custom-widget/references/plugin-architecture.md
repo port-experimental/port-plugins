@@ -70,6 +70,21 @@ Always send this when `window.parent !== window`. Post it on mount (not in an ev
 3. Plugin stores the JWT and uses it as `Authorization: Bearer <token>` on all API calls
 4. API base URL comes from `PLUGIN_DATA.baseUrl` — always use this, never hardcode
 
+## Portal app links (not the API host)
+
+User-facing links (entity pages, dashboards, actions) must target the **portal app**, not
+`PLUGIN_DATA.baseUrl` / `portApiBaseUrl`.
+
+| Concern | Source |
+|---------|--------|
+| REST API | `portApiBaseUrl` + bearer token (e.g. `https://api.getport.io`) |
+| In-app navigation (`<a href>`, `window.open`) | **`document.referrer`** → `new URL(document.referrer).origin` |
+| Local dev / empty referrer | Default origin **`https://app.port.io`** |
+
+The iframe’s referrer is the parent Port page, so links stay on the same region and hostname
+(EU, US, or custom) without a `portalAppUrl` param. See **Portal app links
+(`document.referrer`)** in [SKILL.md](../SKILL.md).
+
 ## Calling Port APIs
 
 ### Search a blueprint's entities (recommended)

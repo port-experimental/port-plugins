@@ -30,9 +30,13 @@ Minimal starter: [port-plugin-sample](https://github.com/port-labs/port-plugin-s
 
 Port widgets are single-file React/TypeScript apps compiled by webpack into a self-contained `dist/index.html` (all JS/CSS inlined). They run inside an `<iframe>` in Port dashboards or entity pages and communicate with the host via `postMessage`.
 
-Each widget can define **params** (metadata in `upload-params.json`) that admins fill when they add a custom widget. Params often include **blueprints**, **relation keys** (string params), and **property identifiers** (string params). **Multiple widgets can target the same catalog concepts** when you keep naming consistent inside your org.
+Each widget can define **params** (metadata in `upload-params.json`) that admins fill when they add a custom widget. Params often include **blueprints**,**property identifiers** and **property values**. **Multiple widgets can target the same catalog concepts** when you keep naming consistent inside your org.
 
 At **runtime**, the widget loads and mutates data only through the **Port HTTP API** (`portApiBaseUrl` + bearer token from the host); MCP and other IDE tooling are for design-time catalog discovery, not for data inside the iframe.
+
+**Portal links** (entity pages, dashboards, actions in `<a href>` or `window.open`) are **not** the API host. Derive the portal **origin** from **`document.referrer`** (the parent Port page that embedded the iframe) and fall back to **`https://app.port.io`** when the referrer is empty (local dev). Entity pages use **`{origin}/{blueprintIdentifier}Entity?identifier={entityIdentifier}`**. Do **not** hardcode EU/US/custom domains or add a `portalAppUrl` param unless you have a deliberate override need — see **Portal app links (`document.referrer`)** under **Implement the widget**.
+
+**Iframe wrapper:** Port already shows the plugin **title** and **description** around the widget. **Do not** render the same title, subtitle, or long marketing description again inside the iframe — use the pixel budget for the actual UI (filters, content, actions). Short in-widget section headings for structure are fine.
 
 ## Bringing an existing plugin up to standard
 
@@ -49,7 +53,7 @@ Use this path when the goal is **not** greenfield scaffolding but to **audit and
 ### Workflow
 
 1. **Read** — `README.md`, `upload-params.json`, `package.json` (`engines`, dependencies), `src/types.ts`, host hook (`usePostMessageData` / `usePortPluginData`), main UI entry, any API modules, `webpack.config.js`, root CSS.
-2. **Gap analysis** — Compare against §8 README order, params guidance in **§5 Define parameters (`upload-params.json`)**, **Theming**, **Build & deploy**, and [widget-conventions.md](references/widget-conventions.md) / [plugin-architecture.md](references/plugin-architecture.md).
+2. **Gap analysis** — Compare against §8 README order, params guidance in **§5 Define parameters (`upload-params.json`)**, **Params vs Port API**, **Portal app links (`document.referrer`)**, **Theming**, **responsive layout** / **no duplicate title or description** under **Implement the widget**, **Build & deploy**, and [widget-conventions.md](references/widget-conventions.md) / [plugin-architecture.md](references/plugin-architecture.md).
 3. **Prioritize** — Correctness first (Port API request shapes, token usage, theme), then operator docs (README, param table), then polish (badges, screenshots, structure tree).
 4. **Patch** — Keep diffs focused: bump SDK with hook changes; keep `PluginConfig` and `upload-params.json` in lockstep; rewrite README sections rather than deleting useful catalog/integration detail.
 5. **Verify** — `npm ci` / `npm install`, `npm run build`, smoke in **Local development** mode and/or in Port; update the **repo-level** widgets table row (step 7 under scaffolding) if the public description or behaviour changed materially.
@@ -63,6 +67,9 @@ Use this path when the goal is **not** greenfield scaffolding but to **audit and
 - [ ] **Entity search** bodies use `{ query: { combinator, rules } }` where applicable; errors surfaced with response body text.
 - [ ] **`npm run build`** succeeds; **`dist/index.html`** is the upload artifact.
 - [ ] **Persistence:** Meaningful saved state uses the Port API where feasible; browser storage only when it is intentionally local-only (see **Data Persistence** in this skill).
+- [ ] **Layout:** Responsive behaviour verified (wide layout and narrow grid cell); root fills available iframe space; no duplicate plugin title/description inside the iframe (see **Responsive layout** / **No duplicate title or description** under **Implement the widget**).
+- [ ] **Portal links:** User-facing URLs use **`document.referrer`** origin with **`https://app.port.io`** fallback; entity pages use **`{origin}/{blueprint}Entity?identifier={entityId}`**; not `portApiBaseUrl` and not a hardcoded region unless documented.
+- [ ] **Params vs API:** Catalog lists and blueprint shape come from the Port API where possible; `upload-params.json` only scopes the widget; **relations** resolved from **`PLUGIN_DATA.entity`** and **`relatedTo` / `entities/search`** before optional string overrides; operators are not asked to type identifiers that could be blueprint pickers, defaults, or derived from context + **`GET /v1/blueprints/{identifier}`**.
 
 ## CRITICAL: Check for Reusable Implementations FIRST
 
@@ -134,7 +141,7 @@ Always **explain your decision** to the user: which blueprints you found, why th
 Apply the blueprint strategy from Step 4:
 
 **If using an existing blueprint + existing properties:**
-- Reference the blueprint identifier directly in `upload-params.json` (type `"blueprint"`)
+- Scope the widget with **`type: "blueprint"`** in `upload-params.json` (or rely on **`PLUGIN_DATA.entity.blueprint`** when the widget is entity-only) — avoid free-text blueprint IDs
 - No catalog changes required; document which blueprint is expected and why in the widget README
 
 **If using an existing blueprint + new property:**
@@ -144,7 +151,7 @@ Apply the blueprint strategy from Step 4:
   |-----------|--------------|------|----------|-------------|
   | `my-blueprint` | `resolvedAt` | `datetime` | No | When the item was resolved |
 
-- Expose the property key as a configurable `string` param so admins can align it if their instance uses a different name
+- Expose the property key as an optional **`string`** plugin param (widget-specific name, e.g. `dueDateProperty`) so admins can point at a different field; **default in code** to the property the widget was designed for (e.g. `resolvedAt`) when the param is blank
 
 **If creating a new blueprint:**
 - Present the full blueprint schema as tables in the README **Prerequisites** section, e.g.:
@@ -193,10 +200,9 @@ The steps below use **sample folder and param names** for clarity. In a real pro
 #### Example 1: Request for "comment widget on tasks"
 ```
 1. Check README → `task-comment-chat` exists
-2. Read upload-params.json → Uses commentBlueprint, taskRelation, commentorRelation
+2. Read upload-params.json → Likely scopes with commentBlueprint; relation to parent may still exist as optional overrides in older plugins
 3. Decision: Widget already exists
-4. Response: "The task-comment-chat widget already implements this. It's configurable 
-   via commentBlueprint, taskRelation, and other parameters. Here's how to configure it..."
+4. Response: "The task-comment-chat widget already implements this. Configure commentBlueprint (and any other blueprint pickers). Prefer resolving the parent link from PLUGIN_DATA.entity and/or relatedTo search — only use relation string params when the widget cannot infer the link from context or the search API."
 ```
 
 #### Example 2: Request for "full project management dashboard with tasks, comments, and milestones"
@@ -245,10 +251,13 @@ Sample names in this skill are **illustrative**; blueprint identifiers and relat
 
 1. **Survey existing `upload-params.json` files** in the project before inventing a second param for the same concept.
 2. **Name params by semantic role** (what the value *means* in your UI), not by incidental sample data.
-3. **Prefer Port’s native `type: "blueprint"`** when the admin should pick a blueprint — see [Define parameters](#5-define-parameters-upload-paramsjson). Use `string` (and similar) for relation identifiers, property keys, labels, and other non-blueprint configuration.
+3. **Prefer Port’s native `type: "blueprint"`** when the admin should pick a blueprint — see [Define parameters](#5-define-parameters-upload-paramsjson). Use **`string`** (and similar) only for values that are **not** “pick a blueprint” and **cannot** be inferred from host context plus `GET /v1/blueprints` / `GET /v1/blueprints/{identifier}` (see **Params vs Port API — minimize operator typing** below).
 4. **Composite widgets:** list related existing widgets, reuse compatible param shapes, and document lineage in the PR.
 5. **Runtime data always via Port API** — entity lists, details, and writes use `fetch` (or your HTTP client) against `portApiBaseUrl` with the host token; never substitute MCP or hard-coded catalog snapshots for live reads.
 6. **Persist meaningful state through the Port API when it should follow the user or org** — for example after reload, on another device or browser, or when visibility should respect Port permissions. Use `localStorage` / `sessionStorage` only for intentionally local-only or ephemeral UI; see **Data Persistence — Prefer Port Entities over localStorage** below.
+7. **Responsive iframe UI** — layout uses **all available iframe width and height** (full column or compact tile); avoid fixed large min-widths that force horizontal scroll in small tiles.
+8. **No duplicate Port chrome** — do not print the plugin’s Port **title** or **description** inside the widget body; Port already surfaces them outside the iframe.
+9. **Portal links via `document.referrer`** — build in-app URLs from the embedding Port page’s origin; default **`https://app.port.io`** when running outside Port (local dev). Entity pages: **`{origin}/{blueprint}Entity?identifier={entityId}`**. Never use `portApiBaseUrl` for user-facing links.
 
 ### Illustrated examples
 
@@ -305,6 +314,7 @@ User requests a widget
 **Port (authoritative):**
 
 - [Plugins — Port Docs](https://docs.getport.io/customize-pages-dashboards-and-plugins/plugins)
+- [Get all blueprints](https://docs.getport.io/api-reference/get-all-blueprints) / [Get a blueprint](https://docs.getport.io/api-reference/get-a-blueprint) — runtime catalog shape for widgets
 - [`@port-labs/plugins-sdk` on npm](https://www.npmjs.com/package/@port-labs/plugins-sdk)
 - [`@port-labs/port-plugins-cli` on npm](https://www.npmjs.com/package/@port-labs/port-plugins-cli)
 
@@ -334,6 +344,7 @@ Before proceeding with scaffolding, complete this checklist in order:
   - [ ] B) Use existing blueprint + new property (list changes in a Prerequisites table in README)
   - [ ] C) Create new blueprint (list full schema in a Prerequisites table in README, expose as `type: "blueprint"` param)
 - [ ] If reusing blueprint params from an existing widget, document which widget they come from
+- [ ] Prefer **Port API** for catalog shape and **native `blueprint` params** for scope; avoid new string params that duplicate data from **`GET /v1/blueprints`** / **`GET /v1/blueprints/{identifier}`** or **`PLUGIN_DATA.entity`**; for **relations**, use **`entity` + `relatedTo` / `entities/search`** before relation string overrides
 
 **Only proceed to implementation once both the widget strategy and blueprint strategy are decided.**
 
@@ -349,21 +360,21 @@ grep -r "comment" README.md
 
 # 2. Check its blueprint usage
 cat task-comment-chat/upload-params.json
-# → Uses: commentBlueprint, taskRelation, commentorRelation, messageProperty, etc.
+# → Likely: commentBlueprint + optional legacy string params for relations/content
 
 # 3. Check its flexibility
 cat task-comment-chat/src/types.ts
-# → taskRelation is configurable (can point to any entity type, not just tasks)
+# → Prefer: parent link from entity.relations / relatedTo search; string relation params only if the implementation still requires overrides
 
 # Decision: Reuse existing widget!
 ```
 
 **Response to user:**
-> "The `task-comment-chat` widget already implements comment functionality in a generic way. 
+> "The `task-comment-chat` widget already implements comment functionality in a generic way.
 > You can reuse it for bug reports by configuring:
-> - `commentBlueprint`: Your comment blueprint ID
-> - `taskRelation`: Set to the relation name from comments to bugs (e.g., 'bug' or 'bugReport')
-> 
+> - `commentBlueprint`: pick your comment blueprint in the widget settings (native blueprint control)
+> - **Linking comments to the current bug:** rely on **entity context** (`PLUGIN_DATA.entity`) and **`POST .../entities/search`** with a **`relatedTo`** rule to the current entity first. Treat any **`taskRelation`-style string param** as a **last-resort override** only when context + search cannot express the join.
+>
 > No new development needed!"
 
 #### Example B: Request is "Create a sprint planning dashboard with tasks and team velocity"
@@ -416,10 +427,10 @@ grep -r "service" */upload-params.json
 **Response to user:**
 > "No existing widgets handle service monitoring. I'll scaffold a new widget from templates
 > that will introduce:
-> - `serviceBlueprint`: For service entities
-> - `healthProperty`: For health status
-> - `metricsRelation`: For related metrics/incidents
-> 
+> - `serviceBlueprint`: For service entities (native `blueprint` param)
+> - `healthProperty`: For health status (prefer inferring from **`GET /v1/blueprints/{identifier}`** when one clear property fits; otherwise a narrow param)
+> - **Related metrics/incidents:** resolve via **`entity.relations` / `relationsObjects`** on the service entity page, or **`entities/search`** (`relatedTo` / relation rules), not a dedicated “metrics relation” string param unless multiple relations are indistinguishable without an override
+>
 > This will be a completely new widget."
 
 ## Code Reuse Beyond Blueprints
@@ -452,7 +463,9 @@ When examining existing widgets, look for:
 
 ```typescript
 // Generic utility functions (REUSABLE)
-function getUserEmail(entity: Entity, relation: string): string | null {
+// Prefer walking entity.relationsObjects (or schema from GET blueprint) to find the user link;
+// pass an explicit relation key only when context + catalog cannot disambiguate.
+function getUserEmail(entity: Entity, userRelationKey?: string): string | null {
   // Can be copied to any widget that needs user email extraction
 }
 
@@ -606,6 +619,7 @@ src/
     comments.ts            # Port API calls, isolated from UI
     entities.ts
   utils/
+    portalUrl.ts         # getPortalOrigin() from document.referrer; default app.port.io
     formatters.ts          # Pure helpers — dates, strings, etc.
   App.css
 ```
@@ -631,6 +645,70 @@ In `App.tsx`:
 
 - When search results must respect **dashboard page filters**, merge with **`mergePageFilters`** from **`@port-labs/plugins-sdk`** (see npm docs).
 - Remove the entity guard block if the widget is for dashboards (not entity pages).
+
+#### Responsive layout
+
+Widgets render both as **large panels** (full column width) and as **small dashboard tiles**. Design the root layout to **use all available space** in the iframe — width **and** height — not a fixed-size card floating in empty chrome.
+
+- Chain **`height: 100%`** / **`min-height: 100%`** on `html`, `body`, and `#plugin-root` (see **Critical Configuration Requirements**); make the app shell **`display: flex; flex-direction: column; min-height: 0`** so main content can grow with **`flex: 1`**.
+- Prefer **flex** / **CSS grid** with **`minmax(0, 1fr)`** (or equivalent) so children shrink instead of overflowing; avoid **`min-width`** on the root that forces horizontal scroll in narrow cells.
+- Use **`width: 100%`**, **`box-sizing: border-box`**, and avoid **`max-width`** on the root that leaves unused margin in a full-width column unless the design intentionally caps content width inside a centered inner wrapper.
+- Use **`overflow-x: auto`** only on intentional inner regions (for example wide tables), not on the whole page.
+- Scale **typography and spacing** down slightly at small widths (`clamp()`, media queries, or container queries) so dense tiles stay readable.
+- Match **height** expectations from [plugin-architecture.md](references/plugin-architecture.md) (root fills the iframe where Port expects it).
+
+#### No duplicate title or description in the iframe
+
+Port’s product UI already shows the plugin **title** and **description** next to or above the iframe. **Do not** repeat them as a big `<h1>`, hero text, or “about this widget” block inside `App.tsx` — it wastes space and reads as duplicate chrome. Start the iframe content at the **functional** UI (toolbar, list, chart, form). Short **in-content** labels (“Filters”, “Open items”) are still appropriate.
+
+#### Portal app links (`document.referrer`)
+
+Widgets often link users to **entity pages**, **dashboard pages**, or **self-service actions** inside Port. Those URLs live on the **portal app** (e.g. `https://app.port.io`, `https://app.us.port.io`, or a customer vanity host) — **not** on `portApiBaseUrl` (`https://api.getport.io`, etc.).
+
+**Rules:**
+
+| Use | For |
+|-----|-----|
+| **`portApiBaseUrl`** + bearer token | REST API calls (`fetch` to `/v1/...`) |
+| **`document.referrer`** → portal **origin** | `<a href>`, `window.open`, “Open in Port” links |
+| **`https://app.port.io`** (default origin) | When `document.referrer` is empty — typical in **local dev** outside the Port iframe |
+
+**Do not** add a `portalAppUrl` (or similar) plugin param for the common case — the referrer already reflects the org’s region and hostname. Reserve an optional override param only when you must support environments where referrer is unreliable.
+
+Put helpers in **`src/utils/portalUrl.ts`** (or equivalent):
+
+```ts
+const DEFAULT_PORTAL_ORIGIN = "https://app.port.io";
+
+/** Portal app origin for in-app links — not the API host. */
+export function getPortalOrigin(): string {
+  try {
+    const ref = document.referrer?.trim();
+    if (ref) return new URL(ref).origin;
+  } catch {
+    /* invalid referrer */
+  }
+  return DEFAULT_PORTAL_ORIGIN;
+}
+
+/** Entity page — Port portal route: {blueprint}Entity?identifier={entityId} */
+export function buildEntityPageUrl(
+  blueprintIdentifier: string,
+  entityIdentifier: string
+): string {
+  const origin = getPortalOrigin();
+  const path = `${encodeURIComponent(blueprintIdentifier)}Entity`;
+  const qs = new URLSearchParams({ identifier: entityIdentifier });
+  return `${origin}/${path}?${qs.toString()}`;
+}
+```
+
+**Canonical entity-page shape:** `{portalOrigin}/{blueprintIdentifier}Entity?identifier={entityIdentifier}` — for example `https://app.port.io/serviceEntity?identifier=my-service`.
+
+- Parse **`document.referrer`** with `new URL(document.referrer).origin` so EU/US and custom domains follow the user’s session automatically.
+- **Encode** the blueprint identifier in the path segment (`{blueprint}Entity`) and the entity identifier in the **`identifier`** query param (`URLSearchParams` handles encoding).
+- In **dev mock**, links may point at `https://app.port.io` until you test inside Port’s iframe (where referrer is set).
+- If the SDK exposes link helpers (see [plugins-sdk on npm](https://www.npmjs.com/package/@port-labs/plugins-sdk)), prefer them when they align with this behaviour; otherwise use the pattern above.
 
 #### Searching blueprint entities (correct endpoint)
 
@@ -667,14 +745,16 @@ if (!response.ok) {
 
 ### 5. Define parameters (`upload-params.json`)
 
+**Goal:** the smallest set of params that still scopes the widget for your org. **Catalog data** (blueprint list, a blueprint’s properties and relations, labels for keys, which relations exist) belongs in **`GET /v1/blueprints`** ([get all blueprints](https://docs.getport.io/api-reference/get-all-blueprints)) and **`GET /v1/blueprints/{identifier}`** ([get a blueprint](https://docs.getport.io/api-reference/get-a-blueprint)) — fetch at runtime and map to UI. **Params** should narrow behaviour: e.g. which blueprint(s) the widget operates on, optional overrides when the API and `PLUGIN_DATA` cannot disambiguate, feature flags — not a hand-typed mirror of the whole catalog. **Do not** add a portal base URL param when **`document.referrer`** + **`https://app.port.io`** fallback suffice (see **Portal app links**).
+
 Each key is a param name; each value describes how it appears in the Port UI. Allowed **`type`** values (see [port-plugins-cli — Plugin metadata reference](https://www.npmjs.com/package/@port-labs/port-plugins-cli)): **`string`**, **`number`**, **`boolean`**, **`object`**, **`array`**, **`blueprint`**.
 
 ```json
 {
-  "exampleRelation": {
+  "relation": {
     "type": "string",
-    "isRequired": true,
-    "label": "Relation identifier on the parent entity"
+    "isRequired": false,
+    "label": "Override relation key only if parent link cannot use entity context + relatedTo search"
   }
 }
 ```
@@ -695,8 +775,10 @@ export type BlueprintParam = { identifier: string; title: string };
 
 export type PluginConfig = {
   discussionBlueprint: BlueprintParam; // NOT string
-  parentRelation?: string;             // plain string — relation key
-  bodyProperty?: string;               // plain string — property key
+  /** Last resort after `entity.relations` / `relatedTo` search / blueprint GET — see Prefer discovering relations */
+  parentRelation?: string;
+  bodyProperty?: string;               // optional override — prefer inferring from blueprint schema
+  dueDateProperty?: string;            // optional override when widget reads a datetime field
 };
 ```
 
@@ -720,13 +802,41 @@ const res = await fetch(
 }
 ```
 
-Use **`string`** (and other scalar types) for **relation identifiers**, **property keys**, enums, labels, URLs, and anything that is **not** “choose a blueprint from the catalog.”
+Use **`string`** (and other scalar types) for **property keys**, enums, labels, and anything that is **not** “choose a blueprint from the catalog.” **Portal base URLs** come from **`document.referrer`** (default **`https://app.port.io`**), not from a string param — see **Portal app links**.
+
+#### Datetime / date blueprint properties
+
+When the widget **reads, filters, sorts, or displays** a blueprint **`datetime`** (or date-like) property, add an **optional `string` param** so operators can point at a different field name in their catalog. **Do not** require it when a single conventional default exists.
+
+| Concern | Guidance |
+|---------|----------|
+| **Param name** | Semantic and widget-specific — e.g. `dueDateProperty`, `createdAtProperty`, `resolvedAtProperty` |
+| **Default** | Hard-code the property the widget was built for (e.g. `dueDate`, `createdAt`) when the param is empty |
+| **Label** | State the default in the Port UI label — e.g. `Due date property (default: dueDate)` |
+| **Validation** | Optionally confirm the key exists on the configured blueprint via **`GET /v1/blueprints/{identifier}`** and that its type is `datetime` |
+
+```json
+{
+  "dueDateProperty": {
+    "type": "string",
+    "isRequired": false,
+    "label": "Datetime property for due date (default: dueDate)"
+  }
+}
+```
+
+```typescript
+const dueDateKey = config.dueDateProperty?.trim() || "dueDate";
+const raw = entity.properties?.[dueDateKey];
+```
+
+Same pattern applies for **deadlines**, **SLA timestamps**, **iteration end dates**, and any other date-driven behaviour — one optional param per distinct date role in the widget, each with its own documented default.
 
 ### Blueprint Parameter Design for Reusability
 
 Design `upload-params.json` to be **composable inside your organization**:
 
-**Good: blueprint picker + configurable keys**
+**Good: blueprint picker + optional overrides only when needed**
 ```json
 {
   "discussionBlueprint": {
@@ -734,20 +844,17 @@ Design `upload-params.json` to be **composable inside your organization**:
     "isRequired": true,
     "label": "Discussion / comment blueprint"
   },
-  "parentRelation": {
-    "type": "string",
-    "isRequired": false,
-    "label": "Relation from discussion entity to parent (default: parent)"
-  },
   "bodyProperty": {
     "type": "string",
     "isRequired": false,
-    "label": "Property key for message text (default: body)"
+    "label": "Property identifier for message text (default: body)"
   }
 }
 ```
 ✅ Native blueprint selection in Port  
-✅ Relation / property identifiers stay explicit and reusable across plugins
+✅ Parent / peer links: prefer **`PLUGIN_DATA.entity`**, then **`relatedTo`** (or equivalent) on **`entities/search`**, then catalog inference — optional **`string`** overrides only when those are insufficient  
+✅ Optional property keys — prefer inferring from **`GET /v1/blueprints/{identifier}`** and host **`entity`** so operators leave them blank when defaults apply  
+✅ **Datetime fields** the widget depends on — optional **`string`** param per date role with a **code default** (see **Datetime / date blueprint properties**)
 
 **Avoid:** encoding “which blueprint” only as an unstructured string when a **`blueprint`** param is clearer for admins — unless you have a deliberate reason (e.g. dynamic lists beyond the blueprint picker).
 
@@ -766,15 +873,22 @@ Design `upload-params.json` to be **composable inside your organization**:
 
 **Design principles:**
 1. **Name parameters by semantic role** (e.g. `discussionBlueprint`, not `blueprint1`).
-2. **Use `type: "blueprint"`** for blueprint selection (subject to the five-param cap); use **`string`** for relation/property identifiers and similar.
-3. **Make property/relation names configurable** when they might vary between catalogs.
+2. **Use `type: "blueprint"`** for blueprint selection (subject to the five-param cap); use **`string`** only for relation/property identifiers (and similar) when they **cannot** be inferred from **`PLUGIN_DATA`**, **`POST .../entities/search`** (e.g. **`relatedTo`**), blueprint **GET**, and documented defaults — **relations: context + search before params** (see **Prefer discovering relations**).
+3. **Expose property/relation string params as a last resort** — try schema-driven defaults first; keep params for true per-deployment variance. **Exception:** widgets that use a blueprint **datetime** property should expose an optional **`string`** override for that field (with a widget-specific default) — see **Datetime / date blueprint properties**.
 4. **Document compatibility** with sibling widgets in the same codebase in the label or PR when it helps operators.
 5. **Separate concerns** — one param per concept, not one opaque blob.
 
 
 ### Prefer discovering relations from the entity or Port API
 
-**Avoid asking admins to type relation keys as string params when the widget already has the entity in context or can query the Port API.** Hard-coded or manually entered relation keys are fragile — they break silently when catalog structure changes.
+**Default order (highest priority first):** resolve relations from **host context** and **entity search** before introducing or relying on a **plugin string param** for a relation key.
+
+1. **`PLUGIN_DATA.entity`** — use `entity.relations` / `entity.relationsObjects` when the widget runs on an entity page and the link is already materialized on the host payload.
+2. **`POST /v1/blueprints/{blueprint}/entities/search`** — use rules such as **`relatedTo`** (and other supported relation filters) so Port resolves “related to this entity” **without** the admin naming a relation identifier, when the query model supports your case.
+3. **`GET /v1/blueprints/{identifier}`** — inspect relation definitions in code to pick the right key, enumerate candidates, or match by target blueprint — still **no operator-facing param** if logic can choose unambiguously.
+4. **Optional `string` plugin param** — **last resort** when 1–4 cannot disambiguate across deployments; use a strong default and clear label (“override only if needed”).
+
+**Avoid asking admins to type relation keys as string params when steps 1–2 already give you the graph.** Hard-coded or manually entered relation keys are fragile — they break silently when catalog structure changes.
 
 #### When you have the host `entity` object
 
@@ -802,10 +916,10 @@ const assigneeId = pluginData.entity?.relations?.assignee;
 
 #### When you need to find related entities via Port API
 
-Use `POST /v1/blueprints/{blueprint}/entities/search` with a relation filter instead of asking admins to input identifiers:
+Use `POST /v1/blueprints/{blueprint}/entities/search` with a relation filter rule **before** requiring a relation-key param — this finds related rows by **current entity identity**, not by typing a relation field name in `upload-params.json`:
 
 ```typescript
-// ✅ Find all comments whose "task" relation points to the current entity
+// ✅ Find all comments linked to the current entity via search (preferred over a "parent relation" param when this suffices)
 const body = {
   query: {
     combinator: "and",
@@ -830,13 +944,15 @@ const res = await fetch(
 
 #### Decision guide for relation params
 
-| Situation | Preferred approach |
-|-----------|-------------------|
-| Widget is on an entity page — entity is in `PLUGIN_DATA` | Read `entity.relations[key]` or `entity.relationsObjects[key]` directly |
-| Relation key is predictable / always the same | Hard-code the key in widget logic; don't expose as a param |
-| Relation key varies per deployment | Expose as a `string` param (it's a key, not a blueprint) |
-| Need to find all related entities | Use `/entities/search` with a `relatedTo` rule |
-| Relation target blueprint is unknown | Enumerate `entity.relations` values and fetch each entity |
+Use this table **after** trying **entity context** (row 1) and **`entities/search`** (row 2). Treat a **`string` relation param** as the **fallback** column, not the default design.
+
+| Situation | Preferred approach | Relation **string** param |
+|-----------|-------------------|---------------------------|
+| Widget is on an entity page — entity is in `PLUGIN_DATA` | Read `entity.relations` / `entity.relationsObjects` | Only if host payload omits the link you need |
+| Need “all rows related to this entity” (e.g. comments on this bug) | **`POST .../entities/search`** with **`relatedTo`** (or supported relation rules) scoped to the comment (or child) blueprint | Only if the query API cannot express the join for your catalog |
+| Relation key varies per deployment | Derive candidates from **`GET /v1/blueprints/{identifier}`** + `PLUGIN_DATA`, then pick in code | Optional override with default |
+| Relation key is predictable / always the same | Hard-code the key in widget logic; don't expose as a param | N/A |
+| Relation target blueprint is unknown | Enumerate `entity.relations` values and fetch each entity | Rarely needed |
 
 ### 6. Document blueprint reuse
 
@@ -948,6 +1064,8 @@ in sync. The template CSS (`template-App.css`) maps those tokens to your own var
    **`theme.css`**.
 4. **Optional:** set **`document.documentElement.style.colorScheme`** from **`theme.mode`**
    (`"light"` / `"dark"`) so native form controls match the portal.
+
+See also **Responsive layout** under **Implement the widget** — theming and layout constraints both affect how the widget reads in wide and narrow hosts.
 
 **Legacy widgets** that implement `postMessage` manually must either adopt the SDK or parse
 **`event.data.theme`** and inject **`theme.css`** themselves — see the **Theming** section in
@@ -1116,8 +1234,11 @@ if (blueprint === "task") {
 
 **Good:**
 ```typescript
-// Generic logic that works with any blueprint
-const relatedEntity = entity.relations?.[config.taskRelation];
+// Prefer entity context + search; avoid indexing relations by admin-supplied key first.
+// 1) From host: entity.relationsObjects, or
+// 2) From API: entities/search with relatedTo to the current entity.
+// Use a config relation key only as an optional override when 1–2 cannot work.
+const parentFromHost = entity.relationsObjects?.[resolvedParentRelationKey];
 ```
 
 ### ✅ Do: Design for Extension
@@ -1247,3 +1368,4 @@ If the widget needs to store records (e.g. comments, bookmarks, reactions):
 | Widget ignores Port theme | `applyThemeCss()` not called or manual `postMessage` hook omits `theme` | Use `@port-labs/plugins-sdk` and call `applyThemeCss()` when `theme.css` updates; or inject `event.data.theme.css` yourself |
 | Theme stuck after portal switch | Effect only runs once | Depend on SDK `applyThemeCss` (it changes when `theme.css` changes) or re-inject on each `PLUGIN_DATA` |
 | Colours look wrong in dev | Port CSS vars not injected | CSS must provide local fallbacks: `var(--text-high, #111827)` |
+| Links open wrong region/host | Hardcoded `app.port.io` or used `portApiBaseUrl` for UI links | Use `new URL(document.referrer).origin` with fallback `https://app.port.io`; keep API on `portApiBaseUrl` only |
