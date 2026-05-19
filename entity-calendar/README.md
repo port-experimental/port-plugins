@@ -6,7 +6,8 @@ Designed for **dashboard** pages (not entity-scoped).
 
 ## Preview image
 
-N/A — add a screenshot under `docs/` after first deploy in Port and link it here.
+<img width="653" height="623" alt="image" src="https://github.com/user-attachments/assets/7afdf1eb-282b-4d3c-b796-4f2744927a42" />
+
 
 ## Features
 
