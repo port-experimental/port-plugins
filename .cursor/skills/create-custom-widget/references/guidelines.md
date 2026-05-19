@@ -25,9 +25,9 @@ Widgets run in Port’s iframe with user and integration data. **Never** assign 
 **Bad:**
 ```json
 {
-  "availableBlueprints": { "type": "array", "label": "Blueprints to show" },
-  "parentRelation": { "type": "string", "label": "Parent relation key" },
-  "statusProperty": { "type": "string", "label": "Status field", "isRequired": true }
+  "availableBlueprints": { "type": "array", "isRequired": true, "label": "Blueprints to show" },
+  "parentRelation": { "type": "string", "isRequired": false, "label": "Parent relation key" },
+  "statusProperty": { "type": "string", "isRequired": true, "label": "Status field" }
 }
 ```
 when the widget could call `GET /v1/blueprints`, `GET /v1/blueprints/{identifier}`, read `PLUGIN_DATA.entity`, or resolve relations via `entity.relations` / `relatedTo` search.
@@ -51,10 +51,17 @@ when the widget could call `GET /v1/blueprints`, `GET /v1/blueprints/{identifier
   }
 }
 ```
+(missing **`isRequired`**; label too long)
 
 **Good:**
 ```json
-{ "dueDateProperty": { "type": "string", "label": "Due date property" } }
+{
+  "dueDateProperty": {
+    "type": "string",
+    "isRequired": false,
+    "label": "Due date property"
+  }
+}
 ```
 Document default `dueDate`, override behaviour, and validation in README **Widget parameters** and **Prerequisites**.
 
@@ -70,15 +77,49 @@ Document default `dueDate`, override behaviour, and validation in README **Widge
 
 **Good:** Skeleton or spinner while loading; friendly empty state with next step; actionable error copy (retry, check catalog); flex/grid layout that fills the iframe; `applyThemeCss()` and CSS variables with fallbacks (`var(--text-high, #111827)`). See [UX and UI](scaffolding-and-implementation.md#ux-and-ui) in scaffolding-and-implementation.md.
 
+### ❌ Don't: Repeat plugin title, description, or icon in the iframe
+
+**Bad:** Header inside the widget with the same name as the Port plugin, a subtitle repeating the upload description, or a decorative icon matching the plugin’s Port icon.
+
+**Good:** Start at functional UI (tabs, lists, filters). Port’s wrapper already shows registration metadata.
+
+### ❌ Don't: Use emoji or omit param fields
+
+**Bad:**
+```tsx
+<button>⭐ Favorite</button>
+```
+```json
+{ "dueDateProperty": { "type": "string", "label": "Due date property" } }
+```
+(missing **`isRequired`**; emoji instead of an icon)
+
+**Good:**
+```tsx
+// <i> + icon font, or an icon-library component — not emoji
+<button type="button" aria-label="Favorite">
+  <i className="your-icon-class" aria-hidden="true" />
+</button>
+```
+```json
+{
+  "dueDateProperty": {
+    "type": "string",
+    "isRequired": false,
+    "label": "Due date property"
+  }
+}
+```
+
 ### ❌ Don't: Create Duplicate Blueprints
 
 **Bad:**
 ```json
 // widget-1/upload-params.json
-{ "commentBlueprintId": { "type": "string", "label": "Comments" } }
+{ "commentBlueprintId": { "type": "string", "isRequired": true, "label": "Comments" } }
 
 // widget-2/upload-params.json
-{ "discussionBlueprintId": { "type": "string", "label": "Discussions" } }
+{ "discussionBlueprintId": { "type": "string", "isRequired": true, "label": "Discussions" } }
 ```
 Both represent the same concept (comments/discussions) but use different parameter names.
 
@@ -121,8 +162,8 @@ Both represent the same concept (comments/discussions) but use different paramet
 **Bad:**
 ```json
 {
-  "parentRelation": { "type": "string", "label": "Relation to parent entity" },
-  "taskRelation": { "type": "string", "label": "Relation to task" }
+  "parentRelation": { "type": "string", "isRequired": true, "label": "Relation to parent entity" },
+  "taskRelation": { "type": "string", "isRequired": true, "label": "Relation to task" }
 }
 ```
 Operators must type catalog structure that should live in **blueprint relations** and README tables.

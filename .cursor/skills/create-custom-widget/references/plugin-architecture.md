@@ -180,7 +180,13 @@ if (!response.ok) {
 | `array` | JSON array |
 | `blueprint` | Blueprint identifier picker |
 
-Schema per parameter:
+Schema per parameter — **all three fields are required** on every param:
+
+| Field | Required | Purpose |
+|-------|----------|---------|
+| `type` | yes | `string`, `number`, `boolean`, `object`, `array`, or `blueprint` |
+| `isRequired` | yes | `true` or `false` |
+| `label` | yes | Short label in Port’s widget configuration UI |
 
 ```json
 {
@@ -205,6 +211,8 @@ const value = params["paramKey"]?.value as string ?? "defaultValue";
 - **No unsafe HTML** — do not use `innerHTML`, `outerHTML`, or `dangerouslySetInnerHTML` for entity properties, comments, or other dynamic strings. Render with React text and components; use a vetted sanitizer only when rich HTML is an explicit, documented requirement.
 - **Params vs runtime** — do not add `upload-params.json` entries for blueprint lists, relation keys, entity inventories, or full property schemas; load them with `GET /v1/blueprints`, `GET /v1/blueprints/{identifier}`, `PLUGIN_DATA.entity`, and `POST .../entities/search`. Params only scope what the host and API cannot infer.
 - **Product-quality UI** — loading, empty, and error states; `applyThemeCss()`; full-iframe responsive layout. See **UX and UI** in [scaffolding-and-implementation.md](scaffolding-and-implementation.md).
+- **No duplicate Port chrome** — do not render the plugin’s Port **title**, **description**, or **icon** inside the iframe; Port’s wrapper already shows them.
+- **Icons** — no hardcoded emoji; use **`<i>`** with icon classes or a vetted icon library when the UI needs icons (see [scaffolding-and-implementation.md](scaffolding-and-implementation.md) (**Icons (no hardcoded emoji)**)).
 
 ## Theming — Inheriting Port's Visual Style
 

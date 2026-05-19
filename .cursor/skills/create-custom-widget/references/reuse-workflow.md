@@ -225,8 +225,10 @@ Sample names in this skill are **illustrative**; blueprint identifiers and relat
 7. **Safe rendering** — no `innerHTML`, `outerHTML`, or `dangerouslySetInnerHTML` for dynamic content; React elements and text only unless a documented sanitizer exception applies.
 8. **Persist meaningful state through the Port API when it should follow the user or org** — for example after reload, on another device or browser, or when visibility should respect Port permissions. Use `localStorage` / `sessionStorage` only for intentionally local-only or ephemeral UI; see **Data Persistence — Prefer Port Entities over localStorage** below.
 9. **Responsive iframe UI** — layout uses **all available iframe width and height** (full column or compact tile); avoid fixed large min-widths that force horizontal scroll in small tiles.
-10. **No duplicate Port chrome** — do not print the plugin’s Port **title** or **description** inside the widget body; Port already surfaces them outside the iframe.
-11. **Portal links via `document.referrer`** — build in-app URLs from the embedding Port page’s origin; default **`https://app.port.io`** when running outside Port (local dev). Entity pages: **`{origin}/{blueprint}Entity?identifier={entityId}`**. Never use `portApiBaseUrl` for user-facing links.
+10. **No duplicate Port chrome** — do not print the plugin’s Port **title**, **description**, or **icon** inside the widget body; Port’s iframe wrapper already surfaces them.
+11. **Icons** — no hardcoded emoji in widget UI; use **`<i>`** or an icon library when icons are needed (see [scaffolding-and-implementation.md](scaffolding-and-implementation.md) (**Icons (no hardcoded emoji)**)).
+12. **Param schema** — every `upload-params.json` param object includes **`type`**, **`isRequired`**, and **`label`** (all three required; no partial objects).
+13. **Portal links via `document.referrer`** — build in-app URLs from the embedding Port page’s origin; default **`https://app.port.io`** when running outside Port (local dev). Entity pages: **`{origin}/{blueprint}Entity?identifier={entityId}`**. Never use `portApiBaseUrl` for user-facing links.
 
 ### Illustrated examples
 

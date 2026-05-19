@@ -2,6 +2,6 @@
   "exampleParam": {
     "type": "string",
     "isRequired": true,
-    "label": "Example Parameter"
+    "label": "Example parameter"
   }
 }

@@ -31,13 +31,15 @@ Platform rules (CSP, upload limits, param metadata), SDK APIs, and CLI behavior 
 6. **Relation strategy before params** — while designing blueprints/properties, decide which **existing catalog relations** to use or which **new relations** to add so the widget can traverse the graph. After that, wire runtime code to **`PLUGIN_DATA.entity`** (`relations` / `relationsObjects`) and **`entities/search`** (`relatedTo` / relation rules). **Never** default to `string` params for relation identifiers (`parentRelation`, `taskRelation`, etc.).
 7. **Single-blueprint widgets** — when the widget is built for one subject blueprint (e.g. calendar on Task), treat that blueprint as the design default: use **`PLUGIN_DATA.entity.blueprint`** on entity pages; omit a `type: "blueprint"` param unless the same build must also run on dashboards without host entity context.
 8. **Cross-blueprint data via relations** — when the widget needs entities on another blueprint, rely on **catalog relations** between blueprints (and host/search resolution). **Before proposing a new relation**, inspect both blueprints’ schemas via MCP (`list_blueprints` with `identifiers`) — confirm an existing relation or target properties do not already satisfy the need. Document missing relations in README; add them via MCP when approved — do not ask operators to type relation keys in params.
-9. **Local dev outside Port** — keep **small, focused mock data** in `usePostMessageData.ts` (host context) and `src/dev/` or early returns in `api/` (API shapes) so `npm run dev` previews real UI without live tokens. Details: [scaffolding-and-implementation.md](references/scaffolding-and-implementation.md) (**Local dev mock data**).
+9. **Local dev outside Port** — always run `npm run dev` on **port 9000** (`devServer.port: 9000` in `webpack.config.js`; URL `http://localhost:9000`). Do not assign per-widget ports — Port’s **Local development** iframe mode expects 9000. Keep **small, focused mock data** in `usePostMessageData.ts` (host context) and `src/dev/` or early returns in `api/` (API shapes) so previews work without live tokens. Details: [scaffolding-and-implementation.md](references/scaffolding-and-implementation.md) (**Local dev mock data**).
 10. **Runtime data via Port HTTP API only** — `portApiBaseUrl` + bearer token from the host; MCP is for **design-time** catalog discovery in the IDE, not inside the iframe.
 11. **Minimize remaining params** — prefer `type: "blueprint"` only when the admin must **pick** a blueprint scope the widget cannot infer (e.g. child blueprint on a dashboard). Do **not** add params to list blueprints, entities, relations, or property keys — fetch those at runtime. Prefer schema defaults and **`GET /v1/blueprints/{identifier}`** before optional property-key `string` overrides.
-12. **Short param labels** — `upload-params.json` **`label`** values are short, simple, and meaningful (what the admin is choosing). Defaults, examples, and long explanations belong in the per-plugin README **Widget parameters** table — not in Port’s param label field.
-13. **README Port prerequisites** — document every **new or required Port instance** operators must create or configure before the widget works: blueprints, properties, **relations**, integrations, **automations**, **self-service actions (SSA)**, scorecards, pages, and similar. Use tables in README **Prerequisites**; do not rely on param labels to carry setup instructions.
-14. **Portal links** — origin from `document.referrer`, fallback `https://app.port.io`; never `portApiBaseUrl` for UI links.
-15. **No duplicate chrome** — Port shows plugin title/description outside the iframe; do not repeat them inside `App.tsx`.
+12. **Param schema** — every entry in `upload-params.json` must include **`type`**, **`isRequired`**, and **`label`** (no partial objects).
+13. **Short param labels** — **`label`** values are short, simple, and meaningful (what the admin is choosing). Defaults, examples, and long explanations belong in the per-plugin README **Widget parameters** table — not in Port’s param label field.
+14. **README Port prerequisites** — document every **new or required Port instance** operators must create or configure before the widget works: blueprints, properties, **relations**, integrations, **automations**, **self-service actions (SSA)**, scorecards, pages, and similar. Use tables in README **Prerequisites**; do not rely on param labels to carry setup instructions.
+15. **Portal links** — origin from `document.referrer`, fallback `https://app.port.io`; never `portApiBaseUrl` for UI links.
+16. **No duplicate chrome** — Port’s iframe wrapper already shows the plugin **title**, **description**, and **icon** from registration; **do not** add them inside the widget (`App.tsx`, headers, heroes). Build functional UI only (lists, filters, forms, charts). In-content labels and the **current entity** title are fine — they are not plugin registration metadata.
+17. **Icons in widget UI** — **never** hardcode emoji (Unicode symbols in JSX or strings). When icons are needed, use a vetted **icon library** (e.g. Lucide, react-icons) — not emoji.
 
 ## Overview
 
@@ -108,6 +110,7 @@ Use `upsert_blueprint` only when the user wants catalog changes applied via MCP.
 
 ### 4. Verify build and configuration
 
+- `npm run dev` → `http://localhost:9000` (`devServer.port: 9000` in `webpack.config.js`)
 - `npm run build` → artifact `dist/index.html`
 - Webpack `inject: "body"` and root `height: 100%` — [references/plugin-architecture.md](references/plugin-architecture.md) (Critical Webpack/CSS)
 - Entity search: `{ query: { combinator, rules } }` on `POST /v1/blueprints/{blueprint}/entities/search`
@@ -134,13 +137,15 @@ Before finishing: [references/guidelines.md](references/guidelines.md) (anti-pat
 | Portal URLs | `getPortalOrigin()` from `document.referrer`; `{origin}/{blueprint}Entity?identifier={id}` |
 | Blueprint params | `type: "blueprint"`; read `.identifier`; max **5** per plugin |
 | Relations | **Schema first:** MCP-inspect source + target blueprints before adding relations. **Catalog:** reuse or add blueprint relations; document in README. **No** relation-key `string` params by default. **Runtime:** `entity.relations` / `relationsObjects` → `relatedTo` search → blueprint GET using designed relation IDs → relation `string` param **only** as documented last-resort override |
-| Local dev | **Small mocks** in `usePostMessageData.ts` + `src/dev/` or `api/` early returns when `DEV_MOCK` — enough to render loading/empty/happy paths outside Port’s iframe |
+| Local dev | **`devServer.port: 9000`** always (`http://localhost:9000`); **small mocks** in `usePostMessageData.ts` + `src/dev/` or `api/` early returns when `DEV_MOCK` — enough to render loading/empty/happy paths outside Port’s iframe |
 | Subject blueprint | If widget targets one blueprint type, use **`PLUGIN_DATA.entity.blueprint`** + design default — skip blueprint param when not needed |
+| Param schema | Every param: **`type`**, **`isRequired`**, **`label`** |
 | Param labels | Short **`label`** in `upload-params.json`; defaults and detail in README **Widget parameters** |
 | README prerequisites | Tables for catalog **and** other Port setup (relations, automations, SSA, integrations, …) — see [readme-and-audit.md](references/readme-and-audit.md) |
 | Search | Nested `query`; not top-level `combinator`/`rules` |
 | Errors | Include full response body text |
-| Iframe UI | Full width/height; no duplicate plugin title/description |
+| Iframe UI | Full width/height; **no** plugin title, description, or icon inside the iframe |
+| Icons | icon library; **never** hardcoded emoji |
 | Persistence | Port entities/properties unless explicitly local-only UI state |
 
 ## Reference index

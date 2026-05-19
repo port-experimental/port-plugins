@@ -37,9 +37,8 @@ export function App() {
 
   return (
     <div className="shell">
-      {/* TODO: implement your widget UI */}
-      <h2>{entity.title ?? entity.identifier}</h2>
-      <pre>{JSON.stringify({ config }, null, 2)}</pre>
+      {/* Functional UI only — no plugin title, description, or icon; use <i> or icon lib, not emoji */}
+      <pre>{JSON.stringify({ config, entity: entity.identifier }, null, 2)}</pre>
     </div>
   );
 }

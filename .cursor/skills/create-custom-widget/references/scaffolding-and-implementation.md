@@ -17,7 +17,7 @@ Copy these from `.cursor/skills/create-custom-widget/assets/` — do not modify 
 
 | Source | Destination |
 |--------|------------|
-| `template-webpack.config.js` | `<widget>/webpack.config.js` |
+| `template-webpack.config.js` | `<widget>/webpack.config.js` — keep **`devServer.port: 9000`** (do not use per-widget ports) |
 | `template-tsconfig.json` | `<widget>/tsconfig.json` |
 | `template-index.html` | `<widget>/src/index.html` |
 | `template-index.tsx` | `<widget>/src/index.tsx` |
@@ -95,9 +95,21 @@ Widgets render both as **large panels** (full column width) and as **small dashb
 - Scale **typography and spacing** down slightly at small widths (`clamp()`, media queries, or container queries) so dense tiles stay readable.
 - Match **height** expectations from [plugin-architecture.md](plugin-architecture.md) (root fills the iframe where Port expects it).
 
-#### No duplicate title or description in the iframe
+#### No duplicate title, description in the iframe
 
-Port’s product UI already shows the plugin **title** and **description** next to or above the iframe. **Do not** repeat them as a big `<h1>`, hero text, or “about this widget” block inside `App.tsx` — it wastes space and reads as duplicate chrome. Start the iframe content at the **functional** UI (toolbar, list, chart, form). Short **in-content** labels (“Filters”, “Open items”) are still appropriate.
+Port’s iframe wrapper already shows the plugin **title**, **description**, and **icon** configured at upload time. **Do not** repeat them inside `App.tsx` — no widget header block with the title, no hero “about this widget” copy, no decorative icon that mirrors Port’s plugin icon. Start at **functional** UI (toolbar, list, chart, form). Short **in-content** labels (“Filters”, “Open items”) and **entity** titles (current record name on an entity page) are still appropriate — those are not the plugin registration metadata.
+
+#### Icons (no hardcoded emoji)
+
+Do **not** use hardcoded **emoji** in the widget UI (e.g. `★`, `📌`, `✅` in button or list text). When an icon is needed for actions, tabs, or list rows, a **vetted icon library** (e.g. Lucide, react-icons) — keep bundle size reasonable and match Port theme tokens where possible.
+
+```tsx
+<button type="button" aria-label="Remove">
+  <TrashIcon size={16} aria-hidden />
+</button>
+```
+
+Use `aria-hidden="true"` on decorative icons; keep accessible names on the control (`aria-label` or visible text). Prefer theme-aware styling over one-off inline SVG unless the design needs a custom graphic.
 
 #### UX and UI
 
@@ -111,7 +123,7 @@ Widgets are embedded product UI — not internal admin tools. **Prioritize UX** 
 | **Theme** | Call **`applyThemeCss()`** from the SDK; use Port CSS variables with local fallbacks so light/dark and regions look native. |
 | **Density** | Works in **full column** and **small dashboard tiles** — responsive typography and spacing (`clamp()`, media/container queries). |
 | **Actions** | Primary actions obvious; destructive actions confirmed or visually distinct; links to Port entities use **`buildEntityPageUrl`** (portal origin, not API host). |
-| **Accessibility** | Semantic HTML, visible focus, `aria-*` on interactive controls, alt text if you add images in README assets only (in-widget icons: prefer SVG/components). |
+| **Accessibility** | Semantic HTML, visible focus, `aria-*` on interactive controls; in-widget icons via **`<i>`** or an icon library (never emoji); alt text for images in README assets only. |
 
 Extract reusable shells: `LoadingState.tsx`, `EmptyState.tsx`, `ErrorBanner.tsx` under `components/` when the widget has more than one view.
 
@@ -282,6 +294,28 @@ Complete **[reuse-workflow.md](reuse-workflow.md) Steps 4–6** (blueprint strat
 **Do not** add a portal base URL param when **`document.referrer`** + **`https://app.port.io`** fallback suffice (see **Portal app links**).
 
 Each key is a param name; each value describes how it appears in the Port UI. Allowed **`type`** values (see [port-plugins-cli — Plugin metadata reference](https://www.npmjs.com/package/@port-labs/port-plugins-cli)): **`string`**, **`number`**, **`boolean`**, **`object`**, **`array`**, **`blueprint`**.
+
+#### Required fields per parameter
+
+Every parameter object **must** include all three fields:
+
+| Field | Purpose |
+|-------|---------|
+| **`type`** | Control type in Port’s widget configuration UI |
+| **`isRequired`** | `true` if the admin must set it before the widget works; `false` for optional overrides |
+| **`label`** | Short label shown in Port (not a description — detail goes in README) |
+
+```json
+{
+  "exampleParam": {
+    "type": "string",
+    "isRequired": true,
+    "label": "Example parameter"
+  }
+}
+```
+
+Do not omit **`isRequired`** (Port/CLI expect it). Do not add extra keys unless the CLI documents them.
 
 #### Param labels (Port UI)
 

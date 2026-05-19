@@ -1,0 +1,12 @@
+{
+  "favoritesProperty": {
+    "type": "string",
+    "isRequired": false,
+    "label": "Favorites property"
+  },
+  "userBlueprint": {
+    "type": "blueprint",
+    "isRequired": false,
+    "label": "User blueprint"
+  }
+}
