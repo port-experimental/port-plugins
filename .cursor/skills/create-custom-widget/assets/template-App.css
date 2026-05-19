@@ -1,0 +1,74 @@
+/* ── Theme: Port host tokens via plugins-sdk (applyThemeCss) ──
+   :root = surfaces, text, borders only.
+   Decorations (dots, badges, links, accent labels) define color on their class — see .example-dot below. */
+:root {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Roboto,
+    Oxygen, Ubuntu, sans-serif;
+  font-size: 13px;
+
+  --bg: var(--background-primary, #f0f2f5);
+  --card: var(--background-dim, #ffffff);
+  --card2: var(--background-dim-transparent, #f7f8fa);
+  --border: var(--border-medium, rgba(0, 0, 0, 0.09));
+  --text: var(--text-high, #111827);
+  --muted: var(--text-medium, #6b7280);
+  --radius: 8px;
+
+  --hover-bg: var(--background-dim-transparent, rgba(0, 0, 0, 0.04));
+  --hover-bg-md: var(--background-dim-transparent, rgba(0, 0, 0, 0.06));
+  --border-hover: var(--border-contrast-medium, rgba(0, 0, 0, 0.22));
+  --badge-bg: var(--background-dim-transparent, rgba(0, 0, 0, 0.06));
+  --shadow-dropdown: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#plugin-root {
+  height: 100%;
+  min-height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+.shell {
+  padding: 16px;
+  min-height: 100%;
+  overflow-y: auto;
+}
+
+.muted {
+  color: var(--muted);
+  font-style: italic;
+  text-align: center;
+  padding: 32px 0;
+}
+
+/* Decoration example — copy pattern for dots, pills, links, chart marks */
+.example-dot {
+  --example-dot-color: #2563eb;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--example-dot-color);
+}
+
+.example-link {
+  --example-link-color: #2563eb;
+  color: var(--example-link-color);
+  text-decoration: none;
+}
+
+.example-link:hover {
+  text-decoration: underline;
+}
