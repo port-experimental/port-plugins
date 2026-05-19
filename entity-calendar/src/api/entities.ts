@@ -1,3 +1,5 @@
+import { MOCK_ENTITIES } from "../dev/mockData";
+import { DEV_MOCK } from "../hooks/usePostMessageData";
 import type { PortEntity } from "../types";
 
 type SearchResponse = {
@@ -20,6 +22,8 @@ export async function searchBlueprintEntities(
   token: string,
   blueprintIdentifier: string
 ): Promise<PortEntity[]> {
+  if (DEV_MOCK) return MOCK_ENTITIES;
+
   const res = await fetch(
     `${baseUrl}/v1/blueprints/${encodeURIComponent(blueprintIdentifier)}/entities/search`,
     {

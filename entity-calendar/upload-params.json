@@ -7,6 +7,6 @@
   "createdDateProperty": {
     "type": "string",
     "isRequired": false,
-    "label": "Datetime property (default: entity createdAt)"
+    "label": "Datetime property"
   }
 }

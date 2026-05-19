@@ -18,18 +18,25 @@ N/A — add a screenshot under `docs/` after first deploy in Port and link it he
 
 ## Prerequisites
 
+### Access
+
 - Port account with permission to add custom widgets and read entities
 - Node.js **≥ 20** (see `package.json` `engines`)
 - [port-plugins-cli](https://www.npmjs.com/package/@port-labs/port-plugins-cli) for upload
+
+### Catalog
+
+| Concept | Requirement |
+|---------|-------------|
+| Blueprint | Any blueprint with entities you want on the calendar |
+| Date field | Port sets `createdAt` on every entity; optional `datetime` property (e.g. `createdDate`) if you override via parameter |
 
 ## Widget parameters
 
 | Key | Type | Required | Default | Description |
 |-----|------|----------|---------|-------------|
 | `blueprint` | `blueprint` | Yes | — | Blueprint whose entities appear on the calendar |
-| `createdDateProperty` | `string` | No | *(see below)* | Optional blueprint property identifier for the date used on the calendar |
-
-When `createdDateProperty` is set, only that property is used for the date, otherwise it will use entity system field `createdAt`
+| `createdDateProperty` | `string` | No | *(empty)* | Blueprint property identifier for the calendar date. When empty, uses entity `createdAt`. When set, only that property is used (no fallback to `createdAt`). |
 
 ## Local development
 
@@ -39,18 +46,16 @@ npm install
 npm run dev
 ```
 
-Open `http://localhost:9000`. Outside Port’s iframe, the dev mock supplies API base URL, token, and a sample `blueprint` param. Edit `src/hooks/usePostMessageData.ts` to adjust mock values.
+Open `http://localhost:9000` (webpack `devServer.port: 9000` — required for Port **Local development** iframe mode). Outside Port’s iframe, `DEV_MOCK` supplies token, a sample blueprint param, and dated entities.
 
-Enable Port **Local development** on the widget to point at your dev server while testing in the portal.
+| File | Purpose |
+|------|---------|
+| `src/hooks/usePostMessageData.ts` | Host bridge + `DEV_MOCK` gate |
+| `src/dev/mockData.ts` | Blueprint param and sample entities for the calendar |
+
+Enable Port **Local development** on the widget to test real `postMessage` and API calls in the portal.
 
 ## Setup
-
-### Catalog
-
-| Concept | Requirement |
-|---------|-------------|
-| Blueprint | Any blueprint with entities you want on the calendar |
-| Date field | Port sets `createdAt` on every entity; optional `datetime` property (e.g. `createdDate`) if you override via parameter |
 
 ### Build
 
@@ -95,6 +100,7 @@ entity-calendar/
 │   ├── components/EntityModal.tsx
 │   ├── hooks/useCalendarEntities.ts
 │   ├── hooks/usePostMessageData.ts
+│   ├── dev/mockData.ts
 │   ├── utils/
 │   ├── App.tsx
 │   └── App.css
@@ -111,3 +117,6 @@ entity-calendar/
 | 422 on search | Malformed search body | Ensure `{ query: { combinator, rules } }` (already handled in `api/entities.ts`) |
 | “Configure Blueprint” | Param missing in widget instance | Set the blueprint parameter in Port |
 | Wrong portal link region | Empty `document.referrer` in dev | Test inside Port iframe; EU/US links follow referrer origin |
+| Local dev blank in Port | Wrong dev server port | Use port **9000** (`npm run dev`); Port Local development expects `http://localhost:9000` |
+| Theme mismatch in Port | `applyThemeCss()` not applied | Widget calls SDK theme on host path; surfaces use Port tokens in `App.css` `:root` |
+| Calendar empty in local dev | No mock entities | `DEV_MOCK` returns sample entities from `src/dev/mockData.ts` when not in Port’s iframe |

@@ -1,3 +1,4 @@
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useMemo, useState } from "react";
 import "./App.css";
 import {
@@ -67,7 +68,7 @@ export function App() {
           onClick={() => setViewMonth((m) => addMonths(m, -1))}
           aria-label="Previous month"
         >
-          ‹
+          <ChevronLeft size={18} strokeWidth={2} aria-hidden />
         </button>
         <h2 className="month-label">{formatMonthYear(viewMonth)}</h2>
         <button
@@ -76,7 +77,7 @@ export function App() {
           onClick={() => setViewMonth((m) => addMonths(m, 1))}
           aria-label="Next month"
         >
-          ›
+          <ChevronRight size={18} strokeWidth={2} aria-hidden />
         </button>
         <button
           type="button"
@@ -109,11 +110,17 @@ export function App() {
           {entities.length === 0 && (
             <p className="status muted-inline">
               No entities with a date found for{" "}
-              <strong>{config.blueprint.title}</strong>. Dates use entity{" "}
-              <code>createdAt</code>
-              {config.createdDateProperty
-                ?? ` or property "${config.createdDateProperty}"`}
-              .
+              <strong>{config.blueprint.title}</strong>.{" "}
+              {config.createdDateProperty ? (
+                <>
+                  Dates use blueprint property{" "}
+                  <code>{config.createdDateProperty}</code>.
+                </>
+              ) : (
+                <>
+                  Dates use entity <code>createdAt</code>.
+                </>
+              )}
             </p>
           )}
         </>
