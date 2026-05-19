@@ -9,8 +9,6 @@
   --border: var(--border-medium, rgba(0, 0, 0, 0.09));
   --text: var(--text-high, #111827);
   --muted: var(--text-medium, #6b7280);
-  --accent: var(--primary, #2563eb);
-  --accent-soft: color-mix(in srgb, var(--accent) 14%, transparent);
   --radius: 8px;
 
   --hover-bg: var(--background-dim-transparent, rgba(0, 0, 0, 0.04));
@@ -171,17 +169,20 @@ body {
 }
 
 .day-cell--today .day-number {
+  --today-number-color: #2563eb;
   font-weight: 700;
-  color: var(--accent);
+  color: var(--today-number-color);
 }
 
 .day-cell--marked {
+  --marked-cell-bg: color-mix(in srgb, #2563eb 14%, transparent);
   cursor: pointer;
-  background: var(--accent-soft);
+  background: var(--marked-cell-bg);
 }
 
 .day-cell--marked:hover:not(:disabled) {
-  border-color: var(--accent);
+  --marked-cell-border: #2563eb;
+  border-color: var(--marked-cell-border);
 }
 
 .day-cell:disabled {
@@ -200,16 +201,18 @@ body {
 }
 
 .day-dot {
+  --day-dot-color: #2563eb;
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--accent);
+  background: var(--day-dot-color);
 }
 
 .day-count {
+  --day-count-color: #2563eb;
   font-size: 9px;
   font-weight: 600;
-  color: var(--accent);
+  color: var(--day-count-color);
 }
 
 .modal-backdrop {
@@ -306,9 +309,10 @@ body {
 }
 
 .entity-link {
+  --entity-link-color: #2563eb;
   flex-shrink: 0;
   font-size: 12px;
-  color: var(--accent);
+  color: var(--entity-link-color);
   text-decoration: none;
 }
 
