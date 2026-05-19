@@ -187,16 +187,24 @@ Schema per parameter:
   "paramKey": {
     "type": "string",
     "isRequired": true,
-    "label": "Human-readable label shown in Port UI"
+    "label": "Short label in Port UI"
   }
 }
 ```
+
+**Labels vs README:** `label` is shown in Port’s widget configuration UI only — keep it short and meaningful. Defaults, examples, and setup detail belong in the per-plugin README **Widget parameters** and **Prerequisites** tables (see [scaffolding-and-implementation.md](scaffolding-and-implementation.md) (**Param labels**)).
 
 Reading a parameter value in TypeScript:
 
 ```ts
 const value = params["paramKey"]?.value as string ?? "defaultValue";
 ```
+
+## Rendering and UX
+
+- **No unsafe HTML** — do not use `innerHTML`, `outerHTML`, or `dangerouslySetInnerHTML` for entity properties, comments, or other dynamic strings. Render with React text and components; use a vetted sanitizer only when rich HTML is an explicit, documented requirement.
+- **Params vs runtime** — do not add `upload-params.json` entries for blueprint lists, relation keys, entity inventories, or full property schemas; load them with `GET /v1/blueprints`, `GET /v1/blueprints/{identifier}`, `PLUGIN_DATA.entity`, and `POST .../entities/search`. Params only scope what the host and API cannot infer.
+- **Product-quality UI** — loading, empty, and error states; `applyThemeCss()`; full-iframe responsive layout. See **UX and UI** in [scaffolding-and-implementation.md](scaffolding-and-implementation.md).
 
 ## Theming — Inheriting Port's Visual Style
 
@@ -470,23 +478,24 @@ export const DEV_MOCK =
   process.env.NODE_ENV === "development" && window.parent === window;
 ```
 
-**Configure mock entity context** at the top of `usePostMessageData.ts`:
+**Configure mock host context** at the top of `usePostMessageData.ts` (entity page vs dashboard, blueprint identifier, optional `relations` / `relationsObjects` aligned with README defaults).
 
-```typescript
-const MOCK_ENTITY_ID: string | null = "my-entity";  // null for dashboard widgets
-const MOCK_ENTITY_BLUEPRINT = "service";
-const MOCK_ENTITY_TITLE = "My Entity";
-```
+**Add small API mocks** for widgets that fetch data — keep fixtures in `src/dev/mockData.ts` (or similar) and short-circuit in `src/api/*`:
 
-**For widgets that call Port APIs**, add mock responses:
+- **2–5 sample entities** is enough for most UIs; mirror Port response shapes (`entities` array, `properties`, `relations`).
+- Import `DEV_MOCK` from `usePostMessageData.ts`; return early before `fetch` unless you intentionally hit a real API with a dev token.
+- Optional ~200ms delay to exercise loading states.
+
+Full pattern: [scaffolding-and-implementation.md](scaffolding-and-implementation.md) (**Local dev mock data**).
 
 ```typescript
 import { DEV_MOCK } from "../hooks/usePostMessageData";
+import { MOCK_ENTITIES } from "../dev/mockData";
 
-export async function fetchSomething(...) {
+export async function searchEntities(...) {
   if (DEV_MOCK) {
-    await new Promise((r) => setTimeout(r, 300));
-    return { /* mock data */ };
+    await new Promise((r) => setTimeout(r, 200));
+    return { entities: MOCK_ENTITIES, ok: true };
   }
   // real fetch...
 }
