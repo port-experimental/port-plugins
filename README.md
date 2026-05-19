@@ -17,3 +17,9 @@ The plugins in this repository are provided by Port.io on an "as-is" and "as-ava
 ## Trademark Notice
 
 "Port" and the Port.io logo are trademarks of Port.io. The open-source license granted herein does not grant any rights to use Port.io's trademarks, trade names, logos, or service marks, whether for purposes of identifying forked or derivative works or otherwise.
+
+## Plugins
+
+| Widget | Description |
+|--------|-------------|
+| [Entity Calendar](./entity-calendar) | Month calendar marking entity creation dates; click a day to view title and identifier |
