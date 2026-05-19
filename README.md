@@ -1,9 +1,8 @@
-# port-plugins
+# Port Plugins
 
-Custom [Port](https://app.getport.io) plugins (widgets) — self-contained React apps built for dashboard and entity pages.
-
-## Widgets
+Custom widgets for [Port](https://app.port.io).
 
 | Widget | Description |
 |--------|-------------|
-| [Entity Created Calendar](./entity-created-calendar) | Calendar by entity creation date; click a day to see title and identifier |
+| [Entity Calendar](./entity-calendar) | Month calendar marking entity creation dates; click a day to view title and identifier |
+| [Entity Comment Thread](./entity-comment-thread) | Threaded markdown comments on entity pages with mentions, replies, and open/resolved status |
