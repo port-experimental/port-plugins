@@ -24,7 +24,7 @@ Platform rules (CSP, upload limits, param metadata), SDK APIs, and CLI behavior 
 ## Core principles
 
 1. **Catalog over plugin params** — blueprints, properties, **relations**, and entity data come from the Port API and host context at **runtime**. Design and document the catalog first (MCP + README **Prerequisites**). `upload-params.json` only scopes behaviour the API and `PLUGIN_DATA` cannot supply — never duplicate lists of blueprints, relation keys, property inventories, or entity identifiers that `GET /v1/blueprints`, `GET /v1/blueprints/{identifier}`, `PLUGIN_DATA.entity`, or `POST .../entities/search` already provide.
-2. **UX and UI matter** — widgets are product surfaces inside Port, not throwaway panels. Invest in loading, empty, and error states; theme alignment; responsive layout; accessible controls; and clear actions. Match Port’s visual language (SDK theme tokens, spacing, typography) — see [scaffolding-and-implementation.md](references/scaffolding-and-implementation.md) (**UX and UI**).
+2. **UX and UI matter** — widgets are product surfaces inside Port, not throwaway panels. Invest in loading, empty, and error states; theme alignment; responsive layout; accessible controls; and clear actions. Match Port’s visual language (SDK theme tokens, spacing, typography) — see [scaffolding-and-implementation.md](references/scaffolding-and-implementation.md) (**UX and UI**). **Surface tokens** (`--bg`, `--card`, `--text`, `--border`) belong in `:root`; **decorations** (dots, badges, accent text, links, chart series) get **dedicated colors on their class** — not `--accent` / `--primary` from `:root`.
 3. **Safe rendering only** — never use `innerHTML`, `outerHTML`, or `dangerouslySetInnerHTML` to render dynamic or user-supplied content. Use React elements, text nodes, or a vetted sanitizer if HTML is unavoidable (rare in widgets).
 4. **Reuse widgets and blueprints** before creating duplicates — survey the repo `README.md` and sibling `upload-params.json` files first.
 5. **Catalog changes are normal** — add properties, relations, or blueprints when the use case needs them; document in README prerequisite tables.
@@ -132,6 +132,7 @@ Before finishing: [references/guidelines.md](references/guidelines.md) (anti-pat
 |-------|------|
 | Rendering | **No** `innerHTML`, `outerHTML`, or `dangerouslySetInnerHTML` for dynamic/user content — React text/elements or vetted sanitizer only |
 | UX / UI | Loading, empty, and error states; `applyThemeCss()`; responsive full-iframe layout; accessible controls — treat widgets as product UI |
+| CSS decorations | `:root` = surfaces/text/borders only; dots, badges, links, accent text use **class-local** color vars (e.g. `--day-dot-color`) — **no** shared `--accent` / `--primary` on decorations — see scaffolding **Surface vs decoration colors** |
 | Runtime vs params | Fetch blueprints, schema, relations, entities via Port API + `PLUGIN_DATA` — **no** params that duplicate that data |
 | API host | `portApiBaseUrl` + token for `/v1/...` only |
 | Portal URLs | `getPortalOrigin()` from `document.referrer`; `{origin}/{blueprint}Entity?identifier={id}` |

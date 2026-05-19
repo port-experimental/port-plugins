@@ -121,11 +121,52 @@ Widgets are embedded product UI — not internal admin tools. **Prioritize UX** 
 | **Empty** | When search returns no rows or relations are missing, explain *why* and what to do (check catalog, place widget on entity page, add relation). |
 | **Errors** | Human-readable message + optional retry; log full API body to console for devs — don’t dump raw JSON in the UI. |
 | **Theme** | Call **`applyThemeCss()`** from the SDK; use Port CSS variables with local fallbacks so light/dark and regions look native. |
+| **Decoration colors** | **`:root`** maps **surfaces, text, borders** only (`--bg`, `--card`, `--text`, `--border`, `--hover-bg`). **Decorations** (calendar dots, status pills, entity links, accent labels, chart marks) define **their own color on the class** — not a shared `--accent` / `--primary` from `:root`. |
 | **Density** | Works in **full column** and **small dashboard tiles** — responsive typography and spacing (`clamp()`, media/container queries). |
 | **Actions** | Primary actions obvious; destructive actions confirmed or visually distinct; links to Port entities use **`buildEntityPageUrl`** (portal origin, not API host). |
 | **Accessibility** | Semantic HTML, visible focus, `aria-*` on interactive controls; in-widget icons via **`<i>`** or an icon library (never emoji); alt text for images in README assets only. |
 
 Extract reusable shells: `LoadingState.tsx`, `EmptyState.tsx`, `ErrorBanner.tsx` under `components/` when the widget has more than one view.
+
+#### Surface vs decoration colors
+
+Port’s injected theme drives **backgrounds and typography**. Widget **decorations** should not reuse those semantic aliases for non-surface UI — otherwise a host `--primary` or dark-mode tweak can make dots, links, and badges clash with adjacent surfaces.
+
+| Layer | Where | Use for |
+|-------|--------|---------|
+| **Surface** | `:root` in `App.css` | Page/card/hover **backgrounds**, primary/secondary **text**, **borders**, shadows — map `var(--background-primary, …)`, `var(--text-high, …)`, etc. |
+| **Decoration** | On the **element’s class** | Dots, counts, pills, links, “today” highlights, chart series, icon tint — **fixed hex fallback** on a class-local custom property |
+
+**Do not** add `--accent: var(--primary, …)` (or similar) in `:root` and use it for dots, link `color`, or small marks. **Do** give each decoration its own variable on the class (namespaced to the component):
+
+```css
+/* :root — surfaces only */
+:root {
+  --bg: var(--background-primary, #f0f2f5);
+  --card: var(--background-dim, #ffffff);
+  --text: var(--text-high, #111827);
+  --border: var(--border-medium, rgba(0, 0, 0, 0.09));
+}
+
+/* Marked day cell — background is a surface; use a local fill token */
+.day-cell--marked {
+  --marked-cell-bg: color-mix(in srgb, #2563eb 14%, transparent);
+  background: var(--marked-cell-bg);
+}
+
+/* Calendar dot — decoration; not --accent or --primary */
+.day-dot {
+  --day-dot-color: #2563eb;
+  background: var(--day-dot-color);
+}
+
+.entity-link {
+  --entity-link-color: #2563eb;
+  color: var(--entity-link-color);
+}
+```
+
+When several decorations share one hue, repeat the same fallback hex on each class (or scope a **component block** e.g. `.calendar { --event-blue: #2563eb; }` and reference `--event-blue` only inside that block — still **not** on `:root` as a global accent). See `assets/template-App.css` (`.example-dot`, `.example-link`) and `entity-calendar/src/App.css`.
 
 #### Local dev mock data (outside Port’s iframe)
 

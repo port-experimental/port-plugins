@@ -17,6 +17,11 @@ N/A — add a screenshot under `docs/` after first deploy in Port and link it he
 
 ## Prerequisites
 
+### Access
+
+- **Node.js** `>=20` (see `package.json` `engines`) for build and [port-plugins-cli](https://www.npmjs.com/package/@port-labs/port-plugins-cli).
+- Widget runs on an **entity page** with a valid Port API token from the host (`PLUGIN_DATA`).
+
 ### Catalog
 
 | Concept | Identifier | Notes |
@@ -120,7 +125,7 @@ npm install
 npm run dev
 ```
 
-Open `http://localhost:9001`. Dev mock provides a sample `service` entity and threaded comments. Edit `src/hooks/usePostMessageData.ts` and `src/dev/mockData.ts` to adjust fixtures.
+Open `http://localhost:9000` (webpack `devServer.port: 9000` — required for Port **Local development** iframe mode). Dev mock provides a sample `service` entity and threaded comments. Edit `src/hooks/usePostMessageData.ts` and `src/dev/mockData.ts` to adjust fixtures.
 
 ## Setup
 
@@ -174,3 +179,5 @@ entity-comment-thread/
 | Mentions list empty | No active users | Check `_user` entities with `status: Active` |
 | Slack not firing | Automation disabled / wrong secret | Verify automation published and token channel ID |
 | 422 on search | Malformed query | Widget uses nested `query` object (already correct) |
+| Local dev blank in Port | Wrong dev server port | Use port **9000** (`npm run dev`); Port Local development expects `http://localhost:9000` |
+| Theme mismatch in Port | `applyThemeCss()` not applied | Widget calls SDK theme on host path; surfaces use Port tokens in `App.css` `:root` |

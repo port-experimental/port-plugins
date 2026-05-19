@@ -87,7 +87,7 @@ design tokens). Widget CSS should use **`var(--background-primary, …)`**-style
 - **Spec and checklist:** [plugin-architecture.md — Theming](./plugin-architecture.md) (also
   documents widgets that do not use the SDK).
 - **Scaffold defaults:** `assets/template-usePostMessageData.ts` calls **`applyThemeCss()`**;
-  `assets/template-App.css` shows token mapping.
+  `assets/template-App.css` shows **surface** token mapping and **decoration** examples (`.example-dot`, `.example-link`).
 
 ## Upload automation (optional)
 

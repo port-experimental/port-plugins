@@ -72,7 +72,7 @@ npm install
 npm run dev
 ```
 
-Open `http://localhost:9002`. Outside Port’s iframe, `DEV_MOCK` supplies token, catalog lists, and sample favorites.
+Open `http://localhost:9000` (webpack `devServer.port: 9000` — required for Port **Local development** iframe mode). Outside Port’s iframe, `DEV_MOCK` supplies token, catalog lists, and sample favorites.
 
 | File | Purpose |
 |------|---------|
@@ -124,3 +124,5 @@ See [@port-labs/port-plugins-cli](https://www.npmjs.com/package/@port-labs/port-
 | Save fails with property error | `myFavorites` missing on blueprint | Add object property per Prerequisites |
 | Empty page/action lists | API permissions or beta Pages API | Confirm token scopes; check browser console for `Port API` errors |
 | Links open wrong region | Tested outside Port iframe | Validate inside Port; referrer sets portal origin |
+| Local dev blank in Port | Wrong dev server port | Use port **9000** (`npm run dev`); Port Local development expects `http://localhost:9000` |
+| Theme mismatch in Port | `applyThemeCss()` not applied | Widget calls SDK theme on host path; surfaces use Port tokens in `App.css` `:root` |

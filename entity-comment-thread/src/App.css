@@ -9,10 +9,9 @@
   --border: var(--border-medium, rgba(0, 0, 0, 0.09));
   --text: var(--text-high, #111827);
   --muted: var(--text-medium, #6b7280);
-  --accent: var(--primary, #2563eb);
-  --accent-soft: color-mix(in srgb, var(--accent) 14%, transparent);
-  --success: #059669;
   --radius: 8px;
+
+  --hover-bg: var(--background-dim-transparent, rgba(0, 0, 0, 0.04));
 }
 
 *,
@@ -91,9 +90,12 @@ body {
 }
 
 .error {
-  background: color-mix(in srgb, #dc2626 10%, var(--card));
-  border: 1px solid color-mix(in srgb, #dc2626 35%, transparent);
-  color: #b91c1c;
+  --error-bg: color-mix(in srgb, #dc2626 10%, var(--card));
+  --error-border: color-mix(in srgb, #dc2626 35%, transparent);
+  --error-text: #b91c1c;
+  background: var(--error-bg);
+  border: 1px solid var(--error-border);
+  color: var(--error-text);
   padding: 10px 12px;
   border-radius: var(--radius);
   font-size: 12px;
@@ -130,19 +132,21 @@ body {
 }
 
 .thread-badge {
+  --thread-badge-bg: color-mix(in srgb, #2563eb 14%, transparent);
+  --thread-badge-color: #2563eb;
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   padding: 2px 8px;
   border-radius: 999px;
-  background: var(--accent-soft);
-  color: var(--accent);
+  background: var(--thread-badge-bg);
+  color: var(--thread-badge-color);
 }
 
 .thread-badge--resolved {
-  background: color-mix(in srgb, var(--success) 16%, transparent);
-  color: var(--success);
+  --thread-badge-bg: color-mix(in srgb, #059669 16%, transparent);
+  --thread-badge-color: #059669;
 }
 
 .comment-item {
@@ -164,11 +168,13 @@ body {
 }
 
 .comment-avatar {
+  --comment-avatar-bg: color-mix(in srgb, #2563eb 14%, transparent);
+  --comment-avatar-color: #2563eb;
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: var(--accent-soft);
-  color: var(--accent);
+  background: var(--comment-avatar-bg);
+  color: var(--comment-avatar-color);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -284,7 +290,7 @@ body {
 }
 
 .toolbar-btn:hover {
-  background: var(--accent-soft);
+  background: var(--hover-bg);
 }
 
 .editor-input-wrap {
@@ -305,8 +311,10 @@ body {
 }
 
 .editor-textarea:focus {
-  outline: 2px solid var(--accent-soft);
-  border-color: var(--accent);
+  --editor-focus-outline: color-mix(in srgb, #2563eb 14%, transparent);
+  --editor-focus-border: #2563eb;
+  outline: 2px solid var(--editor-focus-outline);
+  border-color: var(--editor-focus-border);
 }
 
 .mention-list {
@@ -338,7 +346,7 @@ body {
 }
 
 .mention-option:hover {
-  background: var(--accent-soft);
+  background: var(--hover-bg);
 }
 
 .mention-label {
@@ -365,7 +373,8 @@ body {
 }
 
 .btn.primary {
-  background: var(--accent);
+  --btn-primary-bg: #2563eb;
+  background: var(--btn-primary-bg);
   color: #fff;
 }
 
@@ -381,9 +390,10 @@ body {
 }
 
 .btn.link {
+  --btn-link-color: #2563eb;
   background: none;
   border: none;
-  color: var(--accent);
+  color: var(--btn-link-color);
   padding: 2px 4px;
   font-size: 12px;
 }

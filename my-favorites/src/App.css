@@ -8,11 +8,9 @@
   --border: var(--border-medium, rgba(0, 0, 0, 0.09));
   --text: var(--text-high, #111827);
   --muted: var(--text-medium, #6b7280);
-  --accent: var(--primary, #2563eb);
-  --accent-soft: color-mix(in srgb, var(--accent) 14%, transparent);
-  --gold: #d4a017;
-  --danger: #dc2626;
   --radius: 8px;
+
+  --hover-bg: var(--background-dim-transparent, rgba(0, 0, 0, 0.04));
 }
 
 *,
@@ -69,7 +67,7 @@ body {
 }
 
 .mf-menu__trigger:hover {
-  background: var(--accent-soft);
+  background: var(--hover-bg);
 }
 
 .mf-menu__panel {
@@ -99,11 +97,12 @@ body {
 }
 
 .mf-menu__item:hover {
-  background: var(--accent-soft);
+  background: var(--hover-bg);
 }
 
 .mf-menu__item--danger {
-  color: var(--danger);
+  --menu-danger-color: #dc2626;
+  color: var(--menu-danger-color);
 }
 
 .mf-tabs {
@@ -128,16 +127,19 @@ body {
 }
 
 .mf-tabs__tab--active {
+  --tab-active-border: #2563eb;
   color: var(--text);
-  border-bottom-color: var(--accent);
+  border-bottom-color: var(--tab-active-border);
 }
 
 .mf-tabs__count {
+  --tab-count-bg: color-mix(in srgb, #2563eb 14%, transparent);
+  --tab-count-color: #2563eb;
   min-width: 18px;
   padding: 0 6px;
   border-radius: 999px;
-  background: var(--accent-soft);
-  color: var(--accent);
+  background: var(--tab-count-bg);
+  color: var(--tab-count-color);
   font-size: 11px;
   font-weight: 600;
   text-align: center;
@@ -185,12 +187,14 @@ body {
 }
 
 .mf-list__item--over {
-  border-color: var(--accent);
+  --list-drag-border: #2563eb;
+  border-color: var(--list-drag-border);
 }
 
 .mf-list__star {
+  --favorite-star-color: #d4a017;
   flex-shrink: 0;
-  color: var(--gold);
+  color: var(--favorite-star-color);
 }
 
 .mf-list__handle {
@@ -207,7 +211,8 @@ body {
 }
 
 .mf-list__link:hover .mf-list__title {
-  color: var(--accent);
+  --list-link-hover-color: #2563eb;
+  color: var(--list-link-hover-color);
 }
 
 .mf-list__title {
@@ -241,8 +246,10 @@ body {
 }
 
 .mf-list__remove:hover:not(:disabled) {
-  color: var(--danger);
-  background: color-mix(in srgb, var(--danger) 10%, transparent);
+  --remove-hover-color: #dc2626;
+  --remove-hover-bg: color-mix(in srgb, #dc2626 10%, transparent);
+  color: var(--remove-hover-color);
+  background: var(--remove-hover-bg);
 }
 
 .mf-list__remove:disabled {
@@ -269,11 +276,13 @@ body {
 }
 
 .mf-error {
+  --error-bg: color-mix(in srgb, #dc2626 12%, transparent);
+  --error-text: #dc2626;
   margin-top: 8px;
   padding: 8px 10px;
   border-radius: var(--radius);
-  background: color-mix(in srgb, var(--danger) 12%, transparent);
-  color: var(--danger);
+  background: var(--error-bg);
+  color: var(--error-text);
   font-size: 11px;
   white-space: pre-wrap;
   overflow: auto;
@@ -285,19 +294,21 @@ body {
 }
 
 .mf-add__trigger {
+  --add-trigger-color: #2563eb;
+  --add-trigger-hover-bg: color-mix(in srgb, #2563eb 14%, transparent);
   width: 100%;
   padding: 9px 12px;
   border: 1px dashed var(--border);
   border-radius: var(--radius);
   background: transparent;
-  color: var(--accent);
+  color: var(--add-trigger-color);
   cursor: pointer;
   font: inherit;
   font-weight: 500;
 }
 
 .mf-add__trigger:hover:not(:disabled) {
-  background: var(--accent-soft);
+  background: var(--add-trigger-hover-bg);
 }
 
 .mf-add__trigger:disabled {
@@ -369,7 +380,7 @@ body {
 }
 
 .mf-add__option:hover {
-  background: var(--accent-soft);
+  background: var(--hover-bg);
 }
 
 .mf-add__option-title {

@@ -77,6 +77,31 @@ Document default `dueDate`, override behaviour, and validation in README **Widge
 
 **Good:** Skeleton or spinner while loading; friendly empty state with next step; actionable error copy (retry, check catalog); flex/grid layout that fills the iframe; `applyThemeCss()` and CSS variables with fallbacks (`var(--text-high, #111827)`). See [UX and UI](scaffolding-and-implementation.md#ux-and-ui) in scaffolding-and-implementation.md.
 
+### ❌ Don't: Use `:root` accent tokens for decorations
+
+**Bad:**
+```css
+:root {
+  --accent: var(--primary, #2563eb);
+}
+.day-dot {
+  background: var(--accent);
+}
+.entity-link {
+  color: var(--accent);
+}
+```
+
+**Good:** `:root` maps surfaces/text/borders; each decoration defines its own color on the class:
+```css
+.day-dot {
+  --day-dot-color: #2563eb;
+  background: var(--day-dot-color);
+}
+```
+
+See [Surface vs decoration colors](scaffolding-and-implementation.md#surface-vs-decoration-colors).
+
 ### ❌ Don't: Repeat plugin title, description, or icon in the iframe
 
 **Bad:** Header inside the widget with the same name as the Port plugin, a subtitle repeating the upload description, or a decorative icon matching the plugin’s Port icon.

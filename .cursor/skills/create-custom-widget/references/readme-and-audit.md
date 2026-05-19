@@ -34,6 +34,7 @@ Use this path when the goal is **not** greenfield scaffolding but to **audit and
 - [ ] **Params:** Every `upload-params.json` entry has **`type`**, **`isRequired`**, and **`label`**; labels are short; README **Widget parameters** holds defaults, examples, and operator-facing detail.
 - [ ] **Params vs API:** Catalog shape from Port API + host context; `upload-params.json` minimal — **no** params for blueprint lists, relations, entities, or schemas the API returns; **relations** from catalog + **`PLUGIN_DATA.entity`** + **`relatedTo` / `entities/search`**; subject blueprint param omitted when entity page + design default suffice.
 - [ ] **UX/UI:** Loading, empty, and error states; theme applied; responsive iframe layout; no duplicate plugin title/description/icon; no emoji — use **`<i>`** or an icon library for icons when needed.
+- [ ] **CSS:** `:root` = surfaces/text/borders only; decorations (dots, links, badges, accent text) use **class-local** color vars — not shared `--accent` / `--primary` on non-surface UI ([Surface vs decoration colors](scaffolding-and-implementation.md#surface-vs-decoration-colors)).
 - [ ] **Safe rendering:** No `innerHTML` / `dangerouslySetInnerHTML` for dynamic or user content.
 
 ### 8. Per-plugin `README.md` standard (required)
