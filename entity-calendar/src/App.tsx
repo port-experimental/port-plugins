@@ -15,6 +15,7 @@ import {
 import { usePostMessageData } from "./hooks/usePostMessageData";
 import type { CalendarEntity } from "./types";
 import { configFromParams } from "./utils/config";
+import { firstDayOfWeekFromConfig } from "./utils/dates";
 
 export function App() {
   const { params, portToken, portApiBaseUrl } = usePostMessageData();
@@ -36,6 +37,14 @@ export function App() {
   const entitiesByDate = useMemo(
     () => groupEntitiesByDate(entities),
     [entities]
+  );
+
+  const firstDayOfWeek = useMemo(
+    () =>
+      config
+        ? firstDayOfWeekFromConfig(config.weekStartsOnMonday)
+        : 0,
+    [config]
   );
 
   if (!portApiBaseUrl || !portToken) {
@@ -102,6 +111,7 @@ export function App() {
         <>
           <Calendar
             viewMonth={viewMonth}
+            firstDayOfWeek={firstDayOfWeek}
             entitiesByDate={entitiesByDate}
             onSelectDate={(dateKey, dayEntities) =>
               setSelected({ dateKey, entities: dayEntities })

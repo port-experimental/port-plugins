@@ -3,6 +3,7 @@ import type { CalendarEntity } from "../types";
 import {
   addMonths,
   formatMonthYear,
+  monthGridStartOffset,
   parseDateKey,
   sameMonth,
   startOfMonth,
@@ -11,6 +12,7 @@ import {
 
 type CalendarProps = {
   viewMonth: Date;
+  firstDayOfWeek: number;
   entitiesByDate: Map<string, CalendarEntity[]>;
   onSelectDate: (dateKey: string, entities: CalendarEntity[]) => void;
 };
@@ -22,11 +24,15 @@ type DayCell = {
   entities: CalendarEntity[];
 };
 
-function buildMonthGrid(viewMonth: Date, entitiesByDate: Map<string, CalendarEntity[]>): DayCell[] {
+function buildMonthGrid(
+  viewMonth: Date,
+  entitiesByDate: Map<string, CalendarEntity[]>,
+  firstDayOfWeek: number
+): DayCell[] {
   const year = viewMonth.getFullYear();
   const month = viewMonth.getMonth();
   const first = startOfMonth(year, month);
-  const startOffset = first.getDay();
+  const startOffset = monthGridStartOffset(first, firstDayOfWeek);
   const gridStart = new Date(year, month, 1 - startOffset);
 
   const cells: DayCell[] = [];
@@ -52,13 +58,17 @@ function buildMonthGrid(viewMonth: Date, entitiesByDate: Map<string, CalendarEnt
 
 export function Calendar({
   viewMonth,
+  firstDayOfWeek,
   entitiesByDate,
   onSelectDate,
 }: CalendarProps) {
-  const weekdays = useMemo(() => weekdayLabels(), []);
+  const weekdays = useMemo(
+    () => weekdayLabels(firstDayOfWeek),
+    [firstDayOfWeek]
+  );
   const cells = useMemo(
-    () => buildMonthGrid(viewMonth, entitiesByDate),
-    [viewMonth, entitiesByDate]
+    () => buildMonthGrid(viewMonth, entitiesByDate, firstDayOfWeek),
+    [viewMonth, entitiesByDate, firstDayOfWeek]
   );
 
   const todayKey = useMemo(() => {
