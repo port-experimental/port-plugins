@@ -3,7 +3,6 @@ import type { CalendarEntity } from "../types";
 import {
   addMonths,
   formatMonthYear,
-  getLocaleFirstDayOfWeek,
   monthGridStartOffset,
   parseDateKey,
   sameMonth,
@@ -13,6 +12,7 @@ import {
 
 type CalendarProps = {
   viewMonth: Date;
+  firstDayOfWeek: number;
   entitiesByDate: Map<string, CalendarEntity[]>;
   onSelectDate: (dateKey: string, entities: CalendarEntity[]) => void;
 };
@@ -58,10 +58,10 @@ function buildMonthGrid(
 
 export function Calendar({
   viewMonth,
+  firstDayOfWeek,
   entitiesByDate,
   onSelectDate,
 }: CalendarProps) {
-  const firstDayOfWeek = useMemo(() => getLocaleFirstDayOfWeek(), []);
   const weekdays = useMemo(
     () => weekdayLabels(firstDayOfWeek),
     [firstDayOfWeek]

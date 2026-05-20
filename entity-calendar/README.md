@@ -38,6 +38,7 @@ Designed for **dashboard** pages (not entity-scoped).
 |-----|------|----------|---------|-------------|
 | `blueprint` | `blueprint` | Yes | — | Blueprint whose entities appear on the calendar |
 | `createdDateProperty` | `string` | No | *(empty)* | Blueprint property identifier for the calendar date. When empty, uses entity `createdAt`. When set, only that property is used (no fallback to `createdAt`). |
+| `weekStartsOnMonday` | `boolean` | No | `false` | When enabled, the calendar week starts on Monday; otherwise Sunday. |
 
 ## Local development
 
@@ -86,6 +87,7 @@ CLI install, auth, and region: [@port-labs/port-plugins-cli](https://www.npmjs.c
 2. Select **Entity Calendar**
 3. Set **Blueprint** to your target blueprint
 4. Optionally set **Datetime property** if dates live on a custom field
+5. Optionally enable **Week starts on Monday** for a Monday-first calendar grid
 
 ### Entity-page behaviour
 

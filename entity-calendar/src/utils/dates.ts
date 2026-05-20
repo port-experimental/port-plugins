@@ -38,61 +38,20 @@ export function formatMonthYear(date: Date): string {
   return date.toLocaleDateString(undefined, { month: "long", year: "numeric" });
 }
 
-type WeekInfo = {
-  firstDay?: number;
-  firstDayOfWeek?: number;
-};
+/** JS Date.getDay(): Sunday = 0, Monday = 1. */
+export const SUNDAY = 0;
+export const MONDAY = 1;
 
-/** ICU week day (1 = Mon … 7 = Sun) → JS Date.getDay() (0 = Sun … 6 = Sat). */
-function icuFirstDayToJs(icuDay: number): number {
-  return icuDay === 7 ? 0 : icuDay;
+export function firstDayOfWeekFromConfig(weekStartsOnMonday: boolean): number {
+  return weekStartsOnMonday ? MONDAY : SUNDAY;
 }
 
-type LocaleWithWeekInfo = Intl.Locale & {
-  weekInfo?: WeekInfo;
-  getWeekInfo?: () => WeekInfo;
-};
-
-function firstDayFromWeekInfo(weekInfo: WeekInfo | undefined): number | undefined {
-  const icu = weekInfo?.firstDay ?? weekInfo?.firstDayOfWeek;
-  return icu != null ? icuFirstDayToJs(icu) : undefined;
-}
-
-/** OS / system locale used for date formatting (region + calendar, not UI language). */
-function getSystemLocaleTag(): string | undefined {
-  try {
-    return Intl.DateTimeFormat().resolvedOptions().locale;
-  } catch {
-    // Intl unavailable
-  }
-  return typeof navigator !== "undefined" ? navigator.language : undefined;
-}
-
-/** First day of the week per system locale (0 = Sunday … 6 = Saturday). */
-export function getLocaleFirstDayOfWeek(): number {
-  const tag = getSystemLocaleTag();
-  if (!tag) return 0;
-
-  try {
-    const locale = new Intl.Locale(tag) as LocaleWithWeekInfo;
-    const weekInfo =
-      typeof locale.getWeekInfo === "function"
-        ? locale.getWeekInfo()
-        : locale.weekInfo;
-    const firstDay = firstDayFromWeekInfo(weekInfo);
-    if (firstDay != null) return firstDay;
-  } catch {
-    // Invalid locale tag or unsupported Intl.Locale
-  }
-  return 0;
-}
-
-/** Offset from the 1st of the month to the first cell in the locale week grid. */
+/** Offset from the 1st of the month to the first cell in the week grid. */
 export function monthGridStartOffset(firstOfMonth: Date, firstDayOfWeek: number): number {
   return (firstOfMonth.getDay() - firstDayOfWeek + 7) % 7;
 }
 
-export function weekdayLabels(firstDayOfWeek = getLocaleFirstDayOfWeek()): string[] {
+export function weekdayLabels(firstDayOfWeek: number): string[] {
   const sunday = new Date(2024, 0, 7);
   return Array.from({ length: 7 }, (_, i) => {
     const d = new Date(sunday);

@@ -8,5 +8,10 @@
     "type": "string",
     "isRequired": false,
     "label": "Datetime property"
+  },
+  "weekStartsOnMonday": {
+    "type": "boolean",
+    "isRequired": false,
+    "label": "Week starts on Monday"
   }
 }
