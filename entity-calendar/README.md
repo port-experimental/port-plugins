@@ -1,6 +1,6 @@
 # Entity Calendar
 
-A Port custom widget that shows a month calendar for a chosen blueprint. Days with at least one entity are highlighted using each entity’s creation date. Click a marked day to open a modal listing **title** and **identifier**, with a link to the entity page in Port.
+A Port plugin that shows a month calendar for a chosen blueprint. Days with at least one entity are highlighted using each entity’s creation date. Click a marked day to open a modal listing **title** and **identifier**, with a link to the entity page in Port.
 
 Designed for **dashboard** pages (not entity-scoped).
 
