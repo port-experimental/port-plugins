@@ -14,6 +14,12 @@ A [Port](https://app.getport.io) plugin that provides a documentation browser fo
 - Inherits Port's theme (light/dark mode) automatically
 - Configurable blueprint identifiers via widget parameters
 
+## Images in ingested READMEs
+
+> **External image URLs do not load in the widget.** Repository README and other markdown ingested as `techDoc` entities often include images via absolute URLs, for example `![Architecture](https://example.com/diagram.png)` or GitHub `user-attachments` links. Port custom widgets run inside a sandboxed iframe with a **Content Security Policy** that blocks loading **external media** (images, video, embeds, and similar remote assets). Those references will appear as broken images in TechDocs even though the same markdown renders correctly on GitHub.
+>
+> **What to do instead:** Keep diagrams and screenshots as plain text or tables in the markdown, commit images into the repo and link via the **View on GitHub** path chip (readers open the file in GitHub where images work), or avoid relying on inline images inside Port. This limitation applies to **documentation content** shown in the widget, not to badge URLs in this plugin README (shields.io badges are outside the iframe).
+
 ## Prerequisites
 
 - A [Port](https://app.getport.io) account
@@ -184,3 +190,4 @@ techdocs/
 | No docs on a **Service** page | Service has no `repository` / `githubRepository` relation, or it doesn’t match tech docs’ repo | In Port, link the service to the same repository entity as your README `techDoc` rows; or set an explicit `service` relation on each tech doc |
 | `Failed to load entity` in console | JWT can’t read that blueprint | Ensure the widget’s Port app / token can call **Get an entity** for the Service blueprint |
 | Widget ignores Port theme | `applyThemeCss()` not called | Ensure `usePostMessageData` hook calls `sdk.applyThemeCss()` on mount |
+| Broken images in doc body | README uses `https://…` image URLs | Port plugin CSP blocks external media; see [Images in ingested READMEs](#images-in-ingested-readmes) |
