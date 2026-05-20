@@ -12,6 +12,10 @@ function readBlueprintParam(raw: unknown): BlueprintParam | null {
   };
 }
 
+function readBooleanParam(value: unknown): boolean {
+  return value === true || value === "true";
+}
+
 export function configFromParams(params: Params): PluginConfig | null {
   const blueprint = readBlueprintParam(params.blueprint?.value);
   if (!blueprint) return null;
@@ -21,5 +25,9 @@ export function configFromParams(params: Params): PluginConfig | null {
       ? params.createdDateProperty.value.trim()
       : "";
 
-  return { blueprint, createdDateProperty };
+  return {
+    blueprint,
+    createdDateProperty,
+    weekStartsOnMonday: readBooleanParam(params.weekStartsOnMonday?.value),
+  };
 }
