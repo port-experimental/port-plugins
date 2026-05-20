@@ -18,13 +18,13 @@ export function useDocs(config: PluginConfig) {
     );
 
     const docsQuery = useInfiniteQuery({
-        queryKey: ["techDocs", config.techDocBlueprint, config.repositoryBlueprint],
+        queryKey: ["techDocs", config.techDocBlueprint, config.techdocsSourceBlueprint],
         queryFn: ({ pageParam }) =>
             fetchTechDocsPage(
                 portApiBaseUrl!,
                 portToken!,
                 config.techDocBlueprint,
-                config.repositoryBlueprint,
+                config.techdocsSourceBlueprint,
                 pageParam as string | undefined
             ),
         initialPageParam: undefined as string | undefined,
@@ -39,7 +39,7 @@ export function useDocs(config: PluginConfig) {
             entityIdentifier,
             entityBlueprintId,
             config.techDocBlueprint,
-            config.repositoryBlueprint,
+            config.techdocsSourceBlueprint,
             config.relatedToDirection,
         ],
         queryFn: ({ pageParam }) =>
@@ -50,7 +50,7 @@ export function useDocs(config: PluginConfig) {
                     hostEntityIdentifier: entityIdentifier!,
                     hostBlueprint: entityBlueprintId!,
                     techDocBlueprint: config.techDocBlueprint,
-                    repositoryBlueprint: config.repositoryBlueprint,
+                    techdocsSourceBlueprint: config.techdocsSourceBlueprint,
                     direction: config.relatedToDirection,
                 },
                 pageParam as string | undefined

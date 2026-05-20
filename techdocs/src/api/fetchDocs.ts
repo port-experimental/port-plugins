@@ -21,11 +21,11 @@ function normalizeNext(raw: unknown): string | null {
 
 export function mapSearchEntity(
   e: Record<string, unknown>,
-  repositoryBlueprint: string
+  techdocsSourceBlueprint: string
 ): TechDocEntity {
   const rel = (e.relations ?? {}) as Record<string, unknown>;
   const repository =
-    relationIdList(rel[repositoryBlueprint])[0] ??
+    relationIdList(rel[techdocsSourceBlueprint])[0] ??
     relationIdList(rel.repository)[0] ??
     relationIdList(rel.githubRepository)[0] ??
     "";
@@ -48,7 +48,7 @@ export async function fetchTechDocsPage(
   baseUrl: string,
   token: string,
   techDocBlueprint: string,
-  repositoryBlueprint: string,
+  techdocsSourceBlueprint: string,
   from?: string | null
 ): Promise<TechDocsPage> {
   if (DEV_MOCK) {
@@ -95,7 +95,7 @@ export async function fetchTechDocsPage(
 
   return {
     entities: entities.map((e: Record<string, unknown>) =>
-      mapSearchEntity(e, repositoryBlueprint)
+      mapSearchEntity(e, techdocsSourceBlueprint)
     ),
     next,
   };

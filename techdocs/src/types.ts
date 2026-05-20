@@ -33,7 +33,7 @@ export type RelatedToDirection = "upstream" | "downstream";
 
 export type PluginConfig = {
   techDocBlueprint: string;
-  repositoryBlueprint: string;
+  techdocsSourceBlueprint: string;
   /**
    * Direction for Port `relatedTo` when resolving tech docs for the current entity page
    * (`POST /v1/entities/search`).

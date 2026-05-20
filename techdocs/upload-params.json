@@ -4,9 +4,9 @@
     "isRequired": false,
     "label": "Tech Doc blueprint"
   },
-  "repositoryBlueprint": {
+  "techdocsSourceBlueprint": {
     "type": "blueprint",
     "isRequired": false,
-    "label": "Repository blueprint"
+    "label": "Tech docs source blueprint"
   }
 }

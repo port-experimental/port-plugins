@@ -32,13 +32,13 @@ function configFromParams(params: Params): PluginConfig {
     params["techDocBlueprint"]?.value,
     "techDoc"
   );
-  const repositoryBlueprint = blueprintParamValue(
-    params["repositoryBlueprint"]?.value,
+  const techdocsSourceBlueprint = blueprintParamValue(
+    params["techdocsSourceBlueprint"]?.value,
     "githubRepository"
   );
   return {
     techDocBlueprint,
-    repositoryBlueprint,
+    techdocsSourceBlueprint,
     relatedToDirection: "downstream",
   };
 }

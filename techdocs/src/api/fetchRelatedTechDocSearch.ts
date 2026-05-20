@@ -57,7 +57,7 @@ export type RelatedTechDocSearchParams = {
   hostEntityIdentifier: string;
   hostBlueprint: string;
   techDocBlueprint: string;
-  repositoryBlueprint: string;
+  techdocsSourceBlueprint: string;
   direction: RelatedToDirection;
 };
 
@@ -327,7 +327,7 @@ export async function fetchTechDocsRelatedToEntityPage(
       ? data.next.trim()
       : null;
   return {
-    entities: raw.map((e) => mapSearchEntity(e, params.repositoryBlueprint)),
+    entities: raw.map((e) => mapSearchEntity(e, params.techdocsSourceBlueprint)),
     next,
   };
 }
