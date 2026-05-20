@@ -38,11 +38,24 @@ export function formatMonthYear(date: Date): string {
   return date.toLocaleDateString(undefined, { month: "long", year: "numeric" });
 }
 
-export function weekdayLabels(): string[] {
-  const base = new Date(2024, 0, 7); // Sunday
+/** JS Date.getDay(): Sunday = 0, Monday = 1. */
+export const SUNDAY = 0;
+export const MONDAY = 1;
+
+export function firstDayOfWeekFromConfig(weekStartsOnMonday: boolean): number {
+  return weekStartsOnMonday ? MONDAY : SUNDAY;
+}
+
+/** Offset from the 1st of the month to the first cell in the week grid. */
+export function monthGridStartOffset(firstOfMonth: Date, firstDayOfWeek: number): number {
+  return (firstOfMonth.getDay() - firstDayOfWeek + 7) % 7;
+}
+
+export function weekdayLabels(firstDayOfWeek: number): string[] {
+  const sunday = new Date(2024, 0, 7);
   return Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(base);
-    d.setDate(base.getDate() + i);
+    const d = new Date(sunday);
+    d.setDate(sunday.getDate() + ((firstDayOfWeek + i) % 7));
     return d.toLocaleDateString(undefined, { weekday: "short" });
   });
 }

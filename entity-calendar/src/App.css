@@ -12,7 +12,9 @@
   --radius: 8px;
 
   --hover-bg: var(--background-dim-transparent, rgba(0, 0, 0, 0.04));
-  --shadow-dropdown: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --accent: rgb(var(--primary, 37, 99, 235));
+  --overlay: color-mix(in srgb, var(--text) 40%, transparent);
+  --shadow-dropdown: 0 8px 24px color-mix(in srgb, var(--text) 12%, transparent);
 }
 
 *,
@@ -109,7 +111,7 @@ body {
 .error {
   --error-bg: color-mix(in srgb, #dc2626 8%, var(--card));
   --error-border: color-mix(in srgb, #dc2626 30%, var(--border));
-  --error-text: #b91c1c;
+  --error-text: color-mix(in srgb, #dc2626 85%, var(--text));
   background: var(--error-bg);
   border: 1px solid var(--error-border);
   color: var(--error-text);
@@ -176,20 +178,17 @@ body {
 }
 
 .day-cell--today .day-number {
-  --today-number-color: #000000;
   font-weight: 700;
-  color: var(--today-number-color);
+  color: var(--text);
 }
 
 .day-cell--marked {
-  --marked-cell-bg: color-mix(in srgb, #000000 10%, transparent);
   cursor: pointer;
-  background: var(--marked-cell-bg);
+  background: color-mix(in srgb, var(--text) 10%, transparent);
 }
 
 .day-cell--marked:hover:not(:disabled) {
-  --marked-cell-border: #000000;
-  border-color: var(--marked-cell-border);
+  border-color: var(--text);
 }
 
 .day-cell:disabled {
@@ -208,24 +207,22 @@ body {
 }
 
 .day-dot {
-  --day-dot-color: #000000;
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--day-dot-color);
+  background: var(--text);
 }
 
 .day-count {
-  --day-count-color: #000000;
   font-size: 9px;
   font-weight: 600;
-  color: var(--day-count-color);
+  color: var(--text);
 }
 
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4);
+  background: var(--overlay);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -316,10 +313,9 @@ body {
 }
 
 .entity-link {
-  --entity-link-color: #2563eb;
   flex-shrink: 0;
   font-size: 12px;
-  color: var(--entity-link-color);
+  color: var(--accent);
   text-decoration: none;
 }
 

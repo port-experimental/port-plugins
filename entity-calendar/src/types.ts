@@ -40,6 +40,8 @@ export type BlueprintParam = {
 export type PluginConfig = {
   blueprint: BlueprintParam;
   createdDateProperty: string;
+  /** When true, calendar week starts Monday; otherwise Sunday (default). */
+  weekStartsOnMonday: boolean;
 };
 
 export type CalendarEntity = {
