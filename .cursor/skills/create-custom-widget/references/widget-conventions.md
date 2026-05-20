@@ -11,7 +11,7 @@ Each widget lives in its own top-level directory:
 
 ```
 <plugins-repo>/
-├── README.md                     # Lists plugins — update when adding one
+├── README.md                     # Plugins table (Widget, Version, Description) — update when adding one or bumping package.json version
 ├── .cursor/                      # Optional — e.g. editor skills / templates
 │   └── skills/
 │       └── create-custom-widget/

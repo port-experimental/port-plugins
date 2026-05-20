@@ -17,7 +17,7 @@ Use this path when the goal is **not** greenfield scaffolding but to **audit and
 2. **Gap analysis** — Compare against the README standard below, params guidance in [scaffolding-and-implementation.md](scaffolding-and-implementation.md) (**Define parameters**), and [plugin-architecture.md](plugin-architecture.md) / [widget-conventions.md](widget-conventions.md).
 3. **Prioritize** — Correctness first (Port API request shapes, token usage, theme), then operator docs (README, param table), then polish (badges, screenshots, structure tree).
 4. **Patch** — Keep diffs focused: bump SDK with hook changes; keep `PluginConfig` and `upload-params.json` in lockstep; rewrite README sections rather than deleting useful catalog/integration detail.
-5. **Verify** — `npm ci` / `npm install`, `npm run build`, smoke in **Local development** mode and/or in Port; update the **repo-level** widgets table row (step 7 under scaffolding) if the public description or behaviour changed materially.
+5. **Verify** — `npm ci` / `npm install`, `npm run build`, smoke in **Local development** mode and/or in Port; update the **repo-level** widgets table row (step 7 under scaffolding) if the public description or behaviour changed materially, and set the **Version** column to match `package.json` `version` when that field changed.
 
 ### PR checklist (copy into description)
 
@@ -36,10 +36,11 @@ Use this path when the goal is **not** greenfield scaffolding but to **audit and
 - [ ] **UX/UI:** Loading, empty, and error states; theme applied; responsive iframe layout; no duplicate plugin title/description/icon; no emoji — use **`<i>`** or an icon library for icons when needed.
 - [ ] **CSS:** `:root` = surfaces/text/borders only; decorations (dots, links, badges, accent text) use **class-local** color vars — not shared `--accent` / `--primary` on non-surface UI ([Surface vs decoration colors](scaffolding-and-implementation.md#surface-vs-decoration-colors)).
 - [ ] **Safe rendering:** No `innerHTML` / `dangerouslySetInnerHTML` for dynamic or user content.
+- [ ] **Repo Plugins table:** Root `README.md` row includes **Version** matching `package.json` `version` when the plugin was added or version-bumped.
 
 ### 8. Per-plugin `README.md` standard (required)
 
-Each **plugin directory must** include a `README.md` that follows **this section order**. The repo-level widgets table (step 7) is only an index; the per-plugin README is the **authoritative** operator and maintainer guide. If a section does not apply don't include it
+Each **plugin directory must** include a `README.md` that follows **this section order**. The repo-level widgets table (step 7) is only an index (widget link, **Version** from `package.json`, short description); the per-plugin README is the **authoritative** operator and maintainer guide. If a section does not apply don't include it
 
 1. **`#` Title + summary** — Human title; one paragraph describing behaviour, a link to [Port](https://app.getport.io), and which catalog concepts apply (blueprints, relations, dashboard vs entity page).
 

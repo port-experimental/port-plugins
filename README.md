@@ -20,6 +20,6 @@ The plugins in this repository are provided by Port.io on an "as-is" and "as-ava
 
 ## Plugins
 
-| Widget | Description |
-|--------|-------------|
-| [Entity Calendar](./entity-calendar) | Month calendar marking entity creation dates; click a day to view title and identifier |
+| Widget | Version | Description |
+|--------|---------|-------------|
+| [Entity Calendar](./entity-calendar) | 0.1.0 | Month calendar marking entity creation dates; click a day to view title and identifier |
