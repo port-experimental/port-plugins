@@ -58,7 +58,7 @@ Plugins in this repo are **custom widgets**: each compiles to a single `dist/ind
 ```
 User requests a widget
         ↓
-Read repo README.md — what widgets exist?
+Read repo README.md — what widgets exist? (note Version column vs package.json)
         ↓
 Exact match? → Recommend existing widget; stop
         ↓
@@ -84,7 +84,7 @@ Document → readme-and-audit.md (per-plugin README §8)
 
 Before scaffolding or editing blueprints:
 
-1. Read the project `README.md` and related plugins’ `upload-params.json`, `src/types.ts`, and `src/App.tsx`.
+1. Read the project `README.md` (Plugins table: widget link, **Version**, description) and related plugins’ `package.json`, `upload-params.json`, `src/types.ts`, and `src/App.tsx`.
 2. Choose: **reuse as-is**, **copy & adapt**, **new widget with shared params**, or **greenfield scaffold**.
 
 Full decision matrix, checklist, and examples: **[references/reuse-workflow.md](references/reuse-workflow.md)**.
@@ -119,7 +119,7 @@ Use `upsert_blueprint` only when the user wants catalog changes applied via MCP.
 ### 5. Document and ship
 
 - Per-plugin **README** (required section order): [references/readme-and-audit.md](references/readme-and-audit.md)
-- Repo-level widgets table row when adding a new plugin
+- Repo-level widgets table row when adding a new plugin (include **Version** from that plugin’s `package.json` `version` field)
 - Canonical upload command (see scaffolding reference or plugin-architecture **Deployment**)
 
 ### 6. Review anti-patterns and persistence

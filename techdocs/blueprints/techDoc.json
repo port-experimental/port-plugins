@@ -1,0 +1,55 @@
+{
+  "identifier": "techDoc",
+  "title": "Tech Doc",
+  "icon": "Book",
+  "schema": {
+    "properties": {
+      "content": {
+        "title": "Content",
+        "type": "string",
+        "format": "markdown",
+        "description": "The raw markdown content of the document"
+      },
+      "filePath": {
+        "title": "File Path",
+        "type": "string",
+        "description": "Path to the file within the repository"
+      },
+      "folderPath": {
+        "title": "Folder Path",
+        "type": "string",
+        "description": "Parent folder path (e.g. apps/Frontend)"
+      },
+      "url": {
+        "title": "GitHub URL",
+        "type": "string",
+        "format": "url",
+        "description": "Direct link to the file on GitHub"
+      },
+      "lastUpdated": {
+        "title": "Last Updated",
+        "type": "string",
+        "format": "date-time"
+      },
+      "archived": {
+        "type": "boolean",
+        "title": "Archived",
+        "default": false
+      }
+    },
+    "required": [
+      "content"
+    ]
+  },
+  "mirrorProperties": {},
+  "calculationProperties": {},
+  "aggregationProperties": {},
+  "relations": {
+    "service": {
+      "title": "Service",
+      "target": "service",
+      "required": true,
+      "many": false
+    }
+  }
+}

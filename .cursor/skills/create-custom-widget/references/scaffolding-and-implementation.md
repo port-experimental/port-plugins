@@ -648,17 +648,19 @@ export type PluginConfig = {
 
 ### 7. Update the README
 
-Add a row to the widgets table:
+Add a row to the repo-level **Plugins** widgets table in the project root `README.md`. Read **`version`** from the plugin’s `package.json` (same semver you ship with the build) and keep the table in sync when you bump that field.
 
 ```markdown
-| [Widget Title](./widget-name) | One-sentence description |
+| [Widget Title](./widget-name) | 1.0.0 | One-sentence description |
 ```
 
 If the widget reuses or extends existing blueprints, mention this in the description:
 
 ```markdown
-| [Project Dashboard](./project-dashboard) | Example: combines work-tracking and discussion plugins already in the same project, plus any new blueprint-backed features |
+| [Project Dashboard](./project-dashboard) | 0.2.1 | Example: combines work-tracking and discussion plugins already in the same project, plus any new blueprint-backed features |
 ```
+
+When auditing or releasing, update the **Version** cell if `package.json` `version` changed and the description still matches.
 
 ### 8. Per-plugin `README.md`
 

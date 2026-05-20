@@ -532,7 +532,7 @@ If an existing widget is **close to the requirements**, consider adapting it ins
    - Document which blueprints are shared with the source widget
 
 4. **Update README:**
-   - Add new widget row
+   - Add new widget row to the repo **Plugins** table (Widget, **Version** from `package.json` `version`, Description)
    - Mention relationship to the source widget (e.g., "Extended from task-comment-chat")
 
 **Example: Creating "bug-comment-chat" from "task-comment-chat":**
