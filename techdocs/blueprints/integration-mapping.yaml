@@ -1,0 +1,40 @@
+resources:
+  - kind: repository
+    selector:
+      query: "true"
+      includedFiles:
+        - README.md
+    port:
+      entity:
+        mappings:
+          identifier: .name
+          title: .name
+          blueprint: '"githubRepository"'
+          properties:
+            readme: .__includedFiles["README.md"]
+            url: .html_url
+            defaultBranch: .default_branch
+
+  - kind: file
+    selector:
+      query: .path | startswith("node_modules/") | not
+      files:
+        - path: "**/*.md"
+          repos: []
+          skipParsing: false
+          validationCheck: false
+    port:
+      entity:
+        mappings:
+          identifier: .repository.name + "-" + (.path | gsub("/"; "-") | gsub("\\."; "-") | gsub(" ";"-"))
+          title: '.path | split("/") | .[-1] | split(".") | .[0]'
+          blueprint: '"techDoc"'
+          properties:
+            content: .content
+            filePath: .path
+            folderPath: .path | split("/") | .[:-1] | join("/")
+            url: .repository.html_url + "/blob/" + .repository.default_branch + "/" + .path
+            # File payload often has no .commit (see Port sample). Prefer commit dates when present; else repo push/update (not per-file).
+            lastUpdated: (try (.commit.commit.committer.date // .commit.commit.author.date // .commit.committer.date // .commit.author.date) catch null) // .repository.pushed_at // .repository.updated_at
+          relations:
+            service: .repository.name
