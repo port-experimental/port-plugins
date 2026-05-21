@@ -6,7 +6,8 @@ Designed for **dashboard** pages (not entity-scoped).
 
 ## Preview image
 
-<img width="653" height="623" alt="image" src="https://github.com/user-attachments/assets/7afdf1eb-282b-4d3c-b796-4f2744927a42" />
+<img width="633" height="606" alt="Screenshot 2026-05-20 at 14 44 06" src="https://github.com/user-attachments/assets/b3f35fb1-429f-4333-8f0a-3475029de4ec" />
+
 
 
 ## Features
