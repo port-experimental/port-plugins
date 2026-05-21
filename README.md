@@ -1,6 +1,6 @@
 # Port Plugins
 
-This repository contains plugins maintained by [Port.io](https://www.port.io).
+This repository contains plugins contributed by [Port.io](https://www.port.io).
 
 ## License
 

@@ -7,6 +7,6 @@
   "techdocsSourceBlueprint": {
     "type": "blueprint",
     "isRequired": false,
-    "label": "Tech docs source blueprint"
+    "label": "Tech Doc related blueprint"
   }
 }
