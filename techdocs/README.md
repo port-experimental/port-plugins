@@ -114,17 +114,12 @@ port-plugins upload \
 3. Select **TechDocs Viewer**
 4. Optionally set **Tech Doc blueprint** and **Tech Doc related blueprint** (defaults: `techDoc` and `githubRepository`)
 
-### Service entity pages
+### Entity page behaviour
 
-When the widget is embedded on an **entity page** whose blueprint is **`service`** or **`microservice`** (case-insensitive, or names you list in `serviceContextBlueprints`), the sidebar lists only tech docs that belong to that service:
+When the widget runs on an **entity page** (Port sends `PLUGIN_DATA.entity` with blueprint and identifier), the sidebar lists only **tech docs related to that host entity**. On **dashboards** (no host entity), it loads all ingested tech docs as before.
 
-1. **Direct link:** If a tech doc has the **`service`** relation (configurable via `serviceRelationKey`) set, it is shown only when it points at the **current entity’s identifier**.
-2. **Inverse link (Related Entities):** If the **service** entity lists related tech docs under relation keys such as **`techDoc`** or **`techDocs`** (see `hostTechDocRelationKeys`), those docs are included even when the tech doc row does **not** store `service` back. This matches what you see under **Related Entities** in Port.
-3. **Repository fallback:** If neither of the above applies, a doc is included when its **`repository`** relation matches any **repository** / **githubRepository** relation on the host service.
+Related docs are resolved with [`POST /v1/blueprints/{techDocBlueprint}/entities/search`](https://docs.getport.io/api-reference/search-entities) using **`relatedTo`** from the host entity on the tech doc blueprint.
 
-The widget loads the **full** service entity with [`GET /v1/blueprints/{blueprint}/entities/{identifier}`](https://docs.getport.io/api-reference/get-an-entity) because Port’s `PLUGIN_DATA` message often omits **relations**; without that, matching would fail and the sidebar would look empty.
-
-On dashboards or non-service entity pages, all tech docs are shown as before.
 
 ## Widget Parameters
 
@@ -144,7 +139,7 @@ npm run dev   # starts webpack-dev-server at http://localhost:9000
 
 The widget includes a **dev mock mode** that activates automatically when running outside Port's iframe. It renders sample documentation so you can develop the UI without a live Port connection.
 
-To test **service-scoped filtering** locally, in [`src/hooks/usePostMessageData.ts`](src/hooks/usePostMessageData.ts) set e.g. `MOCK_ENTITY_ID = "mock-backend-service"`, `MOCK_ENTITY_BLUEPRINT = "service"` (only **Backend Docs** mock has a `service` relation). For **repository fallback** only, use blueprint `service` and set `MOCK_ENTITY_REPOSITORY_RELATION = "Node"` with docs that have no `service` relation.
+To test **entity-page filtering** locally, in [`src/hooks/usePostMessageData.ts`](src/hooks/usePostMessageData.ts) set `MOCK_ENTITY_ID` and `MOCK_ENTITY_BLUEPRINT` (for example `"mock-backend-service"` and `"service"` — only **Backend Docs** mock has a `service` relation). 
 
 To test inside Port: edit a custom widget → toggle **"Local development"** → the iframe loads `http://localhost:9000`.
 
@@ -164,7 +159,8 @@ techdocs/
 │   ├── types.ts                  # TypeScript types
 │   ├── api/
 │   │   ├── fetchDocs.ts          # Port API client for techDoc entities
-│   │   └── fetchEntity.ts        # GET host entity (relations for service filtering)
+│   │   ├── fetchRelatedTechDocSearch.ts  # Entity-page search rules + pagination
+│   │   └── fetchBlueprintSchema.ts       # Blueprint relations / path discovery
 │   ├── components/
 │   │   ├── Sidebar.tsx           # Tree navigation sidebar
 │   │   ├── DocViewer.tsx         # Markdown document viewer
@@ -172,7 +168,7 @@ techdocs/
 │   ├── hooks/
 │   │   ├── usePostMessageData.ts # Port iframe communication (via plugins-sdk)
 │   │   └── useMediaQuery.ts
-│   └── utils/                    # column widths, service filter, tech doc props
+│   └── utils/                    # column widths, relation id helpers, mocks
 ├── package.json
 ├── upload-params.json            # Widget parameter definitions
 ├── webpack.config.js             # Builds single self-contained HTML
@@ -187,7 +183,7 @@ techdocs/
 | No documents in sidebar | `techDoc` entities not ingested | Check GitHub Ocean integration mapping and trigger resync |
 | 422 error on API call | Wrong search body structure | Ensure `combinator`/`rules` are nested inside `{ query: {...} }` |
 | Missing repo docs | Wrong branch in integration mapping | Omit `branch` from `repos` to auto-detect, or verify branch name |
-| No docs on a **Service** page | Service has no `repository` / `githubRepository` relation, or it doesn’t match tech docs’ repo | In Port, link the service to the same repository entity as your README `techDoc` rows; or set an explicit `service` relation on each tech doc |
-| `Failed to load entity` in console | JWT can’t read that blueprint | Ensure the widget’s Port app / token can call **Get an entity** for the Service blueprint |
+| No docs on an **entity** page | Host and tech docs are not connected in the catalog (no shared relation target, traversable path, or `relatedTo` link) | Add or fix **relations** so host and `techDoc` share a bridge (e.g. same `githubRepository`) or link directly; trigger resync if needed |
+| `Failed to load blueprint` in console | JWT can’t read blueprint schemas | Ensure the widget token can call **Get a blueprint** for the host and tech doc blueprints |
 | Widget ignores Port theme | `applyThemeCss()` not called | Ensure `usePostMessageData` hook calls `sdk.applyThemeCss()` on mount |
 | Broken images in doc body | README uses `https://…` image URLs | Port plugin CSP blocks external media; see [Images in ingested READMEs](#images-in-ingested-readmes) |
