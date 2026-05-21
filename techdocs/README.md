@@ -112,7 +112,7 @@ port-plugins upload \
 1. Go to any Port dashboard
 2. Click **+ Widget** → **Custom Widget**
 3. Select **TechDocs Viewer**
-4. Optionally override the `techDocBlueprint` or `techdocsSourceBlueprint` parameters (defaults are `techDoc` and `githubRepository`)
+4. Optionally set **Tech Doc blueprint** and **Tech Doc related blueprint** (defaults: `techDoc` and `githubRepository`)
 
 ### Service entity pages
 
@@ -130,10 +130,10 @@ On dashboards or non-service entity pages, all tech docs are shown as before.
 
 Configured via `upload-params.json`:
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `techDocBlueprint` | string | No | `techDoc` | Blueprint identifier for documentation entities (if not provided we'll use `techDoc` as default blueprint identifier) |
-| `techdocsSourceBlueprint` | string | No | `githubRepository` | Blueprint identifier for repository entities (if not provided we'll use `githubRepository` as default blueprint identifier) |
+| Label (Port UI) | Parameter key | Type | Required | Default | Description |
+|-----------------|---------------|------|----------|---------|-------------|
+| Tech Doc blueprint | `techDocBlueprint` | blueprint | No | `techDoc` | Blueprint for documentation entities |
+| Tech Doc related blueprint | `techdocsSourceBlueprint` | blueprint | No | `githubRepository` | Blueprint for related repository entities (sidebar grouping) |
 
 ## Local Development
 
