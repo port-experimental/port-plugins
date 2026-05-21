@@ -1,16 +1,16 @@
 ---
-name: create-custom-widget
+name: create-port-plugin
 description: >-
   Reuse existing Port custom plugins in the repo or build new ones from scratch as self-contained
   React/TypeScript iframe widgets (@port-labs/plugins-sdk, port-plugins-cli) uploaded as Port
-  custom widgets. Use when recommending an existing plugin, copying/adapting one, greenfield scaffolding, or auditing upload-params.json and per-plugin README. Do not use for Ocean
+  plugins. Use when recommending an existing plugin, copying/adapting one, greenfield scaffolding, or auditing upload-params.json and per-plugin README. Do not use for Ocean
   integrations, generic Port admin without plugin code, or blueprint-only catalog work with no
   widget implementation.
 metadata:
-  title: Create Custom Widget
+  title: Create Plugin
 ---
 
-# Create a Port Custom Widget
+# Create a Port Plugin
 
 ## Official documentation (source of truth)
 
@@ -51,7 +51,7 @@ Plugins in this repo are **custom widgets**: each compiles to a single `dist/ind
 |------|--------|
 | **Reuse** an existing plugin (exact or superset match — configure, don’t rebuild) | [references/reuse-workflow.md](references/reuse-workflow.md) (stop when a match is found) |
 | **Audit or align** an existing plugin (README, params, SDK, build, upload docs) | [references/readme-and-audit.md](references/readme-and-audit.md) |
-| **Copy, adapt, or scaffold** a new custom widget | Steps below → [references/reuse-workflow.md](references/reuse-workflow.md) then [references/scaffolding-and-implementation.md](references/scaffolding-and-implementation.md) |
+| **Copy, adapt, or scaffold** a new plugin | Steps below → [references/reuse-workflow.md](references/reuse-workflow.md) then [references/scaffolding-and-implementation.md](references/scaffolding-and-implementation.md) |
 
 ## Quick decision tree
 
@@ -173,7 +173,7 @@ Use Port MCP while planning the widget and catalog — **not** from widget runti
 
 ## Assets
 
-Scaffold copies from `.cursor/skills/create-custom-widget/assets/`:
+Scaffold copies from `.cursor/skills/create-port-plugin/assets/`:
 
 | Template | Destination |
 |----------|-------------|
