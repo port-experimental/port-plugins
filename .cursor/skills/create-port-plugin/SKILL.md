@@ -40,6 +40,13 @@ Platform rules (CSP, upload limits, param metadata), SDK APIs, and CLI behavior 
 15. **Portal links** — origin from `document.referrer`, fallback `https://app.port.io`; never `portApiBaseUrl` for UI links.
 16. **No duplicate chrome** — Port’s iframe wrapper already shows the plugin **title**, **description**, and **icon** from registration; **do not** add them inside the widget (`App.tsx`, headers, heroes). Build functional UI only (lists, filters, forms, charts). In-content labels and the **current entity** title are fine — they are not plugin registration metadata.
 17. **Icons in widget UI** — **never** hardcode emoji (Unicode symbols in JSX or strings). When icons are needed, use a vetted **icon library** (e.g. Lucide, react-icons) — not emoji.
+18. **Plugin identifier (upload)** — the Port plugin identifier (`port-plugins upload --identifier`, plugin folder name when they match, and README upload examples) **must** satisfy Port’s allowed format. Validate with:
+
+```javascript
+const PLUGIN_IDENTIFIER_REGEX = /^(?!\.{1,2}$)[A-Za-z0-9@_.+:\\/=-]+$/;
+```
+
+Before upload, run the chosen identifier against this regex. If it fails, rename the plugin directory and fix all references (README, CI, docs) — **do not** upload with an invalid identifier. Repo convention remains **kebab-case** matching the directory (see [widget-conventions.md](references/widget-conventions.md)); the regex is the hard gate Port enforces.
 
 ## Overview
 
@@ -147,6 +154,7 @@ Before finishing: [references/guidelines.md](references/guidelines.md) (anti-pat
 | Errors | Include full response body text |
 | Iframe UI | Full width/height; **no** plugin title, description, or icon inside the iframe |
 | Icons | icon library; **never** hardcoded emoji |
+| Plugin identifier | `PLUGIN_IDENTIFIER_REGEX` — validate `--identifier` (and folder name when aligned) **before** every `port-plugins upload`; reject `.`, `..`, spaces, and other disallowed characters |
 | Persistence | Port entities/properties unless explicitly local-only UI state |
 
 ## Reference index

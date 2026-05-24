@@ -85,6 +85,14 @@ Each **plugin directory must** include a `README.md` that follows **this section
        --upsert
      ```
 
+     `<plugin-directory-name>` must pass Port’s identifier regex before upload:
+
+     ```javascript
+     const PLUGIN_IDENTIFIER_REGEX = /^(?!\.{1,2}$)[A-Za-z0-9@_.+:\\/=-]+$/;
+     ```
+
+     When auditing, confirm the README’s `--identifier` matches the folder name and satisfies this regex.
+
      Do **not** duplicate the full CLI tutorial here. For install, `port-plugins config`, tokens vs client credentials, and `--port-api-base-url` / region, link once to [@port-labs/port-plugins-cli on npm](https://www.npmjs.com/package/@port-labs/port-plugins-cli) (and [Port Plugins](https://docs.getport.io/customize-pages-dashboards-and-plugins/plugins) where relevant).
 
    - **Add in Port** — Short steps: custom widget → pick plugin → params defaults vs overrides (cross-reference **Widget parameters** above).

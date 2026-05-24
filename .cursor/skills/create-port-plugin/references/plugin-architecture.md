@@ -457,6 +457,14 @@ body,
 
 ## Deployment
 
+**Plugin identifier:** `--identifier` must match Port’s allowed format. Before upload, validate (folder name too when it matches `--identifier`):
+
+```javascript
+const PLUGIN_IDENTIFIER_REGEX = /^(?!\.{1,2}$)[A-Za-z0-9@_.+:\\/=-]+$/;
+```
+
+Do not upload if the identifier fails this check — rename the plugin directory and fix README/CI references first. See [widget-conventions.md](widget-conventions.md) (**Naming conventions**).
+
 ```bash
 # Install CLI globally
 npm install -g @port-labs/port-plugins-cli

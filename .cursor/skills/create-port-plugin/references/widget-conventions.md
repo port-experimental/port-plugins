@@ -54,6 +54,21 @@ Pick **existing** sibling plugins as references when they match what you are bui
 | `package.json` name | `port-{dir-name}-plugin` | `port-service-health-panel-plugin` |
 | Widget title in Port | Title Case | `"Service Health Panel"` |
 
+### Plugin identifier validation (required before upload)
+
+Port rejects identifiers outside its allowed character set. **Always** validate the directory name and `port-plugins upload --identifier` before uploading:
+
+```javascript
+const PLUGIN_IDENTIFIER_REGEX = /^(?!\.{1,2}$)[A-Za-z0-9@_.+:\\/=-]+$/;
+```
+
+| Outcome | Examples |
+|---------|----------|
+| **Valid** | `entity-calendar`, `service-health-panel`, `my_widget`, `plugin@v1` |
+| **Invalid** | `.`, `..`, empty string, identifiers with spaces or characters outside the class above |
+
+If validation fails, rename the plugin folder and update README upload commands and any CI paths — do not upload until the identifier passes.
+
 ## Required Files Per Widget
 
 | File | Purpose | Action |
