@@ -1,8 +1,12 @@
+import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { searchBlueprintEntities } from "../api/entities";
 import { fetchBlueprintScorecards } from "../api/scorecards";
-import type { PluginConfig, ScorecardComplianceRow } from "../types";
-import { computeScorecardCompliance } from "../utils/entityScorecardStats";
+import type { EntityGapSummary, PluginConfig, ScorecardComplianceRow } from "../types";
+import {
+  buildEntityGapsForScorecard,
+  computeScorecardCompliance,
+} from "../utils/entityScorecardStats";
 
 export function useScorecardGoals(
   config: PluginConfig | null,
@@ -34,10 +38,24 @@ export function useScorecardGoals(
     enabled,
   });
 
+  const scorecards = scorecardsQuery.data ?? [];
+  const entities = entitiesQuery.data ?? [];
+
   const rows: ScorecardComplianceRow[] =
-    scorecardsQuery.data && entitiesQuery.data
-      ? computeScorecardCompliance(scorecardsQuery.data, entitiesQuery.data)
+    scorecards.length > 0
+      ? computeScorecardCompliance(scorecards, entities)
       : [];
+
+  const gapsByScorecard = useMemo(() => {
+    const map: Record<string, EntityGapSummary[]> = {};
+    for (const scorecard of scorecards) {
+      map[scorecard.identifier] = buildEntityGapsForScorecard(
+        scorecard,
+        entities
+      );
+    }
+    return map;
+  }, [scorecards, entities]);
 
   const isLoading = scorecardsQuery.isLoading || entitiesQuery.isLoading;
   const isError = scorecardsQuery.isError || entitiesQuery.isError;
@@ -45,7 +63,8 @@ export function useScorecardGoals(
 
   return {
     rows,
-    entityCount: entitiesQuery.data?.length ?? 0,
+    gapsByScorecard,
+    entityCount: entities.length,
     isLoading,
     isError,
     error,

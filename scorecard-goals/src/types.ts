@@ -64,3 +64,16 @@ export type ScorecardComplianceRow = {
   passedEntities: number;
   passPercent: number;
 };
+
+export type FailedRuleInfo = {
+  ruleIdentifier: string;
+  ruleTitle: string;
+  scorecardIdentifier: string;
+  scorecardTitle: string;
+};
+
+export type EntityGapSummary = {
+  identifier: string;
+  title: string;
+  failedRules: FailedRuleInfo[];
+};

@@ -8,6 +8,7 @@ Compliance is computed from entity search results: for each entity, every rule o
 
 - **Blueprint** parameter to scope entities and scorecards
 - One horizontal bar per scorecard with pass percentage
+- **Show gaps for completion** opens a modal listing entities that did not pass all rules, with the specific rules (and scorecard) still failing
 - Counts of entities that passed all rules vs total entities
 - Loading, empty, and error states
 - Port light/dark theme via `@port-labs/plugins-sdk`

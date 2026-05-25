@@ -1,5 +1,7 @@
 import type {
+  EntityGapSummary,
   EntityScorecardEvaluation,
+  FailedRuleInfo,
   PortEntity,
   Scorecard,
   ScorecardComplianceRow,
@@ -63,4 +65,43 @@ export function computeScorecardCompliance(
       passPercent,
     };
   });
+}
+
+export function buildEntityGapsForScorecard(
+  scorecard: Scorecard,
+  entities: PortEntity[]
+): EntityGapSummary[] {
+  const ruleTitleById = new Map(
+    scorecard.rules.map((r) => [r.identifier, r.title ?? r.identifier])
+  );
+  const gaps: EntityGapSummary[] = [];
+
+  for (const entity of entities) {
+    const evaluation = entity.scorecards?.[scorecard.identifier];
+    const failedRules: FailedRuleInfo[] = [];
+
+    for (const rule of scorecard.rules) {
+      const result = evaluation?.rules?.find(
+        (r) => r.identifier === rule.identifier
+      );
+      if (isRulePassed(result?.status)) continue;
+
+      failedRules.push({
+        ruleIdentifier: rule.identifier,
+        ruleTitle: ruleTitleById.get(rule.identifier) ?? rule.identifier,
+        scorecardIdentifier: scorecard.identifier,
+        scorecardTitle: scorecard.title,
+      });
+    }
+
+    if (failedRules.length > 0) {
+      gaps.push({
+        identifier: entity.identifier,
+        title: entity.title?.trim() || entity.identifier,
+        failedRules,
+      });
+    }
+  }
+
+  return gaps.sort((a, b) => a.title.localeCompare(b.title));
 }

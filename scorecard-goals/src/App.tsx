@@ -1,6 +1,8 @@
+import { useState } from "react";
 import "./App.css";
 import { EmptyState } from "./components/EmptyState";
 import { ErrorBanner } from "./components/ErrorBanner";
+import { GapsModal } from "./components/GapsModal";
 import { LoadingState } from "./components/LoadingState";
 import { ScorecardBar } from "./components/ScorecardBar";
 import { usePostMessageData } from "./hooks/usePostMessageData";
@@ -10,12 +12,12 @@ import { configFromParams } from "./utils/config";
 export function App() {
   const { params, portToken, portApiBaseUrl } = usePostMessageData();
   const config = configFromParams(params);
+  const [gapsModalScorecardId, setGapsModalScorecardId] = useState<
+    string | null
+  >(null);
 
-  const { rows, entityCount, isLoading, isError, error } = useScorecardGoals(
-    config,
-    portToken,
-    portApiBaseUrl
-  );
+  const { rows, gapsByScorecard, entityCount, isLoading, isError, error } =
+    useScorecardGoals(config, portToken, portApiBaseUrl);
 
   if (!portApiBaseUrl || !portToken) {
     return (
@@ -39,6 +41,9 @@ export function App() {
   }
 
   const hasRows = rows.length > 0;
+  const gapsModalRow = gapsModalScorecardId
+    ? rows.find((r) => r.scorecardIdentifier === gapsModalScorecardId)
+    : undefined;
 
   return (
     <div className="shell">
@@ -66,10 +71,27 @@ export function App() {
         <ul className="scorecard-list">
           {rows.map((row) => (
             <li key={row.scorecardIdentifier}>
-              <ScorecardBar row={row} />
+              <ScorecardBar
+                row={row}
+                gapCount={
+                  gapsByScorecard[row.scorecardIdentifier]?.length ?? 0
+                }
+                onShowGaps={() =>
+                  setGapsModalScorecardId(row.scorecardIdentifier)
+                }
+              />
             </li>
           ))}
         </ul>
+      )}
+
+      {gapsModalRow && config && (
+        <GapsModal
+          scorecardTitle={gapsModalRow.scorecardTitle}
+          blueprintIdentifier={config.blueprint.identifier}
+          entities={gapsByScorecard[gapsModalRow.scorecardIdentifier] ?? []}
+          onClose={() => setGapsModalScorecardId(null)}
+        />
       )}
     </div>
   );
