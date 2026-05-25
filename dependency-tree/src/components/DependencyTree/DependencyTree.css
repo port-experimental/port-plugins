@@ -1,0 +1,348 @@
+/*
+ * Theme tokens — use Port's CSS variables (injected by applyThemeCss) with
+ * light-mode fallbacks. Dark mode is applied automatically when Port injects
+ * its dark-mode overrides via applyThemeCss().
+ */
+.dep-tree-widget {
+  --dt-bg:           var(--background-primary,         #f5f7fa);
+  --dt-surface:      var(--background-dim,             #eaeef5);
+  --dt-node:         var(--background-dim,             #ffffff);
+  --dt-border:       var(--border-medium,              #d0d7e3);
+  --dt-border-node:  var(--border-contrast-medium,     #b8c2d6);
+  --dt-text:         var(--text-high,                  #1a1f2e);
+  --dt-text-muted:   var(--text-medium,                #4a5568);
+  --dt-text-faint:   var(--text-low,                   #718096);
+  --dt-accent:       #3c73f3;
+  --dt-error-bg:     rgba(185, 28, 28, 0.06);
+  --dt-error-border: rgba(185, 28, 28, 0.25);
+  --dt-error-text:   #b91c1c;
+}
+
+/* ── Widget shell ─────────────────────────────────────────── */
+.dep-tree-widget {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--dt-bg);
+  color: var(--dt-text);
+  font-family: 'DM Sans', system-ui, sans-serif;
+  overflow: hidden;
+}
+
+/* ── Header ───────────────────────────────────────────────── */
+.dep-tree-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--dt-border);
+  background: var(--dt-surface);
+  flex-shrink: 0;
+}
+.dep-tree-header__title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--dt-text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.dep-tree-header__subtitle {
+  font-size: 11px;
+  color: var(--dt-text-muted);
+  margin-top: 2px;
+}
+.dep-tree-header__controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.dep-tree-header__loading {
+  font-size: 11px;
+  color: var(--dt-accent);
+}
+
+/* ── Upstream toggle button ───────────────────────────────── */
+.dep-tree-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid var(--dt-border-node);
+  background: none;
+  color: var(--dt-text-faint);
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+}
+.dep-tree-toggle:hover {
+  border-color: var(--dt-accent);
+  color: var(--dt-text-muted);
+}
+.dep-tree-toggle--active {
+  background: rgba(60, 115, 243, 0.12);
+  border-color: var(--dt-accent);
+  color: var(--dt-accent);
+}
+
+/* ── Relation filter bar ──────────────────────────────────── */
+.relation-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  background: var(--dt-surface);
+  border-bottom: 1px solid var(--dt-border);
+  flex-shrink: 0;
+  overflow-x: auto;
+}
+.relation-filter-bar__label {
+  font-size: 11px;
+  color: var(--dt-text-muted);
+  white-space: nowrap;
+  margin-right: 4px;
+  flex-shrink: 0;
+}
+.relation-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  background: none;
+  color: var(--dt-text);
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+}
+.relation-filter-chip--active {
+  background: rgba(60, 115, 243, 0.08);
+}
+.relation-filter-chip--inactive {
+  border-color: var(--dt-border);
+  color: var(--dt-text-faint);
+}
+.relation-filter-chip__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--dt-text-faint);
+  flex-shrink: 0;
+}
+
+/* ── Canvas ───────────────────────────────────────────────── */
+.dep-tree-canvas {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+/* React Flow overrides */
+.dep-tree-canvas .react-flow__background {
+  background-color: var(--dt-bg);
+}
+/* CSS wins over SVG presentation attributes — themes the dot color */
+.dep-tree-canvas .react-flow__background circle,
+.dep-tree-canvas .react-flow__background rect {
+  fill: var(--dt-border);
+}
+.dep-tree-canvas .react-flow__controls {
+  background: var(--dt-surface);
+  border: 1px solid var(--dt-border-node);
+  border-radius: 8px;
+}
+.dep-tree-canvas .react-flow__controls-button {
+  background: var(--dt-surface);
+  border-color: var(--dt-border-node);
+  color: var(--dt-text-muted);
+  fill: var(--dt-text-muted);
+}
+.dep-tree-canvas .react-flow__controls-button:hover {
+  background: var(--dt-border);
+}
+
+/* ── Entity node ──────────────────────────────────────────── */
+.entity-node {
+  background: var(--dt-node);
+  border: 1.5px solid var(--dt-border-node);
+  border-radius: 10px;
+  padding: 10px 14px;
+  min-width: 180px;
+  max-width: 220px;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.entity-node:hover {
+  border-color: var(--dt-accent);
+  box-shadow: 0 0 0 3px rgba(60, 115, 243, 0.15);
+}
+.entity-node--root {
+  border-color: var(--dt-accent);
+  box-shadow: 0 0 0 3px rgba(60, 115, 243, 0.12);
+}
+.entity-node--cycle {
+  border-style: dashed;
+  border-color: #f59e0b;
+  opacity: 0.8;
+}
+.entity-node__handle {
+  background: var(--dt-accent) !important;
+  border: none !important;
+  width: 8px !important;
+  height: 8px !important;
+}
+.entity-node__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 7px;
+}
+.entity-node__icon {
+  font-size: 18px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+.entity-node__title-group {
+  min-width: 0;
+}
+.entity-node__title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--dt-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.entity-node__blueprint {
+  font-size: 10px;
+  color: var(--dt-text-muted);
+  margin-top: 2px;
+}
+.entity-node__badges {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  margin-top: 2px;
+}
+.entity-node__badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 500;
+  background: rgba(60, 115, 243, 0.12);
+  border: 1px solid rgba(60, 115, 243, 0.25);
+  color: var(--dt-accent);
+}
+.entity-node__badge--secondary {
+  background: rgba(92, 184, 92, 0.12);
+  border-color: rgba(92, 184, 92, 0.25);
+  color: #5cb85c;
+}
+.entity-node__badge--cycle {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.25);
+  color: #f59e0b;
+}
+.entity-node__more {
+  font-size: 10px;
+  color: var(--dt-text-faint);
+  margin-top: 6px;
+  text-align: right;
+}
+
+/* ── Depth badge ──────────────────────────────────────────── */
+.dep-tree-depth-badge {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  background: var(--dt-surface);
+  border: 1px solid var(--dt-border-node);
+  border-radius: 6px;
+  padding: 3px 10px;
+  font-size: 11px;
+  color: var(--dt-text-muted);
+  z-index: 5;
+  pointer-events: none;
+}
+
+/* ── Setup prompt ─────────────────────────────────────────── */
+.dep-tree-setup {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: var(--dt-text-muted);
+}
+.dep-tree-setup__icon { font-size: 32px; }
+.dep-tree-setup__text { font-size: 14px; }
+
+/* ── Empty state ──────────────────────────────────────────── */
+.dep-tree-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--dt-text-muted);
+  padding: 32px;
+  text-align: center;
+}
+.dep-tree-empty__icon { font-size: 36px; }
+.dep-tree-empty__title { font-size: 15px; font-weight: 600; color: var(--dt-text-faint); }
+.dep-tree-empty__subtitle { font-size: 13px; max-width: 340px; }
+
+/* ── Error banner ─────────────────────────────────────────── */
+.dep-tree-error {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: var(--dt-error-bg);
+  border-bottom: 1px solid var(--dt-error-border);
+  font-size: 13px;
+  color: var(--dt-error-text);
+  flex-shrink: 0;
+}
+.dep-tree-error__message { flex: 1; }
+.dep-tree-error__retry {
+  padding: 4px 12px;
+  background: var(--dt-error-bg);
+  border: 1px solid var(--dt-error-border);
+  border-radius: 6px;
+  color: var(--dt-error-text);
+  cursor: pointer;
+  font-size: 12px;
+}
+.dep-tree-error__retry:hover { filter: brightness(1.15); }
+
+/* ── Loading skeleton ─────────────────────────────────────── */
+.dep-tree-skeleton {
+  flex: 1;
+  position: relative;
+}
+.dep-tree-skeleton__node {
+  position: absolute;
+  width: 180px;
+  height: 72px;
+  border-radius: 10px;
+  background: linear-gradient(90deg,
+    var(--dt-node) 25%,
+    var(--dt-border) 50%,
+    var(--dt-node) 75%
+  );
+  background-size: 400% 100%;
+  animation: skeleton-shimmer 1.4s ease infinite;
+}
+@keyframes skeleton-shimmer {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}

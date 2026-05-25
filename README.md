@@ -22,5 +22,9 @@ The plugins in this repository are provided by Port.io on an "as-is" and "as-ava
 
 | Widget | Version | Description |
 |--------|---------|-------------|
+| [Blueprint Table](./blueprint-table) | 0.1.0 | Multi-blueprint entity table with configurable columns; supports up to 5 blueprints with tab navigation |
+| [Dependency Tree](./dependency-tree) | 0.1.0 | Interactive dependency graph with BFS traversal; shows upstream/downstream relations with configurable depth and relation filtering |
+| [DORA Dashboard](./dora-dashboard) | 0.1.0 | DORA metrics dashboard (Deployment Frequency, Lead Time, Change Failure Rate, MTTR) with historical trends |
 | [Entity Calendar](./entity-calendar) | 0.1.0 | Month calendar marking entity creation dates; click a day to view title and identifier |
+| [Scorecard Dashboard](./scorecard-dashboard) | 0.1.0 | Scorecard compliance dashboard grouped by team with grade thresholds and per-rule breakdown |
 | [TechDocs](./techdocs) | 0.1.0 | Documentation browser for ingested READMEs; sidebar navigation by repository and folder with GitHub-Flavored Markdown rendering |
