@@ -9,6 +9,27 @@ This repository contains plugins contributed by [Port.io](https://www.port.io).
 | [Entity Calendar](./entity-calendar) | 0.1.0 | Month calendar marking entity creation dates; click a day to view title and identifier |
 | [TechDocs](./techdocs) | 0.1.0 | Documentation browser for ingested READMEs; sidebar navigation by repository and folder with GitHub-Flavored Markdown rendering |
 
+## AI-assisted development - Skills (Cursor & Claude)
+
+This repo ships the same **create-port-plugin** skill for [Cursor](./.cursor/skills/create-port-plugin/) and [Claude Code](./.claude/skills/create-port-plugin/):
+
+| Tool | Skill path |
+|------|------------|
+| **Cursor** | [`.cursor/skills/create-port-plugin/`](./.cursor/skills/create-port-plugin/) |
+| **Claude Code** | [`.claude/skills/create-port-plugin/`](./.claude/skills/create-port-plugin/) |
+
+In either editor, ask the agent to create or extend a plugin; it will follow the skill’s workflows (reuse an existing widget, scaffold from templates, align `upload-params.json`, and document prerequisites).
+
+**After the skill generates or updates a plugin**, read that plugin’s **README** end to end — especially **Prerequisites**, **Widget parameters**, local development, and upload steps. Also review the skill reference guidelines (for example [guidelines.md](./.cursor/skills/create-port-plugin/references/guidelines.md) and [readme-and-audit.md](./.cursor/skills/create-port-plugin/references/readme-and-audit.md) under [`.cursor/skills/create-port-plugin/references/`](./.cursor/skills/create-port-plugin/references/) or the mirrored [`.claude/skills/create-port-plugin/references/`](./.claude/skills/create-port-plugin/references/)) so catalog setup, params, and runtime behaviour match Port’s expectations.
+
+## Port MCP (recommended)
+
+For design-time discovery of your Port catalog, install the [Port MCP server](https://docs.port.io/ai-interfaces/port-mcp-server/overview-and-installation/#install-port-mcp) in your IDE. Use it to inspect **blueprints** (properties and relations), sample **entities**, and other Port data while planning a widget — without hard-coding catalog details in plugin parameters. MCP is for planning in the editor; widget runtime code should use the Port HTTP API and host context (`PLUGIN_DATA`), not MCP.
+
+## Port Plugins CLI (recommended)
+
+Build, upload, and manage plugins with the [Port Plugins CLI](https://docs.port.io/customize-pages-dashboards-and-plugins/plugins/#port-plugins-cli) (`@port-labs/port-plugins-cli`). Install it globally or per plugin, then use commands such as `port-plugins upload` and `port-plugins list` as documented in each plugin’s README. The CLI is required to register widgets in your Port organization.
+
 ## License
 
 This repository is licensed under the [Apache License 2.0](./LICENSE).
