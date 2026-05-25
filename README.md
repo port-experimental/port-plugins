@@ -2,6 +2,13 @@
 
 This repository contains plugins contributed by [Port.io](https://www.port.io).
 
+## Plugins
+
+| Widget | Version | Description |
+|--------|---------|-------------|
+| [Entity Calendar](./entity-calendar) | 0.1.0 | Month calendar marking entity creation dates; click a day to view title and identifier |
+| [TechDocs](./techdocs) | 0.1.0 | Documentation browser for ingested READMEs; sidebar navigation by repository and folder with GitHub-Flavored Markdown rendering |
+
 ## License
 
 This repository is licensed under the [Apache License 2.0](./LICENSE).
@@ -17,10 +24,3 @@ The plugins in this repository are provided by Port.io on an "as-is" and "as-ava
 ## Trademark Notice
 
 "Port" and the Port.io logo are trademarks of Port.io. The open-source license granted herein does not grant any rights to use Port.io's trademarks, trade names, logos, or service marks, whether for purposes of identifying forked or derivative works or otherwise.
-
-## Plugins
-
-| Widget | Version | Description |
-|--------|---------|-------------|
-| [Entity Calendar](./entity-calendar) | 0.1.0 | Month calendar marking entity creation dates; click a day to view title and identifier |
-| [TechDocs](./techdocs) | 0.1.0 | Documentation browser for ingested READMEs; sidebar navigation by repository and folder with GitHub-Flavored Markdown rendering |
