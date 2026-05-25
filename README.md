@@ -23,4 +23,5 @@ The plugins in this repository are provided by Port.io on an "as-is" and "as-ava
 | Widget | Version | Description |
 |--------|---------|-------------|
 | [Entity Calendar](./entity-calendar) | 0.1.0 | Month calendar marking entity creation dates; click a day to view title and identifier |
+| [Scorecard goals](./scorecard-goals) | 0.1.0 | Per-scorecard compliance bars for a chosen blueprint — percent of entities that passed all rules |
 | [TechDocs](./techdocs) | 0.1.0 | Documentation browser for ingested READMEs; sidebar navigation by repository and folder with GitHub-Flavored Markdown rendering |

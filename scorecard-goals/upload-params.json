@@ -1,0 +1,7 @@
+{
+  "blueprint": {
+    "type": "blueprint",
+    "isRequired": true,
+    "label": "Blueprint"
+  }
+}
