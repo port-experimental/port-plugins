@@ -11,7 +11,8 @@ Compliance is computed from entity search results: for each entity, every rule o
 - **Show gaps for completion** opens a modal listing entities that did not pass all rules, with the specific rules (and scorecard) still failing
 - Counts of entities that passed all rules vs total entities
 - Loading, empty, and error states
-- Port light/dark theme via `@port-labs/plugins-sdk`
+- UI built with [MUI](https://mui.com/) Material Design 3 (`@mui/material`, `@mui/icons-material`)
+- Light/dark via MUI `defaultMode="system"`; Port host theme via `@port-labs/plugins-sdk`
 
 ## Prerequisites
 

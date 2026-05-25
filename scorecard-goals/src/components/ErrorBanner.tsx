@@ -1,3 +1,5 @@
+import { Alert } from "@mui/material";
+
 type ErrorBannerProps = {
   error: unknown;
 };
@@ -7,8 +9,8 @@ export function ErrorBanner({ error }: ErrorBannerProps) {
     error instanceof Error ? error.message : "Failed to load scorecard data";
 
   return (
-    <pre className="error" role="alert">
+    <Alert severity="error" sx={{ whiteSpace: "pre-wrap" }}>
       {message}
-    </pre>
+    </Alert>
   );
 }

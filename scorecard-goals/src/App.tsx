@@ -1,4 +1,6 @@
 import { useState } from "react";
+import CategoryOutlinedIcon from "@mui/icons-material/CategoryOutlined";
+import { Box, Chip, Stack, Typography } from "@mui/material";
 import "./App.css";
 import { EmptyState } from "./components/EmptyState";
 import { ErrorBanner } from "./components/ErrorBanner";
@@ -21,22 +23,38 @@ export function App() {
 
   if (!portApiBaseUrl || !portToken) {
     return (
-      <div className="shell">
-        <p className="muted">
-          Waiting for Port context… If you opened this file directly, embed it
-          in a Port dashboard instead.
-        </p>
-      </div>
+      <Box
+        sx={{
+          flex: 1,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          p: 3,
+        }}
+      >
+        <Typography variant="body2" color="text.secondary" textAlign="center">
+          Waiting for Port context… If you opened this file directly, embed it in
+          a Port dashboard instead.
+        </Typography>
+      </Box>
     );
   }
 
   if (!config) {
     return (
-      <div className="shell">
-        <p className="muted">
+      <Box
+        sx={{
+          flex: 1,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          p: 3,
+        }}
+      >
+        <Typography variant="body1" color="text.secondary" textAlign="center">
           Configure the <strong>Blueprint</strong> parameter for this widget.
-        </p>
-      </div>
+        </Typography>
+      </Box>
     );
   }
 
@@ -46,16 +64,27 @@ export function App() {
     : undefined;
 
   return (
-    <div className="shell">
-      <p className="scope-label">
-        Blueprint: <strong>{config.blueprint.title}</strong>
-        {!isLoading && !isError && (
-          <span className="scope-label__count">
-            {" "}
-            · {entityCount} {entityCount === 1 ? "entity" : "entities"}
-          </span>
-        )}
-      </p>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
+        minHeight: 0,
+        p: 2,
+        gap: 2,
+        bgcolor: "background.default",
+      }}
+    >
+      <Chip
+        icon={<CategoryOutlinedIcon />}
+        label={
+          !isLoading && !isError
+            ? `${config.blueprint.title} · ${entityCount} ${entityCount === 1 ? "entity" : "entities"}`
+            : config.blueprint.title
+        }
+        variant="outlined"
+        sx={{ alignSelf: "flex-start" }}
+      />
 
       {isLoading && <LoadingState />}
       {isError && <ErrorBanner error={error} />}
@@ -68,21 +97,30 @@ export function App() {
       )}
 
       {!isLoading && !isError && hasRows && (
-        <ul className="scorecard-list">
+        <Stack
+          component="ul"
+          spacing={1.5}
+          sx={{
+            listStyle: "none",
+            m: 0,
+            p: 0,
+            flex: 1,
+            minHeight: 0,
+            overflowY: "auto",
+          }}
+        >
           {rows.map((row) => (
-            <li key={row.scorecardIdentifier}>
+            <Box component="li" key={row.scorecardIdentifier}>
               <ScorecardBar
                 row={row}
-                gapCount={
-                  gapsByScorecard[row.scorecardIdentifier]?.length ?? 0
-                }
+                gapCount={gapsByScorecard[row.scorecardIdentifier]?.length ?? 0}
                 onShowGaps={() =>
                   setGapsModalScorecardId(row.scorecardIdentifier)
                 }
               />
-            </li>
+            </Box>
           ))}
-        </ul>
+        </Stack>
       )}
 
       {gapsModalRow && config && (
@@ -93,6 +131,6 @@ export function App() {
           onClose={() => setGapsModalScorecardId(null)}
         />
       )}
-    </div>
+    </Box>
   );
 }

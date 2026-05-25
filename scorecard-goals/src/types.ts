@@ -40,6 +40,9 @@ export type PortEntity = {
   scorecards?: Record<string, EntityScorecardEvaluation>;
 };
 
+/** Alias for host PLUGIN_DATA.entity */
+export type Entity = PortEntity;
+
 export type ParamValue = {
   type?: string;
   value?: unknown;
