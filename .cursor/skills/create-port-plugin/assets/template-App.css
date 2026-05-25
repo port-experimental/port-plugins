@@ -19,6 +19,34 @@
   --border-hover: var(--border-contrast-medium, rgba(0, 0, 0, 0.22));
   --badge-bg: var(--background-dim-transparent, rgba(0, 0, 0, 0.06));
   --shadow-dropdown: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+  /* Optional palette - use on decoration classes, not as shared accent on :root */
+  --blue: var(--color-blue-300, #3cb3f6);
+  --bronze: var(--color-bronze-300, #eb977d);
+  --gold: var(--color-gold-300, #eec355);
+  --gray: var(--color-gray-300, #e9e9e9);
+  --green: var(--color-green-300, #4fcd44);
+  --lime: var(--color-lime-300, #b8dc4b);
+  --ocean-blue: var(--color-ocean-blue-300, #447cea);
+  --olive: var(--color-olive-300, #9ab866);
+  --orange: var(--color-orange-300, #ff9a3d);
+  --pink: var(--color-pink-300, #fa25a5);
+  --purple: var(--color-purple-300, #868dff);
+  --red: var(--color-red-300, #ff6f55);
+  --silver: var(--color-silver-300, #aac6db);
+  --turquoise: var(--color-turquoise-300, #29c7d1);
+
+  /*
+   * Pills / badges on --card: add -bg and -text per hue you use (see skill: Optional palette).
+   * -bg  → lightest tint: usually --color-{hue}-100, else -200 (bronze: -200)
+   * -text → dark label: --color-{hue}-700 or -800 (red: -600)
+   * Do not color-mix(..., var(--card)) for pill bg; do not use -300 for both bg and text.
+   *
+   * --gold-bg: var(--color-gold-100, #fcf5e3);
+   * --gold-text: var(--color-gold-700, #736337);
+   * --bronze-bg: var(--color-bronze-200, #ffcdbe);
+   * --bronze-text: var(--color-bronze-800, #5e3c32);
+   */
 }
 
 *,
@@ -56,7 +84,7 @@ body {
 
 /* Decoration example — copy pattern for dots, pills, links, chart marks */
 .example-dot {
-  --example-dot-color: #2563eb;
+  --example-dot-color: var(--ocean-blue);
   width: 6px;
   height: 6px;
   border-radius: 50%;
@@ -64,7 +92,7 @@ body {
 }
 
 .example-link {
-  --example-link-color: #2563eb;
+  --example-link-color: var(--ocean-blue);
   color: var(--example-link-color);
   text-decoration: none;
 }

@@ -168,6 +168,43 @@ Port’s injected theme drives **backgrounds and typography**. Widget **decorati
 
 When several decorations share one hue, repeat the same fallback hex on each class (or scope a **component block** e.g. `.calendar { --event-blue: #2563eb; }` and reference `--event-blue` only inside that block — still **not** on `:root` as a global accent). See `assets/template-App.css` (`.example-dot`, `.example-link`) and `entity-calendar/src/App.css`.
 
+#### Optional palette and shade variants (`:root`)
+
+After surfaces, `App.css` may define a **shared optional palette** on `:root` — still **not** a global `--accent`. These are **short aliases** to Port **`--color-*`** tokens the host injects via **`applyThemeCss()`**. Provide a **fallback hex** in each `var(...)` for local dev.
+
+**Default shade for the base alias:** use **`--color-{hue}-300`** (readable strokes, dots, chart series, icon tint):
+
+```css
+--gold: var(--color-gold-300, #eec355);
+--bronze: var(--color-bronze-300, #eb977d); /* Port has bronze; not every hue has -50/-100 */
+```
+
+**Infer `-bg` and `-text` when the UI needs pills, badges, or status labels** on white/neutral cards (`--card`). Do **not** use `color-mix(…, var(--card))` at low percentages for pill backgrounds — it disappears on white cards. Do **not** use the **300** alias for both background and label text (low contrast).
+
+| Suffix | Typical Port token | Use for |
+|--------|-------------------|---------|
+| *(none)* | `--color-{hue}-300` | Strokes, dots, rings, links via `var(--ocean-blue)` |
+| `-bg` | `--color-{hue}-100` or `-200` | Solid pill/badge **background** visible on `--card` |
+| `-text` | `--color-{hue}-700`, `-800`, or `-600` | Pill/badge **label** on `-bg` |
+
+**How to pick `-bg` / `-text` for a hue:**
+
+1. Pick the Port token name for the hue (e.g. `--color-gold-300`); copy fallback hex from an existing plugin’s `App.css` or Port’s design tokens when embedded.
+2. Add `--{hue}-bg` pointing at the lightest usable tint (**`-100`**, else **`-200`**; bronze often uses **`--color-bronze-200`**).
+3. Add `--{hue}-text` pointing at a **dark** step (**`-700`** or **`-800`**; red may use **`-600`**).
+4. Wire decoration classes to the variants, not raw `var(--gold)` for both bg and text:
+
+```css
+.level--gold {
+  --level-pill-bg: var(--gold-bg);
+  --level-pill-text: var(--gold-text);
+}
+```
+
+**Only define variants for hues the widget actually uses** (e.g. scorecard levels → `gold`, `silver`, `bronze`, `green`, `orange`, `red`, `gray`; skip `lime` if unused).
+
+**Rings / progress / single-hue marks:** base **`--{hue}`** (300) on the element class is enough; add `-bg`/`-text` only when that hue also appears on pills or badges.
+
 #### Local dev mock data (outside Port’s iframe)
 
 When `npm run dev` runs at `http://localhost:9000`, the bundle is usually **not** inside Port’s iframe (`window.parent === window`). The template’s **`DEV_MOCK`** path supplies host context without a live token. **Add small, widget-specific mocks** so the UI is usable before you toggle Port’s **Local development** mode.
@@ -664,5 +701,17 @@ When auditing or releasing, update the **Version** cell if `package.json` `versi
 
 ### 8. Per-plugin `README.md`
 
-Write the per-plugin README per **[readme-and-audit.md](readme-and-audit.md)** (required section order, preview image, params table before setup, canonical upload command, troubleshooting).
+Write the per-plugin README per **[readme-and-audit.md](readme-and-audit.md)** (required section order, preview image, params table before setup, canonical upload command, troubleshooting). The **Upload** step must use this exact `port-plugins upload` shape (substitute per-plugin values only):
+
+```bash
+port-plugins upload \
+  --file dist/index.html \
+  --identifier <your-widget-name> \
+  --title "<widget title in Port>" \
+  --params "$(cat upload-params.json)" \
+  --description "<short plugin description>" \
+  --upsert
+```
+
+Do **not** document invented flags (`--name`, `--path`, `--plugin-id`, etc.) — see the flag table in readme-and-audit.md.
 

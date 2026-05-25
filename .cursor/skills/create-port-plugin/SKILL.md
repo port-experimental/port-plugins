@@ -1,7 +1,7 @@
 ---
 name: create-port-plugin
 description: >-
-  Reuse existing Port custom plugins in the repo or build new ones from scratch as self-contained
+  Reuse or verify existing Port custom plugins in the repo or build new ones from scratch as self-contained
   React/TypeScript iframe widgets (@port-labs/plugins-sdk, port-plugins-cli) uploaded as Port
   plugins. Use when recommending an existing plugin, copying/adapting one, greenfield scaffolding, or auditing upload-params.json and per-plugin README. Do not use for Ocean
   integrations, generic Port admin without plugin code, or blueprint-only catalog work with no
@@ -120,7 +120,7 @@ Use `upsert_blueprint` only when the user wants catalog changes applied via MCP.
 
 - Per-plugin **README** (required section order): [references/readme-and-audit.md](references/readme-and-audit.md)
 - Repo-level widgets table row when adding a new plugin (include **Version** from that plugin’s `package.json` `version` field)
-- Canonical upload command (see scaffolding reference or plugin-architecture **Deployment**)
+- Canonical **`port-plugins upload`** command — exact flags in [references/readme-and-audit.md](references/readme-and-audit.md) (Setup → Upload); do not invent CLI flags
 
 ### 6. Review anti-patterns and persistence
 
@@ -132,7 +132,7 @@ Before finishing: [references/guidelines.md](references/guidelines.md) (anti-pat
 |-------|------|
 | Rendering | **No** `innerHTML`, `outerHTML`, or `dangerouslySetInnerHTML` for dynamic/user content — React text/elements or vetted sanitizer only |
 | UX / UI | Loading, empty, and error states; `applyThemeCss()`; responsive full-iframe layout; accessible controls — treat widgets as product UI |
-| CSS decorations | `:root` = surfaces/text/borders only; dots, badges, links, accent text use **class-local** color vars (e.g. `--day-dot-color`) — **no** shared `--accent` / `--primary` on decorations — see scaffolding **Surface vs decoration colors** |
+| CSS decorations | `:root` = surfaces/text/borders only; optional palette aliases (`--gold`, `--bronze`, …) at **300**; add **`--{hue}-bg`** / **`--{hue}-text`** when pills/badges need visible backgrounds + readable labels — see scaffolding **Optional palette and shade variants** |
 | Runtime vs params | Fetch blueprints, schema, relations, entities via Port API + `PLUGIN_DATA` — **no** params that duplicate that data |
 | API host | `portApiBaseUrl` + token for `/v1/...` only |
 | Portal URLs | `getPortalOrigin()` from `document.referrer`; `{origin}/{blueprint}Entity?identifier={id}` |
@@ -148,13 +148,14 @@ Before finishing: [references/guidelines.md](references/guidelines.md) (anti-pat
 | Iframe UI | Full width/height; **no** plugin title, description, or icon inside the iframe |
 | Icons | icon library; **never** hardcoded emoji |
 | Persistence | Port entities/properties unless explicitly local-only UI state |
+| Upload CLI | `port-plugins upload` with **`--file`**, **`--identifier`**, **`--title`**, **`--params`**, **`--description`**, **`--upsert`** only — see [readme-and-audit.md](references/readme-and-audit.md) |
 
 ## Reference index
 
 | File | Contents |
 |------|----------|
 | [reuse-workflow.md](references/reuse-workflow.md) | Reuse steps 1–5, blueprint matrix, checklist, adapt vs create, code-reuse patterns |
-| [scaffolding-and-implementation.md](references/scaffolding-and-implementation.md) | Templates, `App.tsx` implementation, params, relations, code layout |
+| [scaffolding-and-implementation.md](references/scaffolding-and-implementation.md) | Templates, `App.tsx` implementation, params, relations, code layout, **optional palette + `-bg`/`-text` variants** |
 | [readme-and-audit.md](references/readme-and-audit.md) | Auditing existing plugins, PR checklist, per-plugin README §8 |
 | [plugin-architecture.md](references/plugin-architecture.md) | postMessage, `PLUGIN_DATA`, API, theming, build/deploy, local dev |
 | [widget-conventions.md](references/widget-conventions.md) | Directory layout, naming, optional automation |

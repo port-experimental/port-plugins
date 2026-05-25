@@ -263,7 +263,7 @@ body {
 3. **Separate decorations from surfaces** — `:root` aliases are for **backgrounds, body text, and borders**. UI **decorations** (dots, badges, accent labels, entity links, chart marks) should define **class-local** color variables with a hex fallback (e.g. `--day-dot-color: #2563eb`), not a global `--accent` tied to `var(--primary)`. Marked/highlighted **cell backgrounds** may use `color-mix` on a local token on that class. Full pattern: [scaffolding-and-implementation.md — Surface vs decoration colors](scaffolding-and-implementation.md#surface-vs-decoration-colors).
 
 4. **Avoid fighting the host** — Prefer Port tokens over `prefers-color-scheme`
-   blocks that hard-code a second palette; when embedded, **`theme.css`** should
+   blocks that hard-code a second palette; when embedded, the **host-injected theme** should
    drive light/dark.
 
 ### Widgets without the SDK
@@ -464,12 +464,13 @@ npm install -g @port-labs/port-plugins-cli
 # Configure credentials (interactive — needs Port client ID + secret)
 port-plugins config
 
-# Upload or update a plugin
+# Upload or update a plugin (canonical flags only — see readme-and-audit.md)
 port-plugins upload \
   --file dist/index.html \
-  --identifier your-widget-name \
-  --title "Your Widget Title" \
+  --identifier <your-widget-name> \
+  --title "<widget title in Port>" \
   --params "$(cat upload-params.json)" \
+  --description "<short plugin description>" \
   --upsert
 ```
 
