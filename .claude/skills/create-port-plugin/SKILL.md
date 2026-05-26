@@ -105,6 +105,7 @@ Use `upsert_blueprint` only when the user wants catalog changes applied via MCP.
 
 ### 5. Document and ship
 
+- **Bump `package.json` `version`** when the plugin changes (bugfix → patch, feature → minor, breaking → major). Sync the repo root **Plugins** table **Version** column to the same value.
 - Per-plugin **README** (required section order): [references/readme-and-audit.md](references/readme-and-audit.md)
 - Repo-level widgets table row when adding a new plugin (include **Version** from that plugin’s `package.json` `version` field)
 - Canonical **`port-plugins upload`** command — exact flags in [references/readme-and-audit.md](references/readme-and-audit.md) (Setup → Upload); do not invent CLI flags
@@ -121,6 +122,7 @@ Before marking the plugin done:
 2. Validate the plugin identifier against Port’s regex (see **Non-negotiables** → Plugin identifier).
 3. Confirm per-plugin README section order and upload command per [readme-and-audit.md](references/readme-and-audit.md).
 4. Walk the **Non-negotiables** table and [guidelines.md](references/guidelines.md) anti-patterns.
+5. If the plugin code changed, confirm **`package.json` `version`** was bumped and the root **`README.md` Plugins** **Version** cell matches.
 
 ## Non-negotiables (always apply)
 
@@ -146,6 +148,7 @@ Before marking the plugin done:
 | Plugin identifier | `PLUGIN_IDENTIFIER_REGEX` — validate `--identifier` (and folder name when aligned) **before** every `port-plugins upload`; reject `.`, `..`, spaces, and other disallowed characters |
 | Persistence | Port entities/properties unless explicitly local-only UI state |
 | Upload CLI | `port-plugins upload` with **`--file`**, **`--identifier`**, **`--title`**, **`--params`**, **`--description`**, **`--upsert`** only — see [readme-and-audit.md](references/readme-and-audit.md) |
+| Versioning | On any functional change to a plugin, **bump** its `package.json` **`version`** (semver) and update the root **`README.md` Plugins** table **Version** cell to match |
 
 ## Reference index
 

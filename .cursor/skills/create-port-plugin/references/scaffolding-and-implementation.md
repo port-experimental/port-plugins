@@ -698,9 +698,9 @@ export type PluginConfig = {
 };
 ```
 
-### 7. Update the README
+### 7. Bump version and update the README
 
-Add a row to the repo-level **Plugins** widgets table in the project root `README.md`. Read **`version`** from the plugin’s `package.json` (same semver you ship with the build) and keep the table in sync when you bump that field.
+**Whenever you change plugin behaviour or fix user-visible bugs**, bump **`version`** in that plugin’s `package.json` (semver: patch for fixes, minor for features, major for breaking changes). Then add or update a row in the repo-level **Plugins** widgets table in the project root `README.md` — the **Version** column must match `package.json` exactly.
 
 ```markdown
 | [Widget Title](./widget-name) | 1.0.0 | One-sentence description |
@@ -712,7 +712,7 @@ If the widget reuses or extends existing blueprints, mention this in the descrip
 | [Project Dashboard](./project-dashboard) | 0.2.1 | Example: combines work-tracking and discussion plugins already in the same project, plus any new blueprint-backed features |
 ```
 
-When auditing or releasing, update the **Version** cell if `package.json` `version` changed and the description still matches.
+Do not ship plugin code changes without a version bump and a matching root **Plugins** table **Version** cell. When auditing or releasing, update the description if behaviour changed materially.
 
 ### 8. Per-plugin `README.md`
 

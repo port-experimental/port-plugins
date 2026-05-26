@@ -193,7 +193,11 @@ export function App() {
           />
         </>
       )}
-      <DocViewer doc={activeDoc} />
+      <DocViewer
+        doc={activeDoc}
+        docs={docs}
+        onSelectDoc={handleSelectDoc}
+      />
     </div>
   );
 }

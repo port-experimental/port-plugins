@@ -7,7 +7,7 @@ This repository contains plugins contributed by [Port.io](https://www.port.io).
 | Widget | Version | Description |
 |--------|---------|-------------|
 | [Entity Calendar](./entity-calendar) | 0.1.0 | Month calendar marking entity creation dates; click a day to view title and identifier |
-| [TechDocs](./techdocs) | 0.1.0 | Documentation browser for ingested READMEs; sidebar navigation by repository and folder with GitHub-Flavored Markdown rendering |
+| [TechDocs](./techdocs) | 0.2.0 | Documentation browser for ingested markdown; sidebar by repository and folder, in-widget relative links between docs, external URLs via Port link bridge |
 
 ## AI-assisted development - Skills (Cursor & Claude)
 
