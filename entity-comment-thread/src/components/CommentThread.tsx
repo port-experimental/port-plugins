@@ -71,12 +71,7 @@ export function CommentThreadBlock({
       />
 
       {thread.replies.map((reply) => (
-        <CommentItem
-          key={reply.identifier}
-          comment={reply}
-          isReply
-          onReply={() => setReplyTargetId(reply.identifier)}
-        />
+        <CommentItem key={reply.identifier} comment={reply} isReply />
       ))}
 
       {replyTargetId ? (
