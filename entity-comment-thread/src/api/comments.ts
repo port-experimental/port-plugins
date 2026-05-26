@@ -2,7 +2,6 @@ import { parsePortError } from "./portError";
 import { DEV_MOCK } from "../hooks/usePostMessageData";
 import { MOCK_COMMENTS } from "../dev/mockData";
 import {
-  COMMENT_BLUEPRINT,
   PARENT_COMMENT_RELATION,
   type CommentEntity,
   type SubjectContext,
@@ -22,12 +21,13 @@ function slugify(text: string): string {
 export async function searchCommentsForSubject(
   baseUrl: string,
   token: string,
+  commentBlueprintId: string,
   subject: SubjectContext
 ): Promise<CommentEntity[]> {
   if (DEV_MOCK) return MOCK_COMMENTS;
 
   const res = await fetch(
-    `${baseUrl}/v1/blueprints/${encodeURIComponent(COMMENT_BLUEPRINT)}/entities/search`,
+    `${baseUrl}/v1/blueprints/${encodeURIComponent(commentBlueprintId)}/entities/search`,
     {
       method: "POST",
       headers: {
@@ -66,13 +66,14 @@ export type CreateCommentInput = {
 export async function createComment(
   baseUrl: string,
   token: string,
+  commentBlueprintId: string,
   input: CreateCommentInput
 ): Promise<CommentEntity> {
   if (DEV_MOCK) {
     const id = `mock-${Date.now()}`;
     return {
       identifier: id,
-      blueprint: COMMENT_BLUEPRINT,
+      blueprint: commentBlueprintId,
       title: input.body.slice(0, 60),
       createdAt: new Date().toISOString(),
       properties: {
@@ -108,7 +109,7 @@ export async function createComment(
   }
 
   const res = await fetch(
-    `${baseUrl}/v1/blueprints/${encodeURIComponent(COMMENT_BLUEPRINT)}/entities`,
+    `${baseUrl}/v1/blueprints/${encodeURIComponent(commentBlueprintId)}/entities`,
     {
       method: "POST",
       headers: {
@@ -131,6 +132,7 @@ export async function createComment(
 export async function updateThreadStatus(
   baseUrl: string,
   token: string,
+  commentBlueprintId: string,
   rootCommentId: string,
   threadStatus: ThreadStatus
 ): Promise<CommentEntity> {
@@ -146,7 +148,7 @@ export async function updateThreadStatus(
   }
 
   const res = await fetch(
-    `${baseUrl}/v1/blueprints/${encodeURIComponent(COMMENT_BLUEPRINT)}/entities/${encodeURIComponent(rootCommentId)}`,
+    `${baseUrl}/v1/blueprints/${encodeURIComponent(commentBlueprintId)}/entities/${encodeURIComponent(rootCommentId)}`,
     {
       method: "PATCH",
       headers: {

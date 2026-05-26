@@ -1,6 +1,35 @@
-import type { BlueprintSchema, Entity, SubjectContext } from "../types";
+import type {
+  BlueprintParam,
+  BlueprintSchema,
+  Entity,
+  Params,
+  PluginConfig,
+  SubjectContext,
+} from "../types";
 import { COMMENT_BLUEPRINT, PARENT_COMMENT_RELATION } from "../types";
 import { getEntityBlueprintId } from "./entityBlueprint";
+
+function readBlueprintParam(raw: unknown): BlueprintParam | null {
+  if (!raw || typeof raw !== "object") return null;
+  const obj = raw as Record<string, unknown>;
+  if (typeof obj.identifier !== "string" || !obj.identifier.trim()) {
+    return null;
+  }
+  return {
+    identifier: obj.identifier.trim(),
+    title: typeof obj.title === "string" ? obj.title : obj.identifier,
+  };
+}
+
+export function configFromParams(params: Params): PluginConfig {
+  const fromParam = readBlueprintParam(params.entityCommentBlueprint?.value);
+  return {
+    entityCommentBlueprint: fromParam ?? {
+      identifier: COMMENT_BLUEPRINT,
+      title: "Entity Comment",
+    },
+  };
+}
 
 export function resolveSubjectRelationKey(
   commentBlueprint: BlueprintSchema,
@@ -43,8 +72,4 @@ export function subjectFromEntity(
     title: entity.title,
     subjectRelationKey,
   };
-}
-
-export function defaultCommentBlueprintId(): string {
-  return COMMENT_BLUEPRINT;
 }

@@ -1,12 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchBlueprint } from "../api/blueprints";
-import { defaultCommentBlueprintId, subjectFromEntity } from "../utils/config";
+import { subjectFromEntity } from "../utils/config";
 import { getEntityBlueprintId } from "../utils/entityBlueprint";
 import type { Entity, SubjectContext } from "../types";
 import type { BlueprintSchema } from "../types";
 
 export function useCommentBlueprint(
   entity: Entity | undefined,
+  commentBlueprintId: string,
   portToken: string | null,
   portApiBaseUrl: string | null
 ): {
@@ -18,12 +19,11 @@ export function useCommentBlueprint(
   missingRelation: boolean;
   subjectBlueprintId: string | null;
 } {
-  const blueprintId = defaultCommentBlueprintId();
-
   const blueprintQuery = useQuery({
-    queryKey: ["commentBlueprint", blueprintId, portApiBaseUrl],
+    queryKey: ["commentBlueprint", commentBlueprintId, portApiBaseUrl],
     enabled: Boolean(portToken && portApiBaseUrl),
-    queryFn: () => fetchBlueprint(portApiBaseUrl!, portToken!, blueprintId),
+    queryFn: () =>
+      fetchBlueprint(portApiBaseUrl!, portToken!, commentBlueprintId),
   });
 
   const blueprint = blueprintQuery.data;

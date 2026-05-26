@@ -1,10 +1,12 @@
 # Entity Comment Thread
 
-A [Port](https://app.getport.io) custom widget for **entity pages** that shows threaded comments stored as `entityComment` catalog entities. Users can post **markdown** (bold, lists, fenced code blocks), **@mention** Port users, **reply** to comments, and mark threads **open** or **resolved**.
+A [Port](https://app.getport.io) custom widget for **entity pages** that shows threaded comments stored as `entityComment` catalog entities. Users can post **markdown** (bold, lists, fenced code blocks), **@mention** Port users, **reply** to comments, and mark threads **open** or **resolved**. Subject entity and blueprint come from host `PLUGIN_DATA.entity`; relation keys are resolved from the comment blueprint schema at runtime.
 
 ## Preview image
 
 ![Entity comment thread widget schematic](./docs/preview.svg)
+
+**Entity page** · React 19 · TypeScript · [Port Plugins](https://docs.getport.io/customize-pages-dashboards-and-plugins/plugins)
 
 ## Features
 
@@ -22,15 +24,21 @@ A [Port](https://app.getport.io) custom widget for **entity pages** that shows t
 - **Node.js** `>=20` (see `package.json` `engines`) for build and [port-plugins-cli](https://www.npmjs.com/package/@port-labs/port-plugins-cli).
 - Widget runs on an **entity page** with a valid Port API token from the host (`PLUGIN_DATA`).
 
-### Catalog
+### Blueprints & properties
 
 | Concept | Identifier | Notes |
 |---------|------------|--------|
-| Comment blueprint | `entityComment` | Created by this plugin setup (body, author, threadStatus, mentions) |
+| Comment blueprint | `entityComment` (default) | Created by this plugin setup (body, author, threadStatus, mentions) |
 | Self-relation | `parentComment` → `entityComment` | Replies |
-| Subject relation | e.g. `service` → `service` | **One relation per subject blueprint** the widget should support |
 
-The widget discovers which relation targets the host entity’s blueprint at runtime. If none exists, it shows setup instructions.
+### Relations
+
+| Relation key | Target | Purpose |
+|--------------|--------|---------|
+| `parentComment` | `entityComment` | Nested replies (required; do not remove) |
+| Subject relation(s) | e.g. `service` → `service` | **One relation per subject blueprint** the widget should support |
+
+The widget discovers which subject relation targets the host entity’s blueprint at runtime (excluding `parentComment`). If none exists, it shows setup instructions.
 
 ### Blueprint definition (`blueprints/entityComment.blueprint.json`)
 
@@ -174,6 +182,11 @@ Enable Port **Local development** on the widget to test real `postMessage` and A
 
 ## Setup
 
+### Catalog
+
+1. Create or update the comment blueprint from `blueprints/entityComment.blueprint.json` (properties, `parentComment`, and one subject relation per blueprint you comment on).
+2. Confirm the widget’s optional **Entity Comment blueprint** parameter matches that identifier (default `entityComment`).
+
 ### Build
 
 ```bash
@@ -222,7 +235,8 @@ entity-comment-thread/
 │   ├── components/    # thread UI, editor, markdown
 │   ├── dev/           # local mock data
 │   ├── hooks/
-│   ├── utils/
+│   ├── utils/         # config (params), portal URLs, comment tree
+│   ├── types.ts       # PluginConfig + domain types
 │   └── App.tsx
 ├── upload-params.json
 └── package.json
@@ -239,3 +253,4 @@ entity-comment-thread/
 | 422 on search | Malformed query | Widget uses nested `query` object (already correct) |
 | Local dev blank in Port | Wrong dev server port | Use port **9000** (`npm run dev`); Port Local development expects `http://localhost:9000` |
 | Theme mismatch in Port | `applyThemeCss()` not applied | Widget calls SDK theme on host path; surfaces use Port tokens in `App.css` `:root` |
+| Wrong comment blueprint | Param override without matching catalog | Set **Entity Comment blueprint** to your blueprint identifier and align `blueprints/*.json` relations |

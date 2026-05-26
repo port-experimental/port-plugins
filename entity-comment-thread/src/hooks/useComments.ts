@@ -9,6 +9,7 @@ import { buildCommentThreads } from "../utils/commentTree";
 
 export function useComments(
   subject: SubjectContext | null,
+  commentBlueprintId: string,
   portToken: string | null,
   portApiBaseUrl: string | null
 ) {
@@ -18,6 +19,7 @@ export function useComments(
   const query = useQuery({
     queryKey: [
       "comments",
+      commentBlueprintId,
       subject?.blueprint,
       subject?.identifier,
       portApiBaseUrl,
@@ -27,6 +29,7 @@ export function useComments(
       searchCommentsForSubject(
         portApiBaseUrl!,
         portToken!,
+        commentBlueprintId,
         subject!
       ),
   });
@@ -35,7 +38,12 @@ export function useComments(
 
   const invalidate = () =>
     queryClient.invalidateQueries({
-      queryKey: ["comments", subject?.blueprint, subject?.identifier],
+      queryKey: [
+        "comments",
+        commentBlueprintId,
+        subject?.blueprint,
+        subject?.identifier,
+      ],
     });
 
   const postComment = useMutation({
@@ -45,7 +53,7 @@ export function useComments(
       mentions: string[];
       parentCommentId?: string;
     }) =>
-      createComment(portApiBaseUrl!, portToken!, {
+      createComment(portApiBaseUrl!, portToken!, commentBlueprintId, {
         ...input,
         subject: subject!,
       }),
@@ -63,6 +71,7 @@ export function useComments(
       updateThreadStatus(
         portApiBaseUrl!,
         portToken!,
+        commentBlueprintId,
         rootCommentId,
         threadStatus
       ),

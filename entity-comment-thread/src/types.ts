@@ -34,6 +34,15 @@ export type ParamValue = {
 
 export type Params = Record<string, ParamValue>;
 
+export type BlueprintParam = {
+  identifier: string;
+  title: string;
+};
+
+export type PluginConfig = {
+  entityCommentBlueprint: BlueprintParam;
+};
+
 export type CommentEntity = PortEntity & {
   properties: {
     body?: string;

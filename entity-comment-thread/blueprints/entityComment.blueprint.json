@@ -29,7 +29,11 @@
       "mentions": {
         "title": "Mentions",
         "description": "Users @mentioned in this comment",
-        "type": "array"
+        "type": "array",
+        "items": {
+          "type": "string",
+          "format": "user"
+        }
       }
     },
     "required": ["body", "author"]

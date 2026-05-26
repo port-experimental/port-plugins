@@ -4,10 +4,13 @@ import { CommentThreadBlock } from "./components/CommentThread";
 import { useCommentBlueprint } from "./hooks/useCommentBlueprint";
 import { useComments } from "./hooks/useComments";
 import { usePostMessageData } from "./hooks/usePostMessageData";
-import { COMMENT_BLUEPRINT } from "./types";
+import { configFromParams } from "./utils/config";
 
 export function App() {
-  const { entity, user, portToken, portApiBaseUrl } = usePostMessageData();
+  const { entity, user, params, portToken, portApiBaseUrl } =
+    usePostMessageData();
+  const config = configFromParams(params);
+  const commentBlueprintId = config.entityCommentBlueprint.identifier;
 
   const {
     subject,
@@ -16,7 +19,12 @@ export function App() {
     error: blueprintErr,
     missingRelation,
     subjectBlueprintId,
-  } = useCommentBlueprint(entity, portToken, portApiBaseUrl);
+  } = useCommentBlueprint(
+    entity,
+    commentBlueprintId,
+    portToken,
+    portApiBaseUrl
+  );
 
   const {
     threads,
@@ -25,7 +33,12 @@ export function App() {
     error: commentsErr,
     postComment,
     setThreadStatus,
-  } = useComments(subject, portToken, portApiBaseUrl);
+  } = useComments(
+    subject,
+    commentBlueprintId,
+    portToken,
+    portApiBaseUrl
+  );
 
   const authorEmail = user?.email ?? "";
   const loading = blueprintLoading || commentsLoading;
@@ -67,7 +80,7 @@ export function App() {
     return (
       <div className="shell">
         <p className="setup-hint">
-          Could not match a relation on <code>{COMMENT_BLUEPRINT}</code> to{" "}
+          Could not match a relation on <code>{commentBlueprintId}</code> to{" "}
           <code>{subjectBlueprintId}</code>. If the relation exists in Port,
           rebuild and re-upload the widget. Otherwise add a relation on the
           comment blueprint targeting this entity type (see plugin README).
