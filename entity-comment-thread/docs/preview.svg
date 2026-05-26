@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360" role="img" aria-labelledby="title desc">
+  <title id="title">Entity comment thread widget preview</title>
+  <desc id="desc">Schematic of threaded comments with open status and reply composer</desc>
+  <rect width="640" height="360" fill="#f0f2f5"/>
+  <rect x="16" y="16" width="608" height="220" rx="8" fill="#fff" stroke="#e5e7eb"/>
+  <rect x="28" y="28" width="52" height="18" rx="9" fill="#e8f4fe"/>
+  <text x="38" y="41" font-family="system-ui,sans-serif" font-size="10" font-weight="600" fill="#1d4ed8">OPEN</text>
+  <circle cx="40" cy="68" r="14" fill="#e8f4fe"/>
+  <text x="35" y="72" font-family="system-ui,sans-serif" font-size="11" font-weight="600" fill="#2563eb">A</text>
+  <text x="62" y="62" font-family="system-ui,sans-serif" font-size="12" font-weight="600" fill="#111827">Alice Example</text>
+  <text x="62" y="76" font-family="system-ui,sans-serif" font-size="10" fill="#6b7280">May 18, 10:00 AM</text>
+  <text x="62" y="98" font-family="system-ui,sans-serif" font-size="12" fill="#374151">Please confirm staging is green before prod.</text>
+  <rect x="90" y="112" width="500" height="36" rx="6" fill="#f7f8fa" stroke="#e5e7eb"/>
+  <text x="100" y="134" font-family="ui-monospace,monospace" font-size="10" fill="#6b7280">kubectl rollout status deploy/payments</text>
+  <line x1="90" y1="158" x2="90" y2="198" stroke="#e5e7eb" stroke-width="2"/>
+  <circle cx="40" cy="178" r="12" fill="#e8f4fe"/>
+  <text x="36" y="182" font-family="system-ui,sans-serif" font-size="10" font-weight="600" fill="#2563eb">A</text>
+  <text x="62" y="172" font-family="system-ui,sans-serif" font-size="11" font-weight="600" fill="#111827">Alice Example</text>
+  <text x="62" y="192" font-family="system-ui,sans-serif" font-size="11" fill="#374151">@bob can you approve?</text>
+  <rect x="16" y="248" width="608" height="96" rx="8" fill="#fff" stroke="#e5e7eb"/>
+  <text x="28" y="268" font-family="system-ui,sans-serif" font-size="10" font-weight="600" fill="#6b7280">ADD COMMENT</text>
+  <rect x="28" y="278" width="584" height="52" rx="6" fill="#f0f2f5" stroke="#e5e7eb"/>
+  <text x="40" y="308" font-family="system-ui,sans-serif" font-size="12" fill="#9ca3af">Write a comment&</text>
+  <rect x="520" y="292" width="80" height="28" rx="6" fill="#2563eb"/>
+  <text x="538" y="310" font-family="system-ui,sans-serif" font-size="12" font-weight="600" fill="#fff">Comment</text>
+</svg>
