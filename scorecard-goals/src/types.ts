@@ -10,10 +10,23 @@ export type User = {
   picture?: string;
 };
 
+export type ScorecardRuleCondition = {
+  property?: string;
+  operator?: string;
+  value?: unknown;
+};
+
+export type ScorecardRuleQuery = {
+  combinator?: string;
+  conditions?: ScorecardRuleCondition[];
+};
+
 export type ScorecardRule = {
   identifier: string;
   title?: string;
   level?: string;
+  description?: string;
+  query?: ScorecardRuleQuery;
 };
 
 export type Scorecard = {
@@ -26,6 +39,12 @@ export type ScorecardRuleResult = {
   identifier: string;
   level?: string;
   status?: string | boolean;
+  message?: string;
+  reason?: string;
+  statusMessage?: string;
+  failureMessage?: string;
+  failureReason?: string;
+  description?: string;
 };
 
 export type EntityScorecardEvaluation = {
@@ -73,6 +92,7 @@ export type FailedRuleInfo = {
   ruleTitle: string;
   scorecardIdentifier: string;
   scorecardTitle: string;
+  failureReason: string;
 };
 
 export type EntityGapSummary = {

@@ -10,17 +10,58 @@ export const MOCK_SCORECARDS: Scorecard[] = [
     identifier: "ownership",
     title: "Ownership",
     rules: [
-      { identifier: "has_team", title: "Has team", level: "Bronze" },
-      { identifier: "has_slack", title: "Has Slack channel", level: "Silver" },
+      {
+        identifier: "has_team",
+        title: "Has team",
+        level: "Bronze",
+        description: "The service must have a responsible team assigned.",
+        query: {
+          combinator: "and",
+          conditions: [{ property: "$team", operator: "isNotEmpty" }],
+        },
+      },
+      {
+        identifier: "has_slack",
+        title: "Has Slack channel",
+        level: "Silver",
+        query: {
+          combinator: "and",
+          conditions: [{ property: "slackChannel", operator: "isNotEmpty" }],
+        },
+      },
     ],
   },
   {
     identifier: "production_readiness",
     title: "Production readiness",
     rules: [
-      { identifier: "has_on_call", title: "Has on-call", level: "Bronze" },
-      { identifier: "has_runbook", title: "Has runbook", level: "Silver" },
-      { identifier: "has_slo", title: "Has SLO", level: "Gold" },
+      {
+        identifier: "has_on_call",
+        title: "Has on-call",
+        level: "Bronze",
+        query: {
+          combinator: "and",
+          conditions: [{ property: "on_call", operator: "isNotEmpty" }],
+        },
+      },
+      {
+        identifier: "has_runbook",
+        title: "Has runbook",
+        level: "Silver",
+        query: {
+          combinator: "and",
+          conditions: [{ property: "runbook_url", operator: "isNotEmpty" }],
+        },
+      },
+      {
+        identifier: "has_slo",
+        title: "Has SLO",
+        level: "Gold",
+        query: {
+          combinator: "and",
+          conditions: [{ property: "slo_defined", operator: "=", value: true }],
+        },
+      },
     ],
   },
 ];
@@ -41,8 +82,16 @@ export const MOCK_ENTITIES: PortEntity[] = [
         level: "Bronze",
         rules: [
           { identifier: "has_on_call", status: "Passed" },
-          { identifier: "has_runbook", status: "Not passed" },
-          { identifier: "has_slo", status: "Not passed" },
+          {
+            identifier: "has_runbook",
+            status: "Not passed",
+            message: "runbook_url is empty on this service.",
+          },
+          {
+            identifier: "has_slo",
+            status: "Not passed",
+            message: "slo_defined is false; an SLO must be configured.",
+          },
         ],
       },
     },
@@ -55,7 +104,11 @@ export const MOCK_ENTITIES: PortEntity[] = [
         level: "Bronze",
         rules: [
           { identifier: "has_team", status: "Passed" },
-          { identifier: "has_slack", status: "Not passed" },
+          {
+            identifier: "has_slack",
+            status: "Not passed",
+            message: "slackChannel is not set.",
+          },
         ],
       },
       production_readiness: {

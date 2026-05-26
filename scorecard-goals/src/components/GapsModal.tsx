@@ -17,6 +17,7 @@ import {
 } from "@mui/material";
 import type { EntityGapSummary } from "../types";
 import { buildEntityPageUrl } from "../utils/portalUrl";
+import { FailedRuleChip } from "./FailedRuleChip";
 
 type GapsModalProps = {
   scorecardTitle: string;
@@ -156,15 +157,12 @@ export function GapsModal({
                         ? "Rule to fix"
                         : "Rules to fix"}
                     </Typography>
-                    <Stack direction="row" flexWrap="wrap" gap={1}>
+                    <Stack direction="row" flexWrap="wrap" gap={1} useFlexGap>
                       {entity.failedRules.map((rule) => (
-                        <Chip
+                        <FailedRuleChip
                           key={`${entity.identifier}-${rule.ruleIdentifier}`}
-                          label={rule.ruleTitle}
-                          size="small"
-                          color="error"
-                          variant="outlined"
-                          title={rule.scorecardTitle}
+                          rule={rule}
+                          entityKey={entity.identifier}
                         />
                       ))}
                     </Stack>

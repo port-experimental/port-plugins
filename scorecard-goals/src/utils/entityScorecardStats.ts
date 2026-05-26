@@ -6,6 +6,7 @@ import type {
   Scorecard,
   ScorecardComplianceRow,
 } from "../types";
+import { formatRuleFailureReason } from "./ruleFailureReason";
 
 export function isRulePassed(status: string | boolean | undefined): boolean {
   if (status === true) return true;
@@ -91,6 +92,7 @@ export function buildEntityGapsForScorecard(
         ruleTitle: ruleTitleById.get(rule.identifier) ?? rule.identifier,
         scorecardIdentifier: scorecard.identifier,
         scorecardTitle: scorecard.title,
+        failureReason: formatRuleFailureReason(rule, result, entity),
       });
     }
 

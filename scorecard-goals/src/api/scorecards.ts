@@ -1,11 +1,29 @@
 import { MOCK_SCORECARDS } from "../dev/mockData";
 import { DEV_MOCK } from "../hooks/usePostMessageData";
-import type { Scorecard, ScorecardRule } from "../types";
+import type { Scorecard, ScorecardRule, ScorecardRuleQuery } from "../types";
 import { parsePortError } from "./portFetch";
 
 type ScorecardsResponse = {
   scorecards?: unknown[];
 };
+
+function normalizeQuery(raw: unknown): ScorecardRuleQuery | undefined {
+  if (!raw || typeof raw !== "object") return undefined;
+  const obj = raw as Record<string, unknown>;
+  const conditionsRaw = Array.isArray(obj.conditions) ? obj.conditions : [];
+  const conditions = conditionsRaw
+    .filter((c): c is Record<string, unknown> => !!c && typeof c === "object")
+    .map((c) => ({
+      property: typeof c.property === "string" ? c.property : undefined,
+      operator: typeof c.operator === "string" ? c.operator : undefined,
+      value: c.value,
+    }));
+
+  return {
+    combinator: typeof obj.combinator === "string" ? obj.combinator : undefined,
+    conditions: conditions.length ? conditions : undefined,
+  };
+}
 
 function normalizeRule(raw: unknown): ScorecardRule | null {
   if (!raw || typeof raw !== "object") return null;
@@ -13,10 +31,19 @@ function normalizeRule(raw: unknown): ScorecardRule | null {
   if (typeof obj.identifier !== "string" || !obj.identifier.trim()) {
     return null;
   }
+  const description =
+    typeof obj.description === "string"
+      ? obj.description
+      : typeof obj.rule_description === "string"
+        ? obj.rule_description
+        : undefined;
+
   return {
     identifier: obj.identifier.trim(),
     title: typeof obj.title === "string" ? obj.title : undefined,
     level: typeof obj.level === "string" ? obj.level : undefined,
+    description,
+    query: normalizeQuery(obj.query),
   };
 }
 
