@@ -80,7 +80,7 @@ Each **plugin directory must** include a `README.md` that follows **this section
      ```bash
      port-plugins upload \
        --file dist/index.html \
-       --identifier <your-widget-name> \
+       --identifier <your-plugin-name> \
        --title "<widget title in Port>" \
        --params "$(cat upload-params.json)" \
        --description "<short plugin description>" \

@@ -30,7 +30,7 @@ Copy these from `.claude/skills/create-port-plugin/assets/` — do not modify th
 | Source | Destination | Changes needed |
 |--------|------------|----------------|
 | `template-package.json` | `<widget>/package.json` | Update `name` to `port-<widget-name>-plugin`, update `description` |
-| `template-App.css` | `<widget>/src/App.css` | Customize styles; includes thin scrollbars (`.shell`, `.scroll-area`) and optional wide-table pattern (`.table-scroll` / `.table-area` / `.scroll-mirror`) — see **Thin scrollbars** below |
+| `template-App.css` | `<plugin>/src/App.css` | Customize styles; includes thin scrollbars (`.shell`, `.scroll-area`) and optional wide-table pattern (`.table-scroll` / `.table-area` / `.scroll-mirror`) — see **Thin scrollbars** below |
 | `template-useScrollMirror.ts` | `<widget>/src/hooks/useScrollMirror.ts` | **Optional** — only when using the table + bottom horizontal mirror pattern |
 | `template-App.tsx` | `<widget>/src/App.tsx` | Implement widget logic |
 | `template-types.ts` | `<widget>/src/types.ts` | Add fields to `PluginConfig` matching your params |

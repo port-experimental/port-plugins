@@ -722,7 +722,7 @@ Write the per-plugin README per **[readme-and-audit.md](readme-and-audit.md)** (
 port-plugins upload \
   --file dist/index.html \
   --identifier <your-widget-name> \
-  --title "<widget title in Port>" \
+  --title "<plugin title in Port>" \
   --params "$(cat upload-params.json)" \
   --description "<short plugin description>" \
   --upsert
