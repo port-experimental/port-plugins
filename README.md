@@ -18,9 +18,9 @@ This repo ships the same **create-port-plugin** skill for [Cursor](./.cursor/ski
 | **Cursor** | [`.cursor/skills/create-port-plugin/`](./.cursor/skills/create-port-plugin/) |
 | **Claude Code** | [`.claude/skills/create-port-plugin/`](./.claude/skills/create-port-plugin/) |
 
-In either editor, ask the agent to create or extend a plugin; it will follow the skill’s workflows (reuse an existing widget, scaffold from templates, align `upload-params.json`, and document prerequisites).
+In either editor, ask the agent to create or extend a plugin; it will follow the skill’s workflows (reuse an existing widget, scaffold from templates, align `upload-params.json`, and document prerequisites in the plugin’s README).
 
-**After the skill generates or updates a plugin**, read that plugin’s **README** end to end — especially **Prerequisites**, **Widget parameters**, local development, and upload steps. Also review the skill reference guidelines (for example [guidelines.md](./.cursor/skills/create-port-plugin/references/guidelines.md) and [readme-and-audit.md](./.cursor/skills/create-port-plugin/references/readme-and-audit.md) under [`.cursor/skills/create-port-plugin/references/`](./.cursor/skills/create-port-plugin/references/) or the mirrored [`.claude/skills/create-port-plugin/references/`](./.claude/skills/create-port-plugin/references/)) so catalog setup, params, and runtime behaviour match Port’s expectations.
+**After the skill generates or updates a plugin**, read that plugin’s **README** end to end. It is the single source of truth for everything you need to run the widget: Port catalog setup (blueprints, properties, and relations), widget parameters, local development, and uploading the plugin to your organization.
 
 ## Port MCP (recommended)
 
