@@ -102,6 +102,18 @@ Document default `dueDate`, override behaviour, and validation in README **Widge
 
 See [Surface vs decoration colors](scaffolding-and-implementation.md#surface-vs-decoration-colors).
 
+### ❌ Don't: Use one palette shade for pill background and text
+
+**Bad:**
+```css
+.level--silver {
+  --level-pill-bg: color-mix(in srgb, var(--silver) 22%, var(--card));
+  --level-pill-text: var(--silver); /* both from -300 — invisible on white card */
+}
+```
+
+**Good:** Base alias at **300** for strokes/dots; **`-bg`** (100/200) and **`-text`** (600–800) on `:root` for labels — see [Optional palette and shade variants](scaffolding-and-implementation.md#optional-palette-and-shade-variants-root).
+
 ### ❌ Don't: Repeat plugin title, description, or icon in the iframe
 
 **Bad:** Header inside the widget with the same name as the Port plugin, a subtitle repeating the upload description, or a decorative icon matching the plugin’s Port icon.

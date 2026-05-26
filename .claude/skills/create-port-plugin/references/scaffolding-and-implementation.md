@@ -13,7 +13,7 @@ mkdir <widget-name>   # lowercase + hyphens only, e.g. service-health-panel
 
 ### 2. Copy template files verbatim
 
-Copy these from `.cursor/skills/create-port-plugin/assets/` — do not modify them:
+Copy these from `.claude/skills/create-port-plugin/assets/` — do not modify them:
 
 | Source | Destination |
 |--------|------------|
@@ -30,7 +30,8 @@ Copy these from `.cursor/skills/create-port-plugin/assets/` — do not modify th
 | Source | Destination | Changes needed |
 |--------|------------|----------------|
 | `template-package.json` | `<widget>/package.json` | Update `name` to `port-<widget-name>-plugin`, update `description` |
-| `template-App.css` | `<widget>/src/App.css` | Customize styles |
+| `template-App.css` | `<plugin>/src/App.css` | Customize styles; includes thin scrollbars (`.shell`, `.scroll-area`) and optional wide-table pattern (`.table-scroll` / `.table-area` / `.scroll-mirror`) — see **Thin scrollbars** below |
+| `template-useScrollMirror.ts` | `<widget>/src/hooks/useScrollMirror.ts` | **Optional** — only when using the table + bottom horizontal mirror pattern |
 | `template-App.tsx` | `<widget>/src/App.tsx` | Implement widget logic |
 | `template-types.ts` | `<widget>/src/types.ts` | Add fields to `PluginConfig` matching your params |
 | `template-upload-params.json` | `<widget>/upload-params.json` | Define widget parameters |
@@ -167,6 +168,57 @@ Port’s injected theme drives **backgrounds and typography**. Widget **decorati
 ```
 
 When several decorations share one hue, repeat the same fallback hex on each class (or scope a **component block** e.g. `.calendar { --event-blue: #2563eb; }` and reference `--event-blue` only inside that block — still **not** on `:root` as a global accent). See `assets/template-App.css` (`.example-dot`, `.example-link`) and `entity-calendar/src/App.css`.
+
+#### Thin scrollbars
+
+`template-App.css` ships scrollbar styling aligned with Port catalogue tables:
+
+| Class | Use |
+|-------|-----|
+| `.shell` | Main iframe vertical scroll — `overflow-x: hidden`, thin 6px thumb via `--text-faint` |
+| `.scroll-area` | Any other scrollable panel (errors, sidebars) — same thin thumb |
+| `.table-scroll` + `.table-area` + `.table-area__body` + `.scroll-mirror` | Wide tables: **one** vertical bar on `.table-area`, **one** horizontal bar on `.scroll-mirror` only |
+
+Do **not** put `overflow-x: scroll` on the same node as the mirror — Chromium will draw two horizontal bars. The split layout hides horizontal scrollbars on `.table-area__body` and syncs scroll position with the mirror.
+
+Copy `template-useScrollMirror.ts` → `src/hooks/useScrollMirror.ts` when using the table pattern. Reference: `ai-invocation-stats` (`UserStatsTable.tsx`).
+
+#### Optional palette and shade variants (`:root`)
+
+After surfaces, `App.css` may define a **shared optional palette** on `:root` — still **not** a global `--accent`. These are **short aliases** to Port **`--color-*`** tokens the host injects via **`applyThemeCss()`**. Provide a **fallback hex** in each `var(...)` for local dev.
+
+**Default shade for the base alias:** use **`--color-{hue}-300`** (readable strokes, dots, chart series, icon tint):
+
+```css
+--gold: var(--color-gold-300, #eec355);
+--bronze: var(--color-bronze-300, #eb977d); /* Port has bronze; not every hue has -50/-100 */
+```
+
+**Infer `-bg` and `-text` when the UI needs pills, badges, or status labels** on white/neutral cards (`--card`). Do **not** use `color-mix(…, var(--card))` at low percentages for pill backgrounds — it disappears on white cards. Do **not** use the **300** alias for both background and label text (low contrast).
+
+| Suffix | Typical Port token | Use for |
+|--------|-------------------|---------|
+| *(none)* | `--color-{hue}-300` | Strokes, dots, rings, links via `var(--ocean-blue)` |
+| `-bg` | `--color-{hue}-100` or `-200` | Solid pill/badge **background** visible on `--card` |
+| `-text` | `--color-{hue}-700`, `-800`, or `-600` | Pill/badge **label** on `-bg` |
+
+**How to pick `-bg` / `-text` for a hue:**
+
+1. Pick the Port token name for the hue (e.g. `--color-gold-300`); copy fallback hex from an existing plugin’s `App.css` or Port’s design tokens when embedded.
+2. Add `--{hue}-bg` pointing at the lightest usable tint (**`-100`**, else **`-200`**; bronze often uses **`--color-bronze-200`**).
+3. Add `--{hue}-text` pointing at a **dark** step (**`-700`** or **`-800`**; red may use **`-600`**).
+4. Wire decoration classes to the variants, not raw `var(--gold)` for both bg and text:
+
+```css
+.level--gold {
+  --level-pill-bg: var(--gold-bg);
+  --level-pill-text: var(--gold-text);
+}
+```
+
+**Only define variants for hues the widget actually uses** (e.g. scorecard levels → `gold`, `silver`, `bronze`, `green`, `orange`, `red`, `gray`; skip `lime` if unused).
+
+**Rings / progress / single-hue marks:** base **`--{hue}`** (300) on the element class is enough; add `-bg`/`-text` only when that hue also appears on pills or badges.
 
 #### Local dev mock data (outside Port’s iframe)
 
@@ -664,5 +716,17 @@ When auditing or releasing, update the **Version** cell if `package.json` `versi
 
 ### 8. Per-plugin `README.md`
 
-Write the per-plugin README per **[readme-and-audit.md](readme-and-audit.md)** (required section order, preview image, params table before setup, canonical upload command, troubleshooting).
+Write the per-plugin README per **[readme-and-audit.md](readme-and-audit.md)** (required section order, preview image, params table before setup, canonical upload command, troubleshooting). The **Upload** step must use this exact `port-plugins upload` shape (substitute per-plugin values only):
+
+```bash
+port-plugins upload \
+  --file dist/index.html \
+  --identifier <your-widget-name> \
+  --title "<widget title in Port>" \
+  --params "$(cat upload-params.json)" \
+  --description "<short plugin description>" \
+  --upsert
+```
+
+Do **not** document invented flags (`--name`, `--path`, `--plugin-id`, etc.) — see the flag table in readme-and-audit.md.
 

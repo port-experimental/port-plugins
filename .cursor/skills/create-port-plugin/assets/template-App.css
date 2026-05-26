@@ -12,6 +12,7 @@
   --border: var(--border-medium, rgba(0, 0, 0, 0.09));
   --text: var(--text-high, #111827);
   --muted: var(--text-medium, #6b7280);
+  --text-faint: var(--text-low, #9ca3af);
   --radius: 8px;
 
   --hover-bg: var(--background-dim-transparent, rgba(0, 0, 0, 0.04));
@@ -19,6 +20,34 @@
   --border-hover: var(--border-contrast-medium, rgba(0, 0, 0, 0.22));
   --badge-bg: var(--background-dim-transparent, rgba(0, 0, 0, 0.06));
   --shadow-dropdown: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+  /* Optional palette - use on decoration classes, not as shared accent on :root */
+  --blue: var(--color-blue-300, #3cb3f6);
+  --bronze: var(--color-bronze-300, #eb977d);
+  --gold: var(--color-gold-300, #eec355);
+  --gray: var(--color-gray-300, #e9e9e9);
+  --green: var(--color-green-300, #4fcd44);
+  --lime: var(--color-lime-300, #b8dc4b);
+  --ocean-blue: var(--color-ocean-blue-300, #447cea);
+  --olive: var(--color-olive-300, #9ab866);
+  --orange: var(--color-orange-300, #ff9a3d);
+  --pink: var(--color-pink-300, #fa25a5);
+  --purple: var(--color-purple-300, #868dff);
+  --red: var(--color-red-300, #ff6f55);
+  --silver: var(--color-silver-300, #aac6db);
+  --turquoise: var(--color-turquoise-300, #29c7d1);
+
+  /*
+   * Pills / badges on --card: add -bg and -text per hue you use (see skill: Optional palette).
+   * -bg  → lightest tint: usually --color-{hue}-100, else -200 (bronze: -200)
+   * -text → dark label: --color-{hue}-700 or -800 (red: -600)
+   * Do not color-mix(..., var(--card)) for pill bg; do not use -300 for both bg and text.
+   *
+   * --gold-bg: var(--color-gold-100, #fcf5e3);
+   * --gold-text: var(--color-gold-700, #736337);
+   * --bronze-bg: var(--color-bronze-200, #ffcdbe);
+   * --bronze-text: var(--color-bronze-800, #5e3c32);
+   */
 }
 
 *,
@@ -41,10 +70,172 @@ body {
   color: var(--text);
 }
 
+/* ── Optional thin scrollbars (apply to main iframe scroll regions) ──
+   Use on .shell and any .scroll-area. Thumb uses --text-faint; hover uses --muted. */
 .shell {
   padding: 16px;
   min-height: 100%;
+  overflow-x: hidden;
   overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--text-faint) transparent;
+}
+
+.shell::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.shell::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.shell::-webkit-scrollbar-thumb {
+  background: var(--text-faint);
+  border-radius: 3px;
+}
+
+.shell::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
+
+.shell::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Optional: second scroll region (panels, code blocks, modals) */
+.scroll-area {
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--text-faint) transparent;
+}
+
+.scroll-area::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.scroll-area::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scroll-area::-webkit-scrollbar-thumb {
+  background: var(--text-faint);
+  border-radius: 3px;
+}
+
+.scroll-area::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
+
+.scroll-area::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/*
+ * Wide table: one vertical bar + one horizontal bar (no doubled horizontal).
+ *
+ * Markup (pair with assets/template-useScrollMirror.ts):
+ *
+ *   <div class="table-scroll">
+ *     <div class="table-area">
+ *       <div class="table-area__body" ref={areaRef}>…table…</div>
+ *     </div>
+ *     <div class="scroll-mirror" ref={mirrorRef} aria-hidden>
+ *       <div class="scroll-mirror__inner" ref={innerRef} />
+ *     </div>
+ *   </div>
+ *
+ * Toggle scroll-mirror--hidden when hasHorizontalOverflow is false (from hook).
+ */
+.table-scroll {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.table-area {
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: auto;
+  max-height: min(360px, 50vh);
+  min-height: 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--text-faint) transparent;
+}
+
+.table-area::-webkit-scrollbar {
+  width: 6px;
+}
+
+.table-area::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.table-area::-webkit-scrollbar-thumb {
+  background: var(--text-faint);
+  border-radius: 3px;
+}
+
+.table-area::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
+
+/* Horizontal scroll without a visible bar (mirror shows horizontal only) */
+.table-area__body {
+  overflow-x: auto;
+  overflow-y: visible;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.table-area__body::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.scroll-mirror {
+  position: sticky;
+  bottom: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  height: 12px;
+  flex-shrink: 0;
+  background: var(--card);
+  border-top: 1px solid var(--border);
+  scrollbar-width: thin;
+  scrollbar-color: var(--text-faint) transparent;
+}
+
+.scroll-mirror--hidden {
+  height: 0;
+  min-height: 0;
+  border-top: none;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.scroll-mirror__inner {
+  height: 1px;
+}
+
+.scroll-mirror::-webkit-scrollbar {
+  height: 8px;
+}
+
+.scroll-mirror::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 4px;
+}
+
+.scroll-mirror::-webkit-scrollbar-thumb {
+  background: var(--text-faint);
+  border-radius: 4px;
+}
+
+.scroll-mirror::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
 }
 
 .muted {
@@ -56,7 +247,7 @@ body {
 
 /* Decoration example — copy pattern for dots, pills, links, chart marks */
 .example-dot {
-  --example-dot-color: #2563eb;
+  --example-dot-color: var(--ocean-blue);
   width: 6px;
   height: 6px;
   border-radius: 50%;
@@ -64,7 +255,7 @@ body {
 }
 
 .example-link {
-  --example-link-color: #2563eb;
+  --example-link-color: var(--ocean-blue);
   color: var(--example-link-color);
   text-decoration: none;
 }
