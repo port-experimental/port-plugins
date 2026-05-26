@@ -24,7 +24,7 @@ In either editor, ask the agent to create or extend a plugin; it will follow the
 
 ## Port MCP (recommended)
 
-For design-time discovery of your Port catalog, install the [Port MCP server](https://docs.port.io/ai-interfaces/port-mcp-server/overview-and-installation/#install-port-mcp) in your IDE. Use it to inspect **blueprints** (properties and relations), sample **entities**, and other Port data while planning a widget — without hard-coding catalog details in plugin parameters. MCP is for planning in the editor; widget runtime code should use the Port HTTP API and host context (`PLUGIN_DATA`), not MCP.
+For design-time discovery of your Port catalog, install the [Port MCP server](https://docs.port.io/ai-interfaces/port-mcp-server/overview-and-installation/#install-port-mcp) in your IDE. This allows both you and the create-port-plugin skill to inspect **blueprints** (properties and relations), sample **entities**, and other Port data while planning a widget — without hard-coding catalog details in plugin parameters. MCP is for planning in the editor; widget runtime code should use the Port HTTP API and host context (`PLUGIN_DATA`), not MCP.
 
 ## Port Plugins CLI (recommended)
 
