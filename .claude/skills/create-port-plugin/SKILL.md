@@ -191,5 +191,6 @@ Scaffold copies from `.cursor/skills/create-port-plugin/assets/`:
 | `template-index.html` | `<widget>/src/index.html` |
 | `template-index.tsx` | `<widget>/src/index.tsx` |
 | `template-usePostMessageData.ts` | `<widget>/src/hooks/usePostMessageData.ts` |
+| `template-useScrollMirror.ts` | `<widget>/src/hooks/useScrollMirror.ts` (optional; wide tables with bottom horizontal scrollbar) |
 | `template-package.json` | `<widget>/package.json` (adapt `name`) |
 | `template-App.tsx`, `template-App.css`, `template-types.ts`, `template-upload-params.json` | Adapt under `<widget>/src/` and root |

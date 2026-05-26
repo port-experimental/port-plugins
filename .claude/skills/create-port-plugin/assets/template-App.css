@@ -12,6 +12,7 @@
   --border: var(--border-medium, rgba(0, 0, 0, 0.09));
   --text: var(--text-high, #111827);
   --muted: var(--text-medium, #6b7280);
+  --text-faint: var(--text-low, #9ca3af);
   --radius: 8px;
 
   --hover-bg: var(--background-dim-transparent, rgba(0, 0, 0, 0.04));
@@ -69,10 +70,172 @@ body {
   color: var(--text);
 }
 
+/* ── Optional thin scrollbars (apply to main iframe scroll regions) ──
+   Use on .shell and any .scroll-area. Thumb uses --text-faint; hover uses --muted. */
 .shell {
   padding: 16px;
   min-height: 100%;
+  overflow-x: hidden;
   overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--text-faint) transparent;
+}
+
+.shell::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.shell::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.shell::-webkit-scrollbar-thumb {
+  background: var(--text-faint);
+  border-radius: 3px;
+}
+
+.shell::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
+
+.shell::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Optional: second scroll region (panels, code blocks, modals) */
+.scroll-area {
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--text-faint) transparent;
+}
+
+.scroll-area::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.scroll-area::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scroll-area::-webkit-scrollbar-thumb {
+  background: var(--text-faint);
+  border-radius: 3px;
+}
+
+.scroll-area::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
+
+.scroll-area::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/*
+ * Wide table: one vertical bar + one horizontal bar (no doubled horizontal).
+ *
+ * Markup (pair with assets/template-useScrollMirror.ts):
+ *
+ *   <div class="table-scroll">
+ *     <div class="table-area">
+ *       <div class="table-area__body" ref={areaRef}>…table…</div>
+ *     </div>
+ *     <div class="scroll-mirror" ref={mirrorRef} aria-hidden>
+ *       <div class="scroll-mirror__inner" ref={innerRef} />
+ *     </div>
+ *   </div>
+ *
+ * Toggle scroll-mirror--hidden when hasHorizontalOverflow is false (from hook).
+ */
+.table-scroll {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.table-area {
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: auto;
+  max-height: min(360px, 50vh);
+  min-height: 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--text-faint) transparent;
+}
+
+.table-area::-webkit-scrollbar {
+  width: 6px;
+}
+
+.table-area::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.table-area::-webkit-scrollbar-thumb {
+  background: var(--text-faint);
+  border-radius: 3px;
+}
+
+.table-area::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
+
+/* Horizontal scroll without a visible bar (mirror shows horizontal only) */
+.table-area__body {
+  overflow-x: auto;
+  overflow-y: visible;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.table-area__body::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.scroll-mirror {
+  position: sticky;
+  bottom: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  height: 12px;
+  flex-shrink: 0;
+  background: var(--card);
+  border-top: 1px solid var(--border);
+  scrollbar-width: thin;
+  scrollbar-color: var(--text-faint) transparent;
+}
+
+.scroll-mirror--hidden {
+  height: 0;
+  min-height: 0;
+  border-top: none;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.scroll-mirror__inner {
+  height: 1px;
+}
+
+.scroll-mirror::-webkit-scrollbar {
+  height: 8px;
+}
+
+.scroll-mirror::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 4px;
+}
+
+.scroll-mirror::-webkit-scrollbar-thumb {
+  background: var(--text-faint);
+  border-radius: 4px;
+}
+
+.scroll-mirror::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
 }
 
 .muted {

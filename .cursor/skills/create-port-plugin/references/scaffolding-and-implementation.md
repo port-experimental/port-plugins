@@ -30,7 +30,8 @@ Copy these from `.cursor/skills/create-port-plugin/assets/` — do not modify th
 | Source | Destination | Changes needed |
 |--------|------------|----------------|
 | `template-package.json` | `<widget>/package.json` | Update `name` to `port-<widget-name>-plugin`, update `description` |
-| `template-App.css` | `<widget>/src/App.css` | Customize styles |
+| `template-App.css` | `<widget>/src/App.css` | Customize styles; includes thin scrollbars (`.shell`, `.scroll-area`) and optional wide-table pattern (`.table-scroll` / `.table-area` / `.scroll-mirror`) — see **Thin scrollbars** below |
+| `template-useScrollMirror.ts` | `<widget>/src/hooks/useScrollMirror.ts` | **Optional** — only when using the table + bottom horizontal mirror pattern |
 | `template-App.tsx` | `<widget>/src/App.tsx` | Implement widget logic |
 | `template-types.ts` | `<widget>/src/types.ts` | Add fields to `PluginConfig` matching your params |
 | `template-upload-params.json` | `<widget>/upload-params.json` | Define widget parameters |
@@ -167,6 +168,20 @@ Port’s injected theme drives **backgrounds and typography**. Widget **decorati
 ```
 
 When several decorations share one hue, repeat the same fallback hex on each class (or scope a **component block** e.g. `.calendar { --event-blue: #2563eb; }` and reference `--event-blue` only inside that block — still **not** on `:root` as a global accent). See `assets/template-App.css` (`.example-dot`, `.example-link`) and `entity-calendar/src/App.css`.
+
+#### Thin scrollbars
+
+`template-App.css` ships scrollbar styling aligned with Port catalogue tables:
+
+| Class | Use |
+|-------|-----|
+| `.shell` | Main iframe vertical scroll — `overflow-x: hidden`, thin 6px thumb via `--text-faint` |
+| `.scroll-area` | Any other scrollable panel (errors, sidebars) — same thin thumb |
+| `.table-scroll` + `.table-area` + `.table-area__body` + `.scroll-mirror` | Wide tables: **one** vertical bar on `.table-area`, **one** horizontal bar on `.scroll-mirror` only |
+
+Do **not** put `overflow-x: scroll` on the same node as the mirror — Chromium will draw two horizontal bars. The split layout hides horizontal scrollbars on `.table-area__body` and syncs scroll position with the mirror.
+
+Copy `template-useScrollMirror.ts` → `src/hooks/useScrollMirror.ts` when using the table pattern. Reference: `ai-invocation-stats` (`UserStatsTable.tsx`).
 
 #### Optional palette and shade variants (`:root`)
 
