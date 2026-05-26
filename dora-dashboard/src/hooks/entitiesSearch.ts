@@ -57,7 +57,7 @@ async function fetchEntitiesSearch(
 		},
 		body: JSON.stringify(body),
 	});
-	if (!res.ok) throw new Error(`Entities search failed: ${res.status}`);
+	if (!res.ok) { const body = await res.text(); throw new Error(`Port API ${res.status}: ${body}`); }
 	return res.json();
 }
 

@@ -9,7 +9,6 @@ interface EntityTableProps {
   columns: Column[];
   hidden: Set<string>;
   blueprintMap: Record<string, Blueprint>;
-  portApiBaseUrl: string | null;
   onReorder: (orderedKeys: string[]) => void;
 }
 
@@ -33,10 +32,9 @@ function renderCell(
   value: unknown,
   colType: string,
   blueprintMap: Record<string, Blueprint>,
-  portApiBaseUrl: string | null,
 ): React.ReactNode {
   const openEntity = () => {
-    const url = buildPortEntityUrl(portApiBaseUrl, entity.blueprint ?? '', entity.identifier);
+    const url = buildPortEntityUrl(entity.blueprint ?? '', entity.identifier);
     if (url !== '#') window.open(url, '_blank', 'noopener,noreferrer');
   };
 
@@ -80,7 +78,7 @@ function renderCell(
   return <span>{formatPropertyValue(value)}</span>;
 }
 
-export function EntityTable({ entities, columns, hidden, blueprintMap, portApiBaseUrl, onReorder }: EntityTableProps) {
+export function EntityTable({ entities, columns, hidden, blueprintMap, onReorder }: EntityTableProps) {
   const visibleCols = columns.filter(col => col.fixed || !hidden.has(col.key));
 
   const [dragKey,     setDragKey]     = useState<string | null>(null);
@@ -141,7 +139,7 @@ export function EntityTable({ entities, columns, hidden, blueprintMap, portApiBa
                     key={col.key}
                     className={col.type === 'number' ? 'ec-table__td--num' : ''}
                   >
-                    {renderCell(entity, col.key, value, col.type, blueprintMap, portApiBaseUrl)}
+                    {renderCell(entity, col.key, value, col.type, blueprintMap)}
                   </td>
                 );
               })}

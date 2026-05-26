@@ -285,7 +285,6 @@ export function EntityCatalogue() {
               columns={columns}
               hidden={currentHidden}
               blueprintMap={blueprintMap}
-              portApiBaseUrl={portApiBaseUrl}
               onReorder={keys => reorderColumns(activeTab, keys)}
             />
           </div>

@@ -1,22 +1,18 @@
-/**
- * Builds the Port app URL for an entity page from the API base URL.
- * Port entity pages use the format: /{blueprintId}Entity?identifier={entityId}
- * e.g. https://api.getport.io → https://app.getport.io/serviceEntity?identifier=my-svc
- */
+/** Returns the portal origin from the parent page referrer, falling back to app.port.io. */
+function getPortalOrigin(): string {
+  try {
+    if (document.referrer) return new URL(document.referrer).origin;
+  } catch {
+    // fall through
+  }
+  return 'https://app.port.io';
+}
+
+/** Builds a Port entity-page URL using the portal origin from document.referrer. */
 export function buildPortEntityUrl(
-  portApiBaseUrl: string | null,
   blueprintIdentifier: string,
   entityIdentifier: string,
 ): string {
-  if (!portApiBaseUrl || !blueprintIdentifier) return '#';
-
-  const base = portApiBaseUrl.replace(/\/$/, '');
-  try {
-    const url = new URL(base);
-    // Replace "api" subdomain with "app" (handles api.getport.io and api.eu.getport.io)
-    url.hostname = url.hostname.replace(/^api\./, 'app.');
-    return `${url.origin}/${blueprintIdentifier}Entity?identifier=${entityIdentifier}`;
-  } catch {
-    return '#';
-  }
+  if (!blueprintIdentifier || !entityIdentifier) return '#';
+  return `${getPortalOrigin()}/${blueprintIdentifier}Entity?identifier=${encodeURIComponent(entityIdentifier)}`;
 }

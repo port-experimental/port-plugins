@@ -72,10 +72,10 @@ export function DependencyTree() {
       ...n,
       data: {
         ...n.data,
-        portAppUrl: buildPortEntityUrl(portApiBaseUrl, n.data.entity?.blueprint ?? '', n.id),
+        portAppUrl: buildPortEntityUrl(n.data.entity?.blueprint ?? '', n.id),
       },
     })),
-    [allNodes, portApiBaseUrl],
+    [allNodes],
   );
 
   // Filter by hidden relation types
@@ -97,7 +97,7 @@ export function DependencyTree() {
     return (
       <div className="dep-tree-widget">
         <div className="dep-tree-setup">
-          <div className="dep-tree-setup__icon">🌲</div>
+          <div className="dep-tree-setup__icon" aria-hidden="true">&#x25A1;</div>
           <div className="dep-tree-setup__text">Open this widget from an entity page</div>
         </div>
       </div>
@@ -112,7 +112,7 @@ export function DependencyTree() {
       <div className="dep-tree-header">
         <div>
           <div className="dep-tree-header__title">
-            🌲 Dependency Tree
+            {entity.title || entity.identifier}
           </div>
           <div className="dep-tree-header__subtitle">
             {entity.title || entity.identifier} · depth {maxDepth}

@@ -36,7 +36,7 @@ export function TabBar({
       </div>
       <div className="ec-tabbar__actions">
         <div className="ec-tabbar__search">
-          <span className="ec-tabbar__search-icon">🔍</span>
+          <span className="ec-tabbar__search-icon" aria-hidden="true">&#x2315;</span>
           <input
             type="text"
             placeholder="Search entities…"

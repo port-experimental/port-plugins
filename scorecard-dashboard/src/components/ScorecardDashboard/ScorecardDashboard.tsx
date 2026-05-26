@@ -4,6 +4,13 @@ import { usePortPluginData } from '@port-labs/plugins-sdk/react';
 import { useScorecardData, getGrade, ScorecardStat, LeaderRow, ServiceSummary, GradeThresholds, DEFAULT_THRESHOLDS } from './useScorecardData';
 import type { Params } from '../../types';
 
+function getPortalOrigin(): string {
+  try {
+    if (document.referrer) return new URL(document.referrer).origin;
+  } catch { /* fall through */ }
+  return 'https://app.port.io';
+}
+
 // ── Blueprint param helper (mirrors EntityCatalogue pattern) ──────────────
 
 function getBlueprintId(value: unknown): string | null {
@@ -197,7 +204,7 @@ function ComplianceTable({ leaderRows, scorecardStats, appBaseUrl }: { leaderRow
   if (sorted.length === 0) {
     return (
       <div className="sc-empty">
-        <div className="sc-empty__icon">📋</div>
+        <div className="sc-empty__icon" aria-hidden="true">—</div>
         <div>No org leader data found.</div>
         <div style={{ fontSize: '11px', color: 'var(--sc-text-faint)' }}>
           Check that the team blueprint and relation params are configured correctly.
@@ -300,7 +307,6 @@ export function ScorecardDashboard() {
   const teamServicesRelation = str('teamServicesRelation', '');
   const teamManagerRelation  = str('teamManagerRelation',  'manager');
   const serviceTeamRelation  = str('serviceTeamRelation',  '');
-  const dashboardTitle       = str('dashboardTitle',       'Scorecard Compliance Dashboard');
 
   function num(key: string, def: number): number {
     const v = p?.[key]?.value;
@@ -321,9 +327,7 @@ export function ScorecardDashboard() {
     ? scorecardIdsRaw.split(',').map(s => s.trim()).filter(Boolean)
     : [];
 
-  const appBaseUrl = portApiBaseUrl
-    ? portApiBaseUrl.replace('//api.', '//app.')
-    : 'https://app.getport.io';
+  const appBaseUrl = getPortalOrigin();
 
   const { data, isLoading, error, refetch } = useScorecardData(
     portToken, portApiBaseUrl ?? '', serviceBlueprints, teamBlueprint,
@@ -347,7 +351,6 @@ export function ScorecardDashboard() {
 
       {/* Header */}
       <div className="sc-header">
-        <div className="sc-header__title">{dashboardTitle}</div>
         <div className="sc-header__subtitle">
           Scorecard compliance for <strong>{serviceBlueprints.join(', ')}</strong>
           {' · '}grouped by <strong>{teamManagerRelation}</strong> via <strong>{teamBlueprint}</strong>
@@ -367,7 +370,7 @@ export function ScorecardDashboard() {
       {/* Error banner */}
       {error && (
         <div className="sc-error-banner">
-          <span>⚠️</span>
+          <span aria-hidden="true">!</span>
           <span className="sc-error-banner__msg">{(error as Error).message}</span>
           <button className="sc-error-banner__retry" type="button" onClick={() => refetch()}>
             Retry
