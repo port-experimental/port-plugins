@@ -13,7 +13,7 @@ mkdir <widget-name>   # lowercase + hyphens only, e.g. service-health-panel
 
 ### 2. Copy template files verbatim
 
-Copy these from `.cursor/skills/create-port-plugin/assets/` — do not modify them:
+Copy these from `.claude/skills/create-port-plugin/assets/` — do not modify them:
 
 | Source | Destination |
 |--------|------------|
@@ -30,7 +30,7 @@ Copy these from `.cursor/skills/create-port-plugin/assets/` — do not modify th
 | Source | Destination | Changes needed |
 |--------|------------|----------------|
 | `template-package.json` | `<widget>/package.json` | Update `name` to `port-<widget-name>-plugin`, update `description` |
-| `template-App.css` | `<widget>/src/App.css` | Customize styles; includes thin scrollbars (`.shell`, `.scroll-area`) and optional wide-table pattern (`.table-scroll` / `.table-area` / `.scroll-mirror`) — see **Thin scrollbars** below |
+| `template-App.css` | `<plugin>/src/App.css` | Customize styles; includes thin scrollbars (`.shell`, `.scroll-area`) and optional wide-table pattern (`.table-scroll` / `.table-area` / `.scroll-mirror`) — see **Thin scrollbars** below |
 | `template-useScrollMirror.ts` | `<widget>/src/hooks/useScrollMirror.ts` | **Optional** — only when using the table + bottom horizontal mirror pattern |
 | `template-App.tsx` | `<widget>/src/App.tsx` | Implement widget logic |
 | `template-types.ts` | `<widget>/src/types.ts` | Add fields to `PluginConfig` matching your params |
@@ -722,7 +722,7 @@ Write the per-plugin README per **[readme-and-audit.md](readme-and-audit.md)** (
 port-plugins upload \
   --file dist/index.html \
   --identifier <your-widget-name> \
-  --title "<plugin title in Port>" \
+  --title "<widget title in Port>" \
   --params "$(cat upload-params.json)" \
   --description "<short plugin description>" \
   --upsert
