@@ -13,7 +13,7 @@ mkdir <widget-name>   # lowercase + hyphens only, e.g. service-health-panel
 
 ### 2. Copy template files verbatim
 
-Copy these from `.cursor/skills/create-port-plugin/assets/` — do not modify them:
+Copy these from `.claude/skills/create-port-plugin/assets/` — do not modify them:
 
 | Source | Destination |
 |--------|------------|

@@ -12,6 +12,12 @@ Each widget lives in its own top-level directory:
 ```
 <plugins-repo>/
 ├── README.md                     # Plugins table (Widget, Version, Description) — update when adding one or bumping package.json version
+├── .claude/                      # Optional — e.g. editor skills / templates
+│   └── skills/
+│       └── create-port-plugin/
+│           ├── SKILL.md
+│           ├── references/
+│           └── assets/
 ├── .cursor/                      # Optional — e.g. editor skills / templates
 │   └── skills/
 │       └── create-port-plugin/

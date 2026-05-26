@@ -423,7 +423,7 @@ const apply = (next: Data) => {
 ## Build Requirements
 
 - Output **must be a single self-contained `dist/index.html`** — all JS and CSS inlined
-- Use `InlineChunkHtmlPlugin` from `react-dev-utils` in the webpack config (see `.cursor/skills/create-port-plugin/assets/template-webpack.config.js`)
+- Use `InlineChunkHtmlPlugin` from `react-dev-utils` in the webpack config (see `assets/template-webpack.config.js`)
 - No external CDN/asset requests from the built file — Port hosts it
 
 ### Critical Webpack Configuration

@@ -23,30 +23,14 @@ Platform rules (CSP, upload limits, param metadata), SDK APIs, and CLI behavior 
 
 ## Core principles
 
-1. **Catalog over plugin params** — blueprints, properties, **relations**, and entity data come from the Port API and host context at **runtime**. Design and document the catalog first (MCP + README **Prerequisites**). `upload-params.json` only scopes behaviour the API and `PLUGIN_DATA` cannot supply — never duplicate lists of blueprints, relation keys, property inventories, or entity identifiers that `GET /v1/blueprints`, `GET /v1/blueprints/{identifier}`, `PLUGIN_DATA.entity`, or `POST .../entities/search` already provide.
-2. **UX and UI matter** — widgets are product surfaces inside Port, not throwaway panels. Invest in loading, empty, and error states; theme alignment; responsive layout; accessible controls; and clear actions. Match Port’s visual language (SDK theme tokens, spacing, typography) — see [scaffolding-and-implementation.md](references/scaffolding-and-implementation.md) (**UX and UI**). **Surface tokens** (`--bg`, `--card`, `--text`, `--border`) belong in `:root`; **decorations** (dots, badges, accent text, links, chart series) get **dedicated colors on their class** — not `--accent` / `--primary` from `:root`.
-3. **Safe rendering only** — never use `innerHTML`, `outerHTML`, or `dangerouslySetInnerHTML` to render dynamic or user-supplied content. Use React elements, text nodes, or a vetted sanitizer if HTML is unavoidable (rare in widgets).
-4. **Reuse widgets and blueprints** before creating duplicates — survey the repo `README.md` and sibling `upload-params.json` files first.
-5. **Catalog changes are normal** — add properties, relations, or blueprints when the use case needs them; document in README prerequisite tables.
-6. **Relation strategy before params** — while designing blueprints/properties, decide which **existing catalog relations** to use or which **new relations** to add so the widget can traverse the graph. After that, wire runtime code to **`PLUGIN_DATA.entity`** (`relations` / `relationsObjects`) and **`entities/search`** (`relatedTo` / relation rules). **Never** default to `string` params for relation identifiers (`parentRelation`, `taskRelation`, etc.).
-7. **Single-blueprint widgets** — when the widget is built for one subject blueprint (e.g. calendar on Task), treat that blueprint as the design default: use **`PLUGIN_DATA.entity.blueprint`** on entity pages; omit a `type: "blueprint"` param unless the same build must also run on dashboards without host entity context.
-8. **Cross-blueprint data via relations** — when the widget needs entities on another blueprint, rely on **catalog relations** between blueprints (and host/search resolution). **Before proposing a new relation**, inspect both blueprints’ schemas via MCP (`list_blueprints` with `identifiers`) — confirm an existing relation or target properties do not already satisfy the need. Document missing relations in README; add them via MCP when approved — do not ask operators to type relation keys in params.
-9. **Local dev outside Port** — always run `npm run dev` on **port 9000** (`devServer.port: 9000` in `webpack.config.js`; URL `http://localhost:9000`). Do not assign per-widget ports — Port’s **Local development** iframe mode expects 9000. Keep **small, focused mock data** in `usePostMessageData.ts` (host context) and `src/dev/` or early returns in `api/` (API shapes) so previews work without live tokens. Details: [scaffolding-and-implementation.md](references/scaffolding-and-implementation.md) (**Local dev mock data**).
-10. **Runtime data via Port HTTP API only** — `portApiBaseUrl` + bearer token from the host; MCP is for **design-time** catalog discovery in the IDE, not inside the iframe.
-11. **Minimize remaining params** — prefer `type: "blueprint"` only when the admin must **pick** a blueprint scope the widget cannot infer (e.g. child blueprint on a dashboard). Do **not** add params to list blueprints, entities, relations, or property keys — fetch those at runtime. Prefer schema defaults and **`GET /v1/blueprints/{identifier}`** before optional property-key `string` overrides.
-12. **Param schema** — every entry in `upload-params.json` must include **`type`**, **`isRequired`**, and **`label`** (no partial objects).
-13. **Short param labels** — **`label`** values are short, simple, and meaningful (what the admin is choosing). Defaults, examples, and long explanations belong in the per-plugin README **Widget parameters** table — not in Port’s param label field.
-14. **README Port prerequisites** — document every **new or required Port instance** operators must create or configure before the widget works: blueprints, properties, **relations**, integrations, **automations**, **self-service actions (SSA)**, scorecards, pages, and similar. Use tables in README **Prerequisites**; do not rely on param labels to carry setup instructions.
-15. **Portal links** — origin from `document.referrer`, fallback `https://app.port.io`; never `portApiBaseUrl` for UI links.
-16. **No duplicate chrome** — Port’s iframe wrapper already shows the plugin **title**, **description**, and **icon** from registration; **do not** add them inside the widget (`App.tsx`, headers, heroes). Build functional UI only (lists, filters, forms, charts). In-content labels and the **current entity** title are fine — they are not plugin registration metadata.
-17. **Icons in widget UI** — **never** hardcode emoji (Unicode symbols in JSX or strings). When icons are needed, use a vetted **icon library** (e.g. Lucide, react-icons) — not emoji.
-18. **Plugin identifier (upload)** — the Port plugin identifier (`port-plugins upload --identifier`, plugin folder name when they match, and README upload examples) **must** satisfy Port’s allowed format. Validate with:
+Strategic defaults — tactical checklist in **Non-negotiables**; anti-patterns in [guidelines.md](references/guidelines.md).
 
-```javascript
-const PLUGIN_IDENTIFIER_REGEX = /^(?!\.{1,2}$)[A-Za-z0-9@_.+:\\/=-]+$/;
-```
-
-Before upload, run the chosen identifier against this regex. If it fails, rename the plugin directory and fix all references (README, CI, docs) — **do not** upload with an invalid identifier. Repo convention remains **kebab-case** matching the directory (see [widget-conventions.md](references/widget-conventions.md)); the regex is the hard gate Port enforces.
+1. **Catalog over plugin params** — design and document the catalog first (MCP + README **Prerequisites**). `upload-params.json` only scopes behaviour the API and `PLUGIN_DATA` cannot supply.
+2. **UX and UI matter** — loading, empty, and error states; theme alignment; full-iframe layout. See [scaffolding-and-implementation.md](references/scaffolding-and-implementation.md) (**UX and UI**).
+3. **Safe rendering only** — React text/elements only for dynamic content; no `innerHTML`, `outerHTML`, or `dangerouslySetInnerHTML` (vetted sanitizer only if unavoidable).
+4. **Reuse before creating** — survey repo `README.md` and sibling plugins before scaffolding.
+5. **Relation strategy before params** — pick or add catalog relations first; resolve at runtime via `PLUGIN_DATA.entity` and `entities/search` — not relation-key `string` params by default.
+6. **Runtime via Port API; MCP at design-time only** — `portApiBaseUrl` + token in the iframe; `list_blueprints` / `upsert_blueprint` in the IDE only.
 
 ## Overview
 
@@ -133,6 +117,15 @@ Use `upsert_blueprint` only when the user wants catalog changes applied via MCP.
 
 Before finishing: [references/guidelines.md](references/guidelines.md) (anti-patterns, Port vs `localStorage`, troubleshooting table).
 
+## Verify
+
+Before marking the plugin done:
+
+1. Run `npm run dev` on `http://localhost:9000` and `npm run build` — confirm `dist/index.html` exists.
+2. Validate the plugin identifier against Port’s regex (see **Non-negotiables** → Plugin identifier).
+3. Confirm per-plugin README section order and upload command per [readme-and-audit.md](references/readme-and-audit.md).
+4. Walk the **Non-negotiables** table and [guidelines.md](references/guidelines.md) anti-patterns.
+
 ## Non-negotiables (always apply)
 
 | Topic | Rule |
@@ -182,7 +175,7 @@ Use Port MCP while planning the widget and catalog — **not** from widget runti
 
 ## Assets
 
-Scaffold copies from `.cursor/skills/create-port-plugin/assets/`:
+Scaffold copies from `assets/` (skill root; in this repo also `.cursor/skills/create-port-plugin/assets/`):
 
 | Template | Destination |
 |----------|-------------|
