@@ -1,11 +1,7 @@
 ---
 name: create-port-plugin
 description: >-
-  Reuse or verify existing Port custom plugins in the repo or build new ones from scratch as self-contained
-  React/TypeScript iframe widgets (@port-labs/plugins-sdk, port-plugins-cli) uploaded as Port
-  plugins. Use when recommending an existing plugin, copying/adapting one, greenfield scaffolding, or auditing upload-params.json and per-plugin README. Do not use for Ocean
-  integrations, generic Port admin without plugin code, or blueprint-only catalog work with no
-  widget implementation.
+   Build Port custom plugins and widgets from scratch, or reuse and verify existing ones in the repo, as self-contained React/TypeScript iframe widgets (@port-labs/plugins-sdk, port-plugins-cli) uploaded as Port plugins. Use for greenfield scaffolding, copying/adapting plugins, recommending an existing match, or auditing upload-params.json and per-plugin README. Do not use for Ocean integrations, generic Port admin without plugin code, or blueprint-only catalog work with no widget implementation.
 metadata:
   title: Create Plugin
 ---
