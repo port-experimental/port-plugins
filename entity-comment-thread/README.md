@@ -32,13 +32,47 @@ A [Port](https://app.getport.io) custom widget for **entity pages** that shows t
 
 The widget discovers which relation targets the host entity’s blueprint at runtime. If none exists, it shows setup instructions.
 
+### Blueprint definition (`blueprints/entityComment.blueprint.json`)
+
+Use this file as the **source of truth** when creating or updating the `entityComment` blueprint in Port (Port UI, API, or MCP). It ships with the built-in relations the widget expects; you extend it for your catalog.
+
+| Section | Purpose |
+|---------|---------|
+| `identifier` / `title` / `icon` | Blueprint identity and display in Port (`entityComment`, **Entity Comment**, `Chat`). |
+| `schema.properties` | Fields on each comment entity — see **Properties** below. |
+| `schema.required` | Every comment must have `body` and `author`. |
+| `mirrorProperties` / `calculationProperties` / `aggregationProperties` | Empty in the template; add computed or mirrored fields later if needed. |
+| `relations` | Links between comments and other blueprints (threading + subject). |
+
+**Built-in relations** (do not remove):
+
+| Relation key | Target | Purpose |
+|--------------|--------|---------|
+| `parentComment` | `entityComment` | Nested replies (self-relation). |
+| `service` | `service` | Example subject link for Service entity pages. |
+
+#### Subject relations (`[YOUR-BLUEPRINT-RELATIONS-HERE]`)
+
+The template JSON cannot include a literal `[YOUR-BLUEPRINT-RELATIONS-HERE]` placeholder — JSON does not support comments or placeholders. In practice, that marker means: **add one relation per subject blueprint** you want comments on, as new keys under the existing `"relations": { ... }` object, alongside `parentComment` and `service`.
+
 **Add a subject relation** (example for blueprint `githubPullRequest`):
 
 | Relation key | Target blueprint | Required | Many |
 |--------------|------------------|----------|------|
 | `pullRequest` | `githubPullRequest` | false | false |
 
-Use MCP or Port UI: extend `entityComment.relations` with `target` set to your subject blueprint.
+In `blueprints/entityComment.blueprint.json`, add an entry next to `service`:
+
+```json
+"pullRequest": {
+  "title": "Pull request",
+  "target": "githubPullRequest",
+  "required": false,
+  "many": false
+}
+```
+
+Then create or patch the blueprint in Port (UI, API, or MCP) so `entityComment.relations` includes every subject blueprint you need. The widget picks the relation whose `target` matches the host entity’s blueprint at runtime (excluding `parentComment`).
 
 ### Properties (`entityComment`)
 
@@ -117,7 +151,9 @@ Incoming webhooks (no Slack app) are also supported — use your webhook URL ins
 
 | Key | Type | Required | Default | Description |
 |-----|------|----------|---------|-------------|
-| *(none)* | — | — | — | No plugin parameters. Subject entity and blueprint come from `PLUGIN_DATA.entity` on entity pages. |
+| `entityCommentBlueprint` | blueprint | No | `entityComment` | Blueprint that stores comments. Override only if your org uses a different identifier; align `blueprints/entityComment.blueprint.json` and catalog relations with that blueprint. |
+
+Subject entity and blueprint still come from `PLUGIN_DATA.entity` on entity pages. Relation keys are defined in the catalog (see **Blueprint definition**), not as plugin params.
 
 ## Local development
 
@@ -165,7 +201,7 @@ Install, `port-plugins config`, tokens, and region flags: [@port-labs/port-plugi
 
 1. Open an **entity page** (e.g. a Service).
 2. **Add widget** → **Custom widget** → **Entity Comment Thread**.
-3. Ensure `entityComment` has a relation to that entity’s blueprint (see **Catalog** above).
+3. Create or update the `entityComment` blueprint from `blueprints/entityComment.blueprint.json` (including subject relations for that page’s blueprint).
 
 ### Entity-page behaviour
 
@@ -177,6 +213,8 @@ Install, `port-plugins config`, tokens, and region flags: [@port-labs/port-plugi
 
 ```
 entity-comment-thread/
+├── blueprints/
+│   └── entityComment.blueprint.json
 ├── docs/
 │   └── preview.svg
 ├── src/

@@ -1,1 +1,7 @@
-{}
+{
+  "entityCommentBlueprint": {
+    "type": "blueprint",
+    "isRequired": false,
+    "label": "Entity Comment blueprint"
+  }
+}

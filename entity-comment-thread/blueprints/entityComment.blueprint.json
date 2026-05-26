@@ -1,0 +1,54 @@
+{
+  "identifier": "entityComment",
+  "title": "Entity Comment",
+  "icon": "Chat",
+  "schema": {
+    "properties": {
+      "body": {
+        "title": "Body",
+        "description": "Comment text (markdown, code fences, mentions)",
+        "type": "string",
+        "format": "markdown"
+      },
+      "author": {
+        "title": "Author",
+        "description": "Port user who wrote the comment",
+        "type": "string",
+        "format": "user"
+      },
+      "threadStatus": {
+        "title": "Thread status",
+        "description": "Open or resolved (root comments only)",
+        "type": "string",
+        "enum": ["open", "resolved"],
+        "enumColors": {
+          "open": "blue",
+          "resolved": "green"
+        }
+      },
+      "mentions": {
+        "title": "Mentions",
+        "description": "Users @mentioned in this comment",
+        "type": "array"
+      }
+    },
+    "required": ["body", "author"]
+  },
+  "mirrorProperties": {},
+  "calculationProperties": {},
+  "aggregationProperties": {},
+  "relations": {
+    "parentComment": {
+      "title": "Parent comment",
+      "target": "entityComment",
+      "required": false,
+      "many": false
+    },
+    "service": {
+      "title": "Service",
+      "target": "service",
+      "required": false,
+      "many": false
+    }
+  }
+}
