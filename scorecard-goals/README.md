@@ -6,7 +6,8 @@ Compliance is computed from entity search results: for each entity, every rule o
 
 ## Preview image
 
-N/A - Add preview image
+<img width="1213" height="593" alt="image" src="https://github.com/user-attachments/assets/de622d9e-bd95-48f2-9ff4-8e7f57daeea9" />
+
 
 ## Features
 
