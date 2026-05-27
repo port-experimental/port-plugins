@@ -35,14 +35,13 @@ Dashboard · React 19 · TypeScript · [Port Plugins](https://docs.getport.io/cu
 |---------|-------------|
 | Blueprint | Any blueprint with entities you want on the calendar |
 | Date field | Port sets `createdAt` on every entity; optional `datetime` property (e.g. `createdDate`) if you override via parameter |
-| Dashboard page filters | Optional; when the dashboard applies filters (e.g. `$team`), the blueprint should include **`ownership`** in Port so team filters merge correctly |
 
 ## Widget parameters
 
 | Key | Type | Required | Default | Description |
 |-----|------|----------|---------|-------------|
 | `blueprint` | `blueprint` | Yes | — | Blueprint whose entities appear on the calendar |
-| `createdDateProperty` | `string` | No | *(empty)* | Blueprint property identifier for the calendar date. When empty, uses entity `createdAt`. When set, only that property is used (no fallback to `createdAt`). |
+| `createdDateProperty` | `string` | No | `createdAt` | Blueprint property identifier for the calendar date. When empty, uses entity `createdAt`. When set, only that property is used (no fallback to `createdAt`). |
 | `weekStartsOnMonday` | `boolean` | No | `false` | When enabled, the calendar week starts on Monday; otherwise Sunday. |
 
 ## Local development
