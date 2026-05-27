@@ -11,13 +11,7 @@ Each widget lives in its own top-level directory:
 
 ```
 <plugins-repo>/
-├── README.md                     # Plugins table (Widget, Version, Description) — bump package.json version on every plugin change; sync Version column
-├── .claude/                      # Optional — e.g. editor skills / templates
-│   └── skills/
-│       └── create-port-plugin/
-│           ├── SKILL.md
-│           ├── references/
-│           └── assets/
+├── README.md                     # Plugins table (Widget, Version, Description) — bump package.json version once per branch (cumulative changes); sync Version column
 ├── .cursor/                      # Optional — e.g. editor skills / templates
 │   └── skills/
 │       └── create-port-plugin/

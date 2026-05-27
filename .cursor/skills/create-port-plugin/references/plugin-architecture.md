@@ -120,6 +120,68 @@ const res = await fetch(
 > - Using the generic `/v1/entities/search` endpoint instead of the
 >   blueprint-scoped version above.
 
+### Dashboard page filters (`mergePageFilters`)
+
+On **dashboard** pages, Port passes active page filters on **`PLUGIN_DATA.page.pageFilters`**
+(access via `usePortPluginData().page` or the `usePostMessageData` template wrapper). When the
+widget searches entities with a **`query`** body, merge those filters into the widget query —
+do **not** ignore them and do **not** hand-roll AND rules.
+
+Use **`mergePageFilters`** from **`@port-labs/plugins-sdk`**:
+
+| Argument | Source |
+|----------|--------|
+| `widgetQuery` | Your widget’s base search query (`{ combinator, rules }`) |
+| `pageQuery` | `page?.pageFilters` (cast to `PageQuery[]` when typing) |
+| `blueprint` | **Required when merging page filters** — the **full blueprint object** for the searched blueprint (see below) |
+
+The third argument lets the SDK keep only page rules for that blueprint (and dashboard-wide
+filters). Without it, page filters may not apply correctly.
+
+**Pass the full blueprint object — not `{ identifier }` alone.** Port’s `type: "blueprint"`
+widget param delivers a blueprint record on **`PLUGIN_DATA.params.<key>.value`** (includes
+`identifier`, `title`, and fields such as **`ownership`** when present). Preserve that object in
+`readBlueprintParam` / `PluginConfig` and pass it to `mergePageFilters`. If you pass only
+`{ identifier }`, the SDK treats the blueprint as having no `ownership` and **drops `$team` page
+filters** even when the host sent them.
+
+Use **`GET /v1/blueprints/{identifier}`** for the third argument only when the widget has **no**
+blueprint param (rare) or you already fetch the schema for other reasons — do not add a blueprint
+GET solely to satisfy `mergePageFilters` when the param object is already available.
+
+```ts
+import { mergePageFilters, type PageQuery } from '@port-labs/plugins-sdk';
+import type { PluginConfig } from './types';
+
+let widgetQuery = { combinator: 'and' as const, rules: [] as unknown[] };
+
+if (page?.pageFilters) {
+  widgetQuery = mergePageFilters(
+    widgetQuery,
+    page.pageFilters as PageQuery[],
+    config.blueprint // full object from params.blueprint.value — not { identifier } only
+  );
+}
+
+const res = await fetch(
+  `${portApiBaseUrl}/v1/blueprints/${encodeURIComponent(config.blueprint.identifier)}/entities/search`,
+  {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${portToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ query: widgetQuery, limit: 100 }),
+  }
+);
+```
+
+**Hook wiring:** pass `page` from the host bridge into your data hook and include `page?.pageFilters`
+in the React Query `queryKey` so results refetch when dashboard filters change.
+
+**Entity pages:** `page.pageFilters` is usually empty — call `mergePageFilters` only when
+`page?.pageFilters` is present.
+
 ### GET all entities (simpler, no filtering)
 
 ```ts

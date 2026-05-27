@@ -105,7 +105,7 @@ Use `upsert_blueprint` only when the user wants catalog changes applied via MCP.
 
 ### 5. Document and ship
 
-- **Bump `package.json` `version`** when the plugin changes (bugfix → patch, feature → minor, breaking → major). Sync the repo root **Plugins** table **Version** column to the same value.
+- **Bump `package.json` `version` once per branch** when the plugin has functional changes — based on **all** changes on the branch since merge base, not once per agent invocation. Semver from the aggregate change (patch / minor / major). Sync the repo root **Plugins** table **Version** column. Workflow: [readme-and-audit.md](references/readme-and-audit.md) (**Versioning — once per branch**).
 - Per-plugin **README** (required section order): [references/readme-and-audit.md](references/readme-and-audit.md)
 - Repo-level widgets table row when adding a new plugin (include **Version** from that plugin’s `package.json` `version` field)
 - Canonical **`port-plugins upload`** command — exact flags in [references/readme-and-audit.md](references/readme-and-audit.md) (Setup → Upload); do not invent CLI flags
@@ -122,7 +122,7 @@ Before marking the plugin done:
 2. Validate the plugin identifier against Port’s regex (see **Non-negotiables** → Plugin identifier).
 3. Confirm per-plugin README section order and upload command per [readme-and-audit.md](references/readme-and-audit.md).
 4. Walk the **Non-negotiables** table and [guidelines.md](references/guidelines.md) anti-patterns.
-5. If the plugin code changed, confirm **`package.json` `version`** was bumped and the root **`README.md` Plugins** **Version** cell matches.
+5. If the branch has functional plugin changes, confirm **`package.json` `version`** was bumped **once for the branch** (not re-bumped every invocation) and the root **`README.md` Plugins** **Version** cell matches — [readme-and-audit.md](references/readme-and-audit.md) (**Versioning — once per branch**).
 
 ## Non-negotiables (always apply)
 
@@ -142,13 +142,14 @@ Before marking the plugin done:
 | Param labels | Short **`label`** in `upload-params.json`; defaults and detail in README **Widget parameters** |
 | README prerequisites | Tables for catalog **and** other Port setup (relations, automations, SSA, integrations, …) — see [readme-and-audit.md](references/readme-and-audit.md) |
 | Search | Nested `query`; not top-level `combinator`/`rules` |
+| Dashboard page filters | On `POST .../entities/search` with a `query`, merge `page.pageFilters` via **`mergePageFilters`**; pass the **full blueprint** from **`params.blueprint.value`** as the third argument (not `{ identifier }` only) — [plugin-architecture.md](references/plugin-architecture.md) |
 | Errors | Include full response body text |
 | Iframe UI | Full width/height; **no** plugin title, description, or icon inside the iframe |
 | Icons | icon library; **never** hardcoded emoji |
 | Plugin identifier | `PLUGIN_IDENTIFIER_REGEX` — validate `--identifier` (and folder name when aligned) **before** every `port-plugins upload`; reject `.`, `..`, spaces, and other disallowed characters |
 | Persistence | Port entities/properties unless explicitly local-only UI state |
 | Upload CLI | `port-plugins upload` with **`--file`**, **`--identifier`**, **`--title`**, **`--params`**, **`--description`**, **`--upsert`** only — see [readme-and-audit.md](references/readme-and-audit.md) |
-| Versioning | On any functional change to a plugin, **bump** its `package.json` **`version`** (semver) and update the root **`README.md` Plugins** table **Version** cell to match |
+| Versioning | **Once per git branch** per plugin: bump `package.json` **`version`** from merge-base semver using **cumulative** branch changes (patch / minor / major); sync root **`README.md` Plugins** **Version** — **not** on every agent invocation; see [readme-and-audit.md](references/readme-and-audit.md) (**Versioning — once per branch**) |
 
 ## Reference index
 

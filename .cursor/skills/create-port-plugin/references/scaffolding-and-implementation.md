@@ -82,7 +82,7 @@ In `App.tsx`:
 
 **Runtime data — use the Port API only.** For every live read or write (search entities, get entity by identifier, create/update entities, relations, scores, or any other Port-backed data), call the **Port REST API** with `Authorization: Bearer ${portToken}` and base URL `portApiBaseUrl` from the SDK. Centralize calls in `api/` modules; keep TanStack React Query in hooks with `enabled: !!portToken && !!portApiBaseUrl`. Do not use MCP from widget code, and do not bake in static catalog dumps from planning time as if they were live data.
 
-- When search results must respect **dashboard page filters**, merge with **`mergePageFilters`** from **`@port-labs/plugins-sdk`** (see npm docs).
+- When search results must respect **dashboard page filters**, use **`mergePageFilters`** from **`@port-labs/plugins-sdk`** on the widget’s `query` (see [plugin-architecture.md](plugin-architecture.md) — **Dashboard page filters**). Pass **`page.pageFilters`** and the **full blueprint object** from **`params.blueprint.value`** as the third argument — not optional when page filters are present. Do **not** pass `{ identifier }` only.
 - Remove the entity guard block if the widget is for dashboards (not entity pages).
 
 #### Responsive layout
@@ -334,25 +334,38 @@ export function buildEntityPageUrl(
 
 #### Searching blueprint entities (correct endpoint)
 
-Use `POST /v1/blueprints/{blueprint}/entities/search` — **not** the generic search endpoint. The body must nest filter rules inside a `query` key:
+Use `POST /v1/blueprints/{blueprint}/entities/search` — **not** the generic search endpoint. The body must nest filter rules inside a `query` key.
+
+**Dashboard widgets:** merge **`PLUGIN_DATA.page.pageFilters`** into the widget query with **`mergePageFilters(widgetQuery, page.pageFilters, blueprint)`**. Pass the **full** blueprint from **`config.blueprint`** (parsed from `params.blueprint.value`) when page filters are present — not `{ identifier }` only. Wire `page` from `usePostMessageData()` / `usePortPluginData()` and include `page?.pageFilters` in query keys. Full pattern: [plugin-architecture.md](plugin-architecture.md) — **Dashboard page filters**.
 
 ```ts
+import { mergePageFilters, type PageQuery } from "@port-labs/plugins-sdk";
+import type { PluginConfig } from "../types";
+
+let query = { combinator: "and" as const, rules: [] as unknown[] };
+
+if (page?.pageFilters) {
+  query = mergePageFilters(
+    query,
+    page.pageFilters as PageQuery[],
+    config.blueprint
+  );
+}
+
 const res = await fetch(
-  `${baseUrl}/v1/blueprints/${encodeURIComponent(blueprint)}/entities/search`,
+  `${baseUrl}/v1/blueprints/${encodeURIComponent(config.blueprint.identifier)}/entities/search`,
   {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      query: { combinator: "and", rules: [] },
-    }),
+    body: JSON.stringify({ query }),
   }
 );
 ```
 
-> **Avoid:** placing `combinator`/`rules` at the top level (causes 422), passing `page`/`page_size` query params, or using the generic `/v1/entities/search` route.
+> **Avoid:** placing `combinator`/`rules` at the top level (causes 422), passing `page`/`page_size` query params, using the generic `/v1/entities/search` route, calling `mergePageFilters` **without** the blueprint argument when `page.pageFilters` is set, or passing **`{ identifier }` only** to `mergePageFilters` when the full blueprint param object is available (breaks `$team` page filters).
 
 #### Error handling
 
@@ -469,15 +482,22 @@ const parentEntity = pluginData.entity?.relationsObjects?.[PARENT_RELATION];
 
 When the admin should **pick a blueprint** (not type a free-form ID), use **`"type": "blueprint"`**. Port renders the native blueprint control.
 
-> **Runtime shape:** A `blueprint` param is **not** a plain string. Port delivers it as a **blueprint object**:
-> ```typescript
-> { identifier: string; title: string; /* …other blueprint fields */ }
-> ```
-> Always read `.identifier` (and optionally `.title`) instead of treating the value as a raw string.
+> **Runtime shape:** A `blueprint` param is **not** a plain string. Port delivers it as a **blueprint object** (e.g. `identifier`, `title`, `ownership`, …). Always read `.identifier` for API paths; **preserve the full object** for `mergePageFilters` and other SDK helpers.
 
 **Type it correctly in `PluginConfig`:**
 ```typescript
-export type BlueprintParam = { identifier: string; title: string };
+import type { mergePageFilters } from "@port-labs/plugins-sdk";
+
+export type BlueprintParam = NonNullable<
+  Parameters<typeof mergePageFilters>[2]
+> & { title?: string };
+
+function readBlueprintParam(raw: unknown): BlueprintParam | null {
+  if (!raw || typeof raw !== "object") return null;
+  const obj = raw as Record<string, unknown>;
+  if (typeof obj.identifier !== "string" || !obj.identifier.trim()) return null;
+  return { ...obj, identifier: obj.identifier.trim() } as BlueprintParam;
+}
 
 export type PluginConfig = {
   discussionBlueprint: BlueprintParam; // NOT string — omit when host entity + design default suffice
@@ -681,6 +701,8 @@ If your widget reuses blueprints from other widgets, document this in your widge
 
 ```typescript
 // types.ts
+import type { mergePageFilters } from "@port-labs/plugins-sdk";
+
 /**
  * Param lineage (update names to match sibling widgets in your project):
  * - discussionBlueprint: align with existing discussion-style widgets if any
@@ -689,7 +711,10 @@ If your widget reuses blueprints from other widgets, document this in your widge
  * New concepts introduced by this widget:
  * - milestoneBlueprint — example only; use type: "blueprint" in upload-params.json
  */
-export type BlueprintParam = { identifier: string; title: string };
+// Preserve full params.blueprint.value — required for mergePageFilters (ownership, etc.)
+export type BlueprintParam = NonNullable<
+  Parameters<typeof mergePageFilters>[2]
+> & { title?: string };
 
 export type PluginConfig = {
   discussionBlueprint: BlueprintParam;
@@ -700,7 +725,7 @@ export type PluginConfig = {
 
 ### 7. Bump version and update the README
 
-**Whenever you change plugin behaviour or fix user-visible bugs**, bump **`version`** in that plugin’s `package.json` (semver: patch for fixes, minor for features, major for breaking changes). Then add or update a row in the repo-level **Plugins** widgets table in the project root `README.md` — the **Version** column must match `package.json` exactly.
+When the branch changes plugin behaviour or fixes user-visible bugs, bump **`version`** in that plugin’s `package.json` **once per git branch** — semver from **all** functional changes on the branch since merge base (patch / minor / major), **not** on every agent invocation. Full workflow: [readme-and-audit.md](readme-and-audit.md) (**Versioning — once per branch**). Then add or update a row in the repo-level **Plugins** widgets table in the project root `README.md` — the **Version** column must match `package.json` exactly.
 
 ```markdown
 | [Widget Title](./widget-name) | 1.0.0 | One-sentence description |
@@ -712,7 +737,7 @@ If the widget reuses or extends existing blueprints, mention this in the descrip
 | [Project Dashboard](./project-dashboard) | 0.2.1 | Example: combines work-tracking and discussion plugins already in the same project, plus any new blueprint-backed features |
 ```
 
-Do not ship plugin code changes without a version bump and a matching root **Plugins** table **Version** cell. When auditing or releasing, update the description if behaviour changed materially.
+Do not ship plugin code changes on a branch without a version bump (once per branch) and a matching root **Plugins** table **Version** cell. When auditing or releasing, update the description if behaviour changed materially.
 
 ### 8. Per-plugin `README.md`
 

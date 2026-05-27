@@ -252,7 +252,11 @@ const parentFromHost = entity.relationsObjects?.[resolvedParentRelationKey];
 
 **Example of extensible design:**
 ```typescript
-export type BlueprintParam = { identifier: string; title: string };
+import type { mergePageFilters } from "@port-labs/plugins-sdk";
+
+export type BlueprintParam = NonNullable<
+  Parameters<typeof mergePageFilters>[2]
+> & { title?: string };
 
 export type PluginConfig = {
   commentBlueprint: BlueprintParam; // omit on entity-only widgets when entity + README default suffice
@@ -372,3 +376,4 @@ If the widget needs to store records (e.g. comments, bookmarks, reactions):
 | Colours look wrong in dev | Port CSS vars not injected | CSS must provide local fallbacks: `var(--text-high, #111827)` |
 | Links open wrong region/host | Hardcoded `app.port.io` or used `portApiBaseUrl` for UI links | Use `new URL(document.referrer).origin` with fallback `https://app.port.io`; keep API on `portApiBaseUrl` only |
 | Upload rejected (`Function` / eval) | Bundle contains `new Function` or `Function("return this")` (webpack polyfill, lodash via recharts, etc.) | Apply optional fixes in [webpack-port-upload-safety.md](webpack-port-upload-safety.md) only when this happens — not in the default template |
+| Dashboard filters ignored | Search uses raw `query` without `mergePageFilters`, missing blueprint third argument, or only `{ identifier }` passed | Merge `page.pageFilters` with SDK; pass **full** `params.blueprint.value` (includes `ownership` when present) — [plugin-architecture.md](plugin-architecture.md) |

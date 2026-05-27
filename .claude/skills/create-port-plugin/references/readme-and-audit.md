@@ -7,7 +7,7 @@ Use this path when the goal is **not** greenfield scaffolding but to **audit and
 - Per-plugin **`README.md`** is missing, thin, or out of order versus **Per-plugin `README.md` standard (required)** below (preview image, parameters table before setup, canonical upload command, troubleshooting, and so on).
 - **`upload-params.json`** drifted from **`src/types.ts`**, overuses `string` where **`type: "blueprint"`** fits, includes **relation-key string params** or other **runtime-fetchable catalog data** (blueprint lists, entity IDs, property inventories) that belong on the Port API, duplicates a fixed subject blueprint that **`PLUGIN_DATA.entity`** already provides, or ignores the five-blueprint-param cap (see [CLI metadata](https://www.npmjs.com/package/@port-labs/port-plugins-cli)).
 - **UX/UI** is weak (no loading/empty/error states, ignores theme, poor responsive layout) or code uses **`innerHTML`** / **`dangerouslySetInnerHTML`** for dynamic content.
-- **`@port-labs/plugins-sdk`** is outdated or the host bridge omits **`applyThemeCss()`**, **`usePortPluginData`**, or dashboard **`mergePageFilters`** when page filters should apply.
+- **`@port-labs/plugins-sdk`** is outdated or the host bridge omits **`applyThemeCss()`**, **`usePortPluginData`**, or dashboard **`mergePageFilters`** when page filters should apply (third argument must be the **full** `params.blueprint.value` object — not `{ identifier }` only).
 - **Build / runtime** issues covered in [plugin-architecture.md](plugin-architecture.md) (Critical Webpack/CSS, entity search `{ query: { ... } }`, error surfacing).
 - **Upload** instructions missing the canonical **`port-plugins upload`** line or contradicting current CLI/auth.
 
@@ -16,8 +16,40 @@ Use this path when the goal is **not** greenfield scaffolding but to **audit and
 1. **Read** — `README.md`, `upload-params.json`, `package.json` (`engines`, dependencies), `src/types.ts`, host hook (`usePostMessageData` / `usePortPluginData`), main UI entry, any API modules, `webpack.config.js`, root CSS.
 2. **Gap analysis** — Compare against the README standard below, params guidance in [scaffolding-and-implementation.md](scaffolding-and-implementation.md) (**Define parameters**), and [plugin-architecture.md](plugin-architecture.md) / [widget-conventions.md](widget-conventions.md).
 3. **Prioritize** — Correctness first (Port API request shapes, token usage, theme), then operator docs (README, param table), then polish (badges, screenshots, structure tree).
-4. **Patch** — Keep diffs focused: bump SDK with hook changes; keep `PluginConfig` and `upload-params.json` in lockstep; rewrite README sections rather than deleting useful catalog/integration detail. **Bump `package.json` `version`** for every functional change (patch / minor / major per semver); update the repo root **Plugins** table **Version** column to match.
+4. **Patch** — Keep diffs focused: bump SDK with hook changes; keep `PluginConfig` and `upload-params.json` in lockstep; rewrite README sections rather than deleting useful catalog/integration detail. **Version bump:** follow **Versioning — once per branch** below (not once per agent invocation).
 5. **Verify** — `npm ci` / `npm install`, `npm run build`, smoke in **Local development** mode and/or in Port; confirm root **`README.md` Plugins** **Version** matches `package.json`; update the row description if behaviour changed materially.
+
+### Versioning — once per branch
+
+Bump a plugin’s `package.json` **`version` at most once per git branch** for that plugin’s functional work. The semver level must reflect **all** functional changes on the branch since it diverged from the default branch (`main` / `master`) — **not** once per agent invocation, chat session, or incremental edit on the same branch.
+
+**Do not bump again** when:
+
+- This branch already increased `version` (and synced the root **Plugins** table **Version** cell) and later commits on the same branch do not raise the warranted semver level (e.g. more patch-level fixes after a patch bump).
+- There are no functional plugin diffs vs merge base (docs-only, skill-only, or unrelated paths).
+
+**Bump (or raise) when:**
+
+- The branch has functional plugin changes under `<plugin>/` and `package.json` `version` is still the merge-base value — bump **once** from that base using cumulative severity.
+- The branch already bumped but **new** commits add a higher semver class (e.g. branch had patch-only fixes, then a feature landed) — increase to the level warranted by **total** branch changes vs merge-base version (do not stack patch bumps per invocation).
+
+**Choose semver from cumulative branch changes** (highest level that applies):
+
+| Level | When (aggregate on branch) |
+|-------|----------------------------|
+| **patch** | Bug fixes, internal corrections, no new operator-facing capability |
+| **minor** | New user-visible behaviour or params (non-breaking) |
+| **major** | Breaking changes for operators (param removals/renames, required new catalog setup, incompatible behaviour) |
+
+**Workflow (run before finishing work on a branch):**
+
+1. Resolve merge base: `git merge-base HEAD origin/main` (or `main` / `master` if `origin/main` is unavailable).
+2. List functional diffs: `git diff <merge-base>...HEAD -- <plugin-dir>/` (exclude docs-only if no behaviour change).
+3. Read merge-base version: `git show <merge-base>:<plugin-dir>/package.json` (or `jq -r .version`).
+4. Compare to current `package.json` `version` on the branch:
+   - **Unchanged vs merge base** and step 2 has functional changes → bump **once** from merge-base version per the table above.
+   - **Already bumped on branch** → bump again **only** if cumulative changes now need a **higher** semver than the current branch version reflects (recompute from merge-base version + total branch changes; do not add another patch per agent run).
+5. Update the root **`README.md` Plugins** table **Version** cell to match `package.json` exactly.
 
 ### PR checklist (copy into description)
 
@@ -27,6 +59,7 @@ Use this path when the goal is **not** greenfield scaffolding but to **audit and
 - [ ] **SDK** current enough for your needs (see [plugins-sdk on npm](https://www.npmjs.com/package/@port-labs/plugins-sdk)); **`applyThemeCss()`** called so host theme tokens apply in the iframe.
 - [ ] **Webpack / CSS** meet Critical Webpack/CSS in [plugin-architecture.md](plugin-architecture.md).
 - [ ] **Entity search** bodies use `{ query: { combinator, rules } }` where applicable; errors surfaced with response body text.
+- [ ] **Dashboard page filters:** `mergePageFilters` receives the **full** blueprint from `params.blueprint.value` (not `{ identifier }` only); `readBlueprintParam` preserves all fields — [plugin-architecture.md](plugin-architecture.md) (**Dashboard page filters**).
 - [ ] **`npm run build`** succeeds; **`dist/index.html`** is the upload artifact.
 - [ ] **Persistence:** Meaningful saved state uses the Port API where feasible; browser storage only when intentionally local-only (see [guidelines.md](guidelines.md)).
 - [ ] **Layout:** Responsive behaviour verified; root fills iframe space; no duplicate plugin title, description, or icon (see [scaffolding-and-implementation.md](scaffolding-and-implementation.md)).
@@ -38,7 +71,7 @@ Use this path when the goal is **not** greenfield scaffolding but to **audit and
 - [ ] **UX/UI:** Loading, empty, and error states; theme applied; responsive iframe layout; no duplicate plugin title/description/icon; no emoji — use **`<i>`** or an icon library for icons when needed.
 - [ ] **CSS:** `:root` = surfaces/text/borders only; optional palette at **300**; pills/badges use **`--{hue}-bg`** + **`--{hue}-text`** (not `color-mix` into `--card` for labels) — [Optional palette and shade variants](scaffolding-and-implementation.md#optional-palette-and-shade-variants-root); decorations otherwise use **class-local** vars — not shared `--accent` / `--primary` ([Surface vs decoration colors](scaffolding-and-implementation.md#surface-vs-decoration-colors)).
 - [ ] **Safe rendering:** No `innerHTML` / `dangerouslySetInnerHTML` for dynamic or user content.
-- [ ] **Version bump:** `package.json` `version` increased for this change (patch / minor / major); root **`README.md` Plugins** **Version** cell matches.
+- [ ] **Version bump:** Branch has at most **one** semver bump per plugin vs merge base; level matches **cumulative** functional changes (patch / minor / major); root **`README.md` Plugins** **Version** cell matches — not re-bumped on every agent run.
 - [ ] **Repo Plugins table:** Root `README.md` row includes **Version** matching `package.json` `version` when the plugin was added or version-bumped.
 
 ### 8. Per-plugin `README.md` standard (required)
