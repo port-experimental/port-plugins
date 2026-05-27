@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { usePortPluginData } from "@port-labs/plugins-sdk/react";
 import { MOCK_BLUEPRINT } from "../dev/mockData";
 import type { Entity, Page, Params, User } from "../types";
+import { applyDocumentTheme, resolveThemeMode } from "../utils/themeMode";
 
 export const DEV_MOCK =
   process.env.NODE_ENV === "development" && window.parent === window;
@@ -24,12 +25,42 @@ export const usePostMessageData = () => {
   );
 
   const applyThemeCss = sdk.applyThemeCss;
+  const hostTheme = sdk.theme;
 
   useEffect(() => {
     if (!DEV_MOCK) {
       applyThemeCss();
     }
   }, [applyThemeCss]);
+
+  useEffect(() => {
+    const syncTheme = () => {
+      const mode = DEV_MOCK
+        ? resolveThemeMode(
+            window.matchMedia("(prefers-color-scheme: dark)").matches
+              ? "dark"
+              : "light"
+          )
+        : resolveThemeMode(hostTheme?.mode);
+      applyDocumentTheme(mode);
+    };
+
+    syncTheme();
+
+    if (DEV_MOCK) {
+      const mq = window.matchMedia("(prefers-color-scheme: dark)");
+      mq.addEventListener("change", syncTheme);
+      return () => mq.removeEventListener("change", syncTheme);
+    }
+
+    // Re-resolve after Port injects theme CSS (tokens may arrive after mode).
+    const raf = requestAnimationFrame(syncTheme);
+    const t = window.setTimeout(syncTheme, 0);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.clearTimeout(t);
+    };
+  }, [hostTheme?.mode, hostTheme?.css]);
 
   return useMemo(() => {
     if (DEV_MOCK) {

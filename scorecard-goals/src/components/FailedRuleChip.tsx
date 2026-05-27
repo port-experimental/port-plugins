@@ -1,4 +1,3 @@
-import { Box, Chip, Tooltip } from "@mui/material";
 import type { FailedRuleInfo } from "../types";
 
 type FailedRuleChipProps = {
@@ -7,61 +6,25 @@ type FailedRuleChipProps = {
 };
 
 export function FailedRuleChip({ rule, entityKey }: FailedRuleChipProps) {
-  const tooltipId = `rule-failure-${entityKey}-${rule.ruleIdentifier}`;
+  const hintId = `rule-failure-${entityKey}-${rule.ruleIdentifier}`;
+  const failureReason =
+    rule.failureReason?.trim() || "No additional failure details provided.";
 
   return (
-    <Chip
-      size="small"
-      color="error"
-      variant="outlined"
-      label={
-        <Box
-          component="span"
-          sx={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 0.5,
-            maxWidth: "100%",
-          }}
-        >
-          <Box
-            component="span"
-            sx={{
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-            }}
-          >
-            {rule.ruleTitle}
-          </Box>
-          <Tooltip
-            id={tooltipId}
-            title={rule.failureReason}
-            arrow
-            placement="top"
-            describeChild
-          >
-            <Box
-              component="span"
-              tabIndex={0}
-              aria-label={`Why ${rule.ruleTitle} did not pass`}
-              aria-describedby={tooltipId}
-              sx={{
-                flexShrink: 0,
-                fontSize: "0.75rem",
-                fontWeight: 700,
-                fontStyle: "italic",
-                fontFamily: "Georgia, serif",
-                lineHeight: 1,
-                color: "text.secondary",
-                cursor: "help",
-              }}
-            >
-              i
-            </Box>
-          </Tooltip>
-        </Box>
-      }
-    />
+    <span className="rule-chip">
+      <span className="rule-chip__label">{rule.ruleTitle}</span>
+      <button
+        type="button"
+        className="rule-chip__hint"
+        aria-label={`Why ${rule.ruleTitle} did not pass`}
+        aria-describedby={hintId}
+        title={failureReason}
+      >
+        i
+      </button>
+      <span id={hintId} className="sr-only">
+        {failureReason}
+      </span>
+    </span>
   );
 }

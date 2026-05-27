@@ -1,19 +1,8 @@
-import { CircularProgress, Stack, Typography } from "@mui/material";
-
 export function LoadingState() {
   return (
-    <Stack
-      alignItems="center"
-      justifyContent="center"
-      spacing={2}
-      sx={{ py: 6, flex: 1 }}
-      role="status"
-      aria-live="polite"
-    >
-      <CircularProgress size={40} />
-      <Typography variant="body1" color="text.secondary">
-        Loading scorecard compliance…
-      </Typography>
-    </Stack>
+    <div className="status-panel" role="status" aria-live="polite">
+      <div className="loading-spinner" aria-hidden />
+      <p className="status-panel__title">Loading scorecard compliance…</p>
+    </div>
   );
 }

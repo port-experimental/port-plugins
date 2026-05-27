@@ -2,7 +2,12 @@ import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { searchBlueprintEntities } from "../api/entities";
 import { fetchBlueprintScorecards } from "../api/scorecards";
-import type { EntityGapSummary, PluginConfig, ScorecardComplianceRow } from "../types";
+import type {
+  EntityGapSummary,
+  Page,
+  PluginConfig,
+  ScorecardComplianceRow,
+} from "../types";
 import {
   buildEntityGapsForScorecard,
   computeScorecardCompliance,
@@ -11,7 +16,8 @@ import {
 export function useScorecardGoals(
   config: PluginConfig | null,
   portToken: string | null,
-  portApiBaseUrl: string | null
+  portApiBaseUrl: string | null,
+  page?: Page
 ) {
   const blueprintId = config?.blueprint.identifier ?? null;
   const enabled = !!config && !!portToken && !!portApiBaseUrl;
@@ -28,14 +34,23 @@ export function useScorecardGoals(
   });
 
   const entitiesQuery = useQuery({
-    queryKey: ["entities", blueprintId, portApiBaseUrl],
+    queryKey: [
+      "entities",
+      blueprintId,
+      portApiBaseUrl,
+      scorecardsQuery.data?.map((s) => s.identifier).join(","),
+      page?.pageFilters,
+    ],
     queryFn: () =>
       searchBlueprintEntities(
         portApiBaseUrl!,
         portToken!,
-        blueprintId!
+        blueprintId!,
+        scorecardsQuery.data!,
+        page
       ),
-    enabled,
+    enabled: enabled && scorecardsQuery.isSuccess,
+    staleTime: 5 * 60 * 1000,
   });
 
   const scorecards = scorecardsQuery.data ?? [];

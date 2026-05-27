@@ -1,8 +1,12 @@
 # Scorecard Goals
 
-A [Port](https://www.port.io) custom widget for **dashboard** pages. Choose a blueprint, then see a progress bar for each scorecard on that blueprint showing what share of entities **passed every rule** in that scorecard.
+A [Port](https://app.getport.io) custom widget for **dashboard** pages. Choose a blueprint, then see a progress bar for each scorecard on that blueprint showing what share of entities **passed every rule** in that scorecard.
 
-Compliance is computed from entity search results: for each entity, every rule on the scorecard must have a passing status (for example `Passed`).
+Compliance is computed from entity search results: for each entity, every rule on the scorecard must have a passing status (for example `Passed`). Dashboard **page filters** are merged into the entity search when present.
+
+## Preview image
+
+N/A - Add preview image
 
 ## Features
 
@@ -10,9 +14,10 @@ Compliance is computed from entity search results: for each entity, every rule o
 - One horizontal bar per scorecard with pass percentage
 - **Show gaps for completion** opens a modal listing entities that did not pass all rules, with the specific rules (and scorecard) still failing
 - Counts of entities that passed all rules vs total entities
+- Respects dashboard page filters via `mergePageFilters`
 - Loading, empty, and error states
-- UI built with [MUI](https://mui.com/) Material Design 3 (`@mui/material`, `@mui/icons-material`)
-- Light/dark via MUI `defaultMode="system"`; Port host theme via `@port-labs/plugins-sdk`
+- Port theme tokens via `@port-labs/plugins-sdk` (`applyThemeCss`) and shared widget CSS (`App.css`)
+- Icons via [lucide-react](https://lucide.dev/)
 
 ## Prerequisites
 
@@ -26,6 +31,7 @@ Compliance is computed from entity search results: for each entity, every rule o
 
 | Requirement | Details |
 |-------------|---------|
+| Blueprint | Any blueprint with entities and scorecards you want to summarize |
 | Scorecards | At least one scorecard defined on the chosen blueprint ([Scorecards](https://docs.port.io/scorecards/overview)) |
 | Rules | Each scorecard should have one or more rules; scorecards with zero rules show as not applicable |
 | Entities | Entities on the blueprint are loaded via `POST /v1/blueprints/{blueprint}/entities/search` |
@@ -72,6 +78,7 @@ port-plugins upload \
   --identifier scorecard-goals \
   --title "Scorecard goals" \
   --params "$(cat upload-params.json)" \
+  --description "Per-scorecard compliance bars for a chosen blueprint" \
   --upsert
 ```
 
@@ -84,13 +91,17 @@ For CLI install, authentication, and region (`--port-api-base-url`), see [@port-
 3. Set **Blueprint** to the catalog blueprint you want to track
 4. Save the page
 
+### Entity-page behaviour
+
+N/A — this widget is intended for dashboards. It does not require `PLUGIN_DATA.entity`.
+
 ## Project structure
 
 ```
 scorecard-goals/
 ├── src/
 │   ├── api/              # Port REST: scorecards + entity search
-│   ├── components/       # Bars, loading, empty, error
+│   ├── components/       # Bars, loading, empty, error, gaps modal
 │   ├── dev/mockData.ts   # Local preview data
 │   ├── hooks/
 │   ├── utils/            # Config + compliance math
@@ -108,5 +119,6 @@ scorecard-goals/
 | “Configure the Blueprint parameter” | Widget param not set | Set **Blueprint** in widget settings |
 | No scorecards shown | Blueprint has no scorecards | Create scorecards for that blueprint in Port |
 | 0% for all bars | Entities missing scorecard evaluations | Confirm entities exist and scorecards are active |
+| Counts ignore dashboard filters | Page filters not applied | Widget merges `page.pageFilters` into entity search; confirm filters are set on the dashboard page |
 | API 422 on search | Malformed query body | Ensure search uses `{ query: { combinator, rules } }` |
 | Blank / unstyled UI | Theme not applied | Widget uses `applyThemeCss()` when embedded in Port |

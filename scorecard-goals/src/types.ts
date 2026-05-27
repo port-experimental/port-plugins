@@ -1,6 +1,6 @@
 export type Page = {
   identifier?: string;
-  pageFilters?: unknown;
+  pageFilters?: import("@port-labs/plugins-sdk").PageQuery[];
 };
 
 export type User = {

@@ -1,6 +1,5 @@
 import { useState } from "react";
-import CategoryOutlinedIcon from "@mui/icons-material/CategoryOutlined";
-import { Box, Chip, Stack, Typography } from "@mui/material";
+import { LayoutGrid } from "lucide-react";
 import "./App.css";
 import { EmptyState } from "./components/EmptyState";
 import { ErrorBanner } from "./components/ErrorBanner";
@@ -12,49 +11,33 @@ import { useScorecardGoals } from "./hooks/useScorecardGoals";
 import { configFromParams } from "./utils/config";
 
 export function App() {
-  const { params, portToken, portApiBaseUrl } = usePostMessageData();
+  const { params, page, portToken, portApiBaseUrl } = usePostMessageData();
   const config = configFromParams(params);
   const [gapsModalScorecardId, setGapsModalScorecardId] = useState<
     string | null
   >(null);
 
   const { rows, gapsByScorecard, entityCount, isLoading, isError, error } =
-    useScorecardGoals(config, portToken, portApiBaseUrl);
+    useScorecardGoals(config, portToken, portApiBaseUrl, page);
 
   if (!portApiBaseUrl || !portToken) {
     return (
-      <Box
-        sx={{
-          flex: 1,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          p: 3,
-        }}
-      >
-        <Typography variant="body2" color="text.secondary" textAlign="center">
+      <div className="shell">
+        <p className="muted">
           Waiting for Port context… If you opened this file directly, embed it in
           a Port dashboard instead.
-        </Typography>
-      </Box>
+        </p>
+      </div>
     );
   }
 
   if (!config) {
     return (
-      <Box
-        sx={{
-          flex: 1,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          p: 3,
-        }}
-      >
-        <Typography variant="body1" color="text.secondary" textAlign="center">
+      <div className="shell">
+        <p className="muted">
           Configure the <strong>Blueprint</strong> parameter for this widget.
-        </Typography>
-      </Box>
+        </p>
+      </div>
     );
   }
 
@@ -63,28 +46,17 @@ export function App() {
     ? rows.find((r) => r.scorecardIdentifier === gapsModalScorecardId)
     : undefined;
 
+  const contextLabel =
+    !isLoading && !isError
+      ? `${config.blueprint.title} · ${entityCount} ${entityCount === 1 ? "entity" : "entities"}`
+      : config.blueprint.title;
+
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        height: "100%",
-        minHeight: 0,
-        p: 2,
-        gap: 2,
-        bgcolor: "background.default",
-      }}
-    >
-      <Chip
-        icon={<CategoryOutlinedIcon />}
-        label={
-          !isLoading && !isError
-            ? `${config.blueprint.title} · ${entityCount} ${entityCount === 1 ? "entity" : "entities"}`
-            : config.blueprint.title
-        }
-        variant="outlined"
-        sx={{ alignSelf: "flex-start" }}
-      />
+    <div className="shell">
+      <div className="context-badge">
+        <LayoutGrid size={14} strokeWidth={2} aria-hidden />
+        <span>{contextLabel}</span>
+      </div>
 
       {isLoading && <LoadingState />}
       {isError && <ErrorBanner error={error} />}
@@ -97,20 +69,9 @@ export function App() {
       )}
 
       {!isLoading && !isError && hasRows && (
-        <Stack
-          component="ul"
-          spacing={1.5}
-          sx={{
-            listStyle: "none",
-            m: 0,
-            p: 0,
-            flex: 1,
-            minHeight: 0,
-            overflowY: "auto",
-          }}
-        >
+        <ul className="scorecard-list">
           {rows.map((row) => (
-            <Box component="li" key={row.scorecardIdentifier}>
+            <li key={row.scorecardIdentifier}>
               <ScorecardBar
                 row={row}
                 gapCount={gapsByScorecard[row.scorecardIdentifier]?.length ?? 0}
@@ -118,12 +79,12 @@ export function App() {
                   setGapsModalScorecardId(row.scorecardIdentifier)
                 }
               />
-            </Box>
+            </li>
           ))}
-        </Stack>
+        </ul>
       )}
 
-      {gapsModalRow && config && (
+      {gapsModalRow && (
         <GapsModal
           scorecardTitle={gapsModalRow.scorecardTitle}
           blueprintIdentifier={config.blueprint.identifier}
@@ -131,6 +92,6 @@ export function App() {
           onClose={() => setGapsModalScorecardId(null)}
         />
       )}
-    </Box>
+    </div>
   );
 }
