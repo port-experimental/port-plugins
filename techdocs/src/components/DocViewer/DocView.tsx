@@ -1,9 +1,12 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import type { TechDocEntity } from "../../types";
 import { pickLastUpdatedRaw } from "../../utils/techDocProperties";
-import type { InternalDocTarget } from "../../utils/internalDocLinks";
+import {
+  buildDocPathIndex,
+  type InternalDocTarget,
+} from "../../utils/internalDocLinks";
 import {
   useMarkdownComponents,
   type MarkdownNavigate,
@@ -12,6 +15,10 @@ import {
 interface DocViewerProps {
   doc: TechDocEntity | null;
   docs: TechDocEntity[];
+  resolveLinkTarget: (
+    href: string | undefined,
+    currentDoc: TechDocEntity
+  ) => Promise<InternalDocTarget | null>;
   onSelectDoc: (docId: string) => void;
 }
 
@@ -34,7 +41,12 @@ function scrollToHash(hash: string) {
   }
 }
 
-export function DocViewer({ doc, docs, onSelectDoc }: DocViewerProps) {
+export function DocViewer({
+  doc,
+  docs,
+  resolveLinkTarget,
+  onSelectDoc,
+}: DocViewerProps) {
   if (!doc) {
     return (
       <div className="doc-viewer doc-empty">
@@ -49,17 +61,27 @@ export function DocViewer({ doc, docs, onSelectDoc }: DocViewerProps) {
   }
 
   return (
-    <DocViewerContent doc={doc} docs={docs} onSelectDoc={onSelectDoc} />
+    <DocViewerContent
+      doc={doc}
+      docs={docs}
+      resolveLinkTarget={resolveLinkTarget}
+      onSelectDoc={onSelectDoc}
+    />
   );
 }
 
 function DocViewerContent({
   doc,
   docs,
+  resolveLinkTarget,
   onSelectDoc,
 }: {
   doc: TechDocEntity;
   docs: TechDocEntity[];
+  resolveLinkTarget: (
+    href: string | undefined,
+    currentDoc: TechDocEntity
+  ) => Promise<InternalDocTarget | null>;
   onSelectDoc: (docId: string) => void;
 }) {
   const pendingScrollRef = useRef<PendingDocScroll | null>(null);
@@ -80,9 +102,12 @@ function DocViewerContent({
     [onSelectDoc]
   );
 
+  const docPathIndex = useMemo(() => buildDocPathIndex(docs), [docs]);
+
   const markdownComponents = useMarkdownComponents({
     currentDoc: doc,
-    docs,
+    docPathIndex,
+    resolveLinkTarget,
     onNavigate,
   });
 

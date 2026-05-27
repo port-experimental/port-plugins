@@ -38,7 +38,7 @@ TechDocs resolves **relative** markdown links against the current document’s `
 **Requirements for internal links to work in production:**
 
 - The GitHub `file` mapping must ingest the target paths as `techDoc` entities (see [integration mapping](#2-configure-the-github-ocean-integration-mapping)); each entity needs a correct **`filePath`** property.
-- The target document must already be loaded in the widget (sidebar list). On large catalogs, scroll the sidebar to **load more** before following a link to a doc that has not been fetched yet.
+- If the target is not in the sidebar yet, TechDocs looks it up on click via the same blueprint search API (`filePath` + repository). If no entity exists, the link does nothing (it does not open Port’s external link flow).
 
 Port’s plugin SDK intercepts ordinary `<a href>` clicks in the iframe. Internal targets are rendered as controls that do not trigger that bridge, so navigation stays inside TechDocs.
 

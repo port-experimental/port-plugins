@@ -75,40 +75,41 @@ function docPathKey(repo: string, filePath: string): string {
   return `${repo}\0${filePath}`;
 }
 
+/** Normalized paths to try when matching `filePath` in search or the loaded index. */
+export function filePathSearchCandidates(resolvedPath: string): string[] {
+  const normalized = normalizeRepoPath(resolvedPath);
+  const candidates = new Set<string>([normalized]);
+  if (!/\.(?:md|markdown)$/i.test(normalized)) {
+    candidates.add(`${normalized}.md`);
+    candidates.add(`${normalized}/README.md`);
+  }
+  return [...candidates];
+}
+
 function lookupDocId(
   index: Map<string, string>,
   repo: string,
   filePath: string
 ): string | undefined {
-  const normalized = normalizeRepoPath(filePath);
-  const direct = index.get(docPathKey(repo, normalized));
-  if (direct) return direct;
-
-  if (!/\.(?:md|markdown)$/i.test(normalized)) {
-    const withMd = index.get(docPathKey(repo, `${normalized}.md`));
-    if (withMd) return withMd;
-    const readme = index.get(
-      docPathKey(repo, `${normalized}/README.md`)
-    );
-    if (readme) return readme;
+  for (const candidate of filePathSearchCandidates(filePath)) {
+    const id = index.get(docPathKey(repo, candidate));
+    if (id) return id;
   }
-
   return undefined;
 }
 
-/**
- * Resolves a markdown href to another techDoc in the same repository, if possible.
- */
-export function resolveInternalDocTarget(
+export type InternalHrefSpec =
+  | { kind: "hash"; hash: string }
+  | { kind: "doc"; filePath: string; hash: string | null };
+
+/** Repo-relative markdown href (same-repo), before checking loaded docs or the API. */
+export function resolveInternalHrefSpec(
   href: string | undefined,
-  currentDoc: TechDocEntity,
-  docPathIndex: Map<string, string>
-): InternalDocTarget | null {
+  currentDoc: TechDocEntity
+): InternalHrefSpec | null {
   if (!href?.trim()) return null;
   if (isExternalHref(href)) return null;
-
-  const repo = currentDoc.relations.repository;
-  if (!repo) return null;
+  if (!currentDoc.relations.repository) return null;
 
   const { pathPart, hash } = splitHrefHash(href);
   const trimmedPath = pathPart.trim();
@@ -120,9 +121,25 @@ export function resolveInternalDocTarget(
 
   const baseFilePath =
     currentDoc.properties.filePath?.trim() || "README.md";
-  const resolved = resolveRepoRelativePath(baseFilePath, trimmedPath);
-  const docId = lookupDocId(docPathIndex, repo, resolved);
+  const filePath = resolveRepoRelativePath(baseFilePath, trimmedPath);
+  return { kind: "doc", filePath, hash };
+}
+
+/**
+ * Resolves a markdown href to another techDoc in the same repository, if possible.
+ */
+export function resolveInternalDocTarget(
+  href: string | undefined,
+  currentDoc: TechDocEntity,
+  docPathIndex: Map<string, string>
+): InternalDocTarget | null {
+  const spec = resolveInternalHrefSpec(href, currentDoc);
+  if (!spec) return null;
+  if (spec.kind === "hash") return spec;
+
+  const repo = currentDoc.relations.repository;
+  const docId = lookupDocId(docPathIndex, repo, spec.filePath);
   if (!docId) return null;
 
-  return { kind: "doc", docId, hash };
+  return { kind: "doc", docId, hash: spec.hash };
 }
