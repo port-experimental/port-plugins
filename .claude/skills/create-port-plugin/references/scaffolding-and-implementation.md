@@ -129,6 +129,28 @@ Widgets are embedded product UI — not internal admin tools. **Prioritize UX** 
 
 Extract reusable shells: `LoadingState.tsx`, `EmptyState.tsx`, `ErrorBanner.tsx` under `components/` when the widget has more than one view.
 
+#### Charts and data visualization
+
+When the widget shows **quantitative breakdowns, trends, or distributions** (bars, columns, lines, areas, pie, donut, stacked series), **prefer [Recharts](https://recharts.org/)** (`recharts` on npm) instead of hand-rolled SVG paths, CSS-only bar charts, or ad hoc canvas.
+
+| Use Recharts | Hand-roll only when |
+|--------------|---------------------|
+| Bar/column (horizontal or vertical), line, area, pie, donut, composed charts | A single progress bar, sparkline, or one static bar with no axes/legend/tooltip |
+| Multiple chart types behind a view toggle | Recharts would materially exceed upload size *and* the viz is trivial |
+
+**Implementation checklist:**
+
+1. **Dependency** — add `"recharts": "^2.15.0"` (align with [`entity-timeline`](../../../../entity-timeline/package.json) / [`blueprint-field-types`](../../../../blueprint-field-types/package.json) in this repo unless a newer major is explicitly chosen).
+2. **Webpack** — apply **[webpack-port-upload-safety.md](webpack-port-upload-safety.md)** when adding Recharts (copy `assets/webpack/lodash-root-shim.js`, `globalObject: "self"`, lodash replacement, `DefinePlugin`). Do this **proactively** with Recharts, not only after a failed upload.
+3. **Layout** — wrap charts in `<ResponsiveContainer width="100%" height={…}>`; height may scale with series count for horizontal bar charts.
+4. **Theming** — axis/grid `stroke` and tick `fill` use Port CSS variables (`var(--muted)`, `var(--border)`); series colors via `Cell` `fill` from a small palette (Port `--color-*-300` tokens + hex fallbacks). Custom `<Tooltip content={…} />` styled like `--card` / `--border`.
+5. **UX** — keep loading/empty/error around the chart; tooltips show human-readable labels and counts; optional view toggle (bars / columns / pie / donut) when operators benefit.
+6. **README** — mention Recharts in **Features**; note upload-safety webpack files under **Troubleshooting** if applicable.
+
+**Repo references:** [`entity-timeline`](../../../../entity-timeline/) (line/time series), [`blueprint-field-types`](../../../../blueprint-field-types/) (bar/column/pie/donut + view toggle).
+
+Do **not** add Chart.js, D3-only, or heavy viz stacks unless the user explicitly requires them and Recharts cannot meet the need.
+
 #### Surface vs decoration colors
 
 Port’s injected theme drives **backgrounds and typography**. Widget **decorations** should not reuse those semantic aliases for non-surface UI — otherwise a host `--primary` or dark-mode tweak can make dots, links, and badges clash with adjacent surfaces.

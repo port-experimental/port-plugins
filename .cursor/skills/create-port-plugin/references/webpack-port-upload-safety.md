@@ -1,6 +1,6 @@
-# Webpack: Port upload safety (optional)
+# Webpack: Port upload safety (Recharts / lodash)
 
-The default **`assets/template-webpack.config.js`** does **not** include these changes. Add them **only when needed** — most simple widgets upload without them.
+The default **`assets/template-webpack.config.js`** does **not** include these changes. **Apply them whenever the widget depends on [Recharts](https://recharts.org/)** — the skill prefers Recharts for charts ([scaffolding-and-implementation.md — Charts](scaffolding-and-implementation.md#charts-and-data-visualization)).
 
 ## When to apply
 
@@ -8,11 +8,12 @@ Add the Port-safe webpack tweaks if **any** of the following is true:
 
 | Trigger | Example |
 |---------|---------|
+| **Widget uses Recharts** | **Always** — proactive; Recharts pulls in lodash `_root.js` |
 | **`port-plugins upload` rejects the bundle** | Error mentions `Function`, `new Function`, or unsafe eval |
-| **Chart / viz library pulls in lodash** | [recharts](https://www.npmjs.com/package/recharts), some d3 wrappers |
-| **You grep the built HTML and see `Function("return this")`** | `rg 'Function\(' dist/index.html` |
+| **Other chart lib pulls in lodash** | Some d3 wrappers |
+| **Built HTML contains `Function("return this")`** | `rg 'Function\(' dist/index.html` (or `grep`) |
 
-Do **not** add by default for minimal React widgets with no chart libs and a successful upload.
+Do **not** add for minimal React widgets with **no** chart library and a successful upload.
 
 ## Steps
 

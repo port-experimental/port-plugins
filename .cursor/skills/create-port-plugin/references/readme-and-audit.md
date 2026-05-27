@@ -71,6 +71,7 @@ Bump a plugin’s `package.json` **`version` at most once per git branch** for t
 - [ ] **UX/UI:** Loading, empty, and error states; theme applied; responsive iframe layout; no duplicate plugin title/description/icon; no emoji — use **`<i>`** or an icon library for icons when needed.
 - [ ] **CSS:** `:root` = surfaces/text/borders only; optional palette at **300**; pills/badges use **`--{hue}-bg`** + **`--{hue}-text`** (not `color-mix` into `--card` for labels) — [Optional palette and shade variants](scaffolding-and-implementation.md#optional-palette-and-shade-variants-root); decorations otherwise use **class-local** vars — not shared `--accent` / `--primary` ([Surface vs decoration colors](scaffolding-and-implementation.md#surface-vs-decoration-colors)).
 - [ ] **Safe rendering:** No `innerHTML` / `dangerouslySetInnerHTML` for dynamic or user content.
+- [ ] **Charts:** Bar/line/area/pie/donut (and similar) use **Recharts** unless trivial; [webpack-port-upload-safety.md](webpack-port-upload-safety.md) applied when Recharts is present — [Charts](scaffolding-and-implementation.md#charts-and-data-visualization).
 - [ ] **Version bump:** Branch has at most **one** semver bump per plugin vs merge base; level matches **cumulative** functional changes (patch / minor / major); root **`README.md` Plugins** **Version** cell matches — not re-bumped on every agent run.
 - [ ] **Repo Plugins table:** Root `README.md` row includes **Version** matching `package.json` `version` when the plugin was added or version-bumped.
 

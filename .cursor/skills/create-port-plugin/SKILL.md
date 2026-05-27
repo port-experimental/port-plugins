@@ -27,6 +27,7 @@ Strategic defaults — tactical checklist in **Non-negotiables**; anti-patterns 
 4. **Reuse before creating** — survey repo `README.md` and sibling plugins before scaffolding.
 5. **Relation strategy before params** — pick or add catalog relations first; resolve at runtime via `PLUGIN_DATA.entity` and `entities/search` — not relation-key `string` params by default.
 6. **Runtime via Port API; MCP at design-time only** — `portApiBaseUrl` + token in the iframe; `list_blueprints` / `upsert_blueprint` in the IDE only.
+7. **Charts → Recharts** — when the widget needs bar, line, area, pie, donut, or similar data visualization, prefer **[Recharts](https://recharts.org/)** over hand-rolled SVG/CSS charts. Apply [webpack-port-upload-safety.md](references/webpack-port-upload-safety.md) when adding Recharts. Details: [scaffolding-and-implementation.md](references/scaffolding-and-implementation.md) (**Charts and data visualization**).
 
 ## Overview
 
@@ -130,6 +131,7 @@ Before marking the plugin done:
 |-------|------|
 | Rendering | **No** `innerHTML`, `outerHTML`, or `dangerouslySetInnerHTML` for dynamic/user content — React text/elements or vetted sanitizer only |
 | UX / UI | Loading, empty, and error states; `applyThemeCss()`; responsive full-iframe layout; accessible controls — treat widgets as product UI |
+| Charts | **Recharts** for bar/line/area/pie/donut and similar viz — not custom SVG/CSS chart implementations unless trivial (e.g. a single progress bar). Webpack upload safety when Recharts is added — [scaffolding-and-implementation.md](references/scaffolding-and-implementation.md) (**Charts**), [webpack-port-upload-safety.md](references/webpack-port-upload-safety.md) |
 | CSS decorations | `:root` = surfaces/text/borders only; optional palette aliases (`--gold`, `--bronze`, …) at **300**; add **`--{hue}-bg`** / **`--{hue}-text`** when pills/badges need visible backgrounds + readable labels — see scaffolding **Optional palette and shade variants** |
 | Runtime vs params | Fetch blueprints, schema, relations, entities via Port API + `PLUGIN_DATA` — **no** params that duplicate that data |
 | API host | `portApiBaseUrl` + token for `/v1/...` only |
@@ -156,10 +158,10 @@ Before marking the plugin done:
 | File | Contents |
 |------|----------|
 | [reuse-workflow.md](references/reuse-workflow.md) | Reuse steps 1–5, blueprint matrix, checklist, adapt vs create, code-reuse patterns |
-| [scaffolding-and-implementation.md](references/scaffolding-and-implementation.md) | Templates, `App.tsx` implementation, params, relations, code layout, **optional palette + `-bg`/`-text` variants** |
+| [scaffolding-and-implementation.md](references/scaffolding-and-implementation.md) | Templates, `App.tsx` implementation, params, relations, code layout, **charts (Recharts)**, **optional palette + `-bg`/`-text` variants** |
 | [readme-and-audit.md](references/readme-and-audit.md) | Auditing existing plugins, PR checklist, per-plugin README §8 |
 | [plugin-architecture.md](references/plugin-architecture.md) | postMessage, `PLUGIN_DATA`, API, theming, build/deploy, local dev |
-| [webpack-port-upload-safety.md](references/webpack-port-upload-safety.md) | **Optional** `globalObject` / lodash shim when upload rejects `Function` or using chart libs |
+| [webpack-port-upload-safety.md](references/webpack-port-upload-safety.md) | `globalObject` / lodash shim — **required with Recharts**; also when upload rejects `Function` |
 | [widget-conventions.md](references/widget-conventions.md) | Directory layout, naming, optional automation |
 | [guidelines.md](references/guidelines.md) | Anti-patterns, data persistence, troubleshooting |
 
@@ -181,7 +183,7 @@ Scaffold copies from `assets/` (skill root; in this repo also `.cursor/skills/cr
 | Template | Destination |
 |----------|-------------|
 | `template-webpack.config.js` | `<widget>/webpack.config.js` |
-| `webpack/lodash-root-shim.js` | `<widget>/webpack/lodash-root-shim.js` — **optional**; only with [webpack-port-upload-safety.md](references/webpack-port-upload-safety.md) |
+| `webpack/lodash-root-shim.js` | `<widget>/webpack/lodash-root-shim.js` — **required** when using Recharts; see [webpack-port-upload-safety.md](references/webpack-port-upload-safety.md) |
 | `template-tsconfig.json` | `<widget>/tsconfig.json` |
 | `template-index.html` | `<widget>/src/index.html` |
 | `template-index.tsx` | `<widget>/src/index.tsx` |

@@ -77,6 +77,12 @@ Document default `dueDate`, override behaviour, and validation in README **Widge
 
 **Good:** Skeleton or spinner while loading; friendly empty state with next step; actionable error copy (retry, check catalog); flex/grid layout that fills the iframe; `applyThemeCss()` and CSS variables with fallbacks (`var(--text-high, #111827)`). See [UX and UI](scaffolding-and-implementation.md#ux-and-ui) in scaffolding-and-implementation.md.
 
+### ❌ Don't: Hand-roll chart UIs when Recharts fits
+
+**Bad:** Custom SVG pie sectors, CSS-only column charts, or canvas drawing for standard bar/line/pie/donut breakdowns and trends.
+
+**Good:** [Recharts](https://recharts.org/) with `ResponsiveContainer`, themed axes/tooltips, and [webpack-port-upload-safety.md](webpack-port-upload-safety.md) applied when the dependency is added. See [Charts and data visualization](scaffolding-and-implementation.md#charts-and-data-visualization).
+
 ### ❌ Don't: Use `:root` accent tokens for decorations
 
 **Bad:**

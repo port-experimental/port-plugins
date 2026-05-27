@@ -506,7 +506,7 @@ Without this, the inlined script executes before `#plugin-root` exists, causing 
 
 ### Port upload — optional `Function` / lodash fixes
 
-Port may reject uploads whose bundle contains the `Function` constructor. The **default template webpack config does not include workarounds** — add them only when upload fails or you depend on libs that pull in `lodash/_root.js` (e.g. recharts). See **[webpack-port-upload-safety.md](webpack-port-upload-safety.md)** for triggers, patch steps, and the optional `assets/webpack/lodash-root-shim.js` file.
+Port may reject uploads whose bundle contains the `Function` constructor. The **default template webpack config does not include workarounds** — apply **[webpack-port-upload-safety.md](webpack-port-upload-safety.md)** whenever the widget uses **Recharts** (preferred chart library; see [Charts and data visualization](scaffolding-and-implementation.md#charts-and-data-visualization)), or when upload fails / the built HTML contains `Function("return this")` from lodash via other chart libs.
 
 ### Critical CSS Configuration
 
