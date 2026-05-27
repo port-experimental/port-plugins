@@ -194,6 +194,12 @@ Both represent the same concept (comments/discussions) but use different paramet
 
 **Good:** Small mocks in `usePostMessageData.ts` + `src/dev/mockData.ts` / `api/` early returns when `DEV_MOCK` — enough to preview loading, empty, and one happy path. See [Local dev mock data](scaffolding-and-implementation.md#local-dev-mock-data-outside-ports-iframe).
 
+### ❌ Don't: Omit README notice when portal links use mock data
+
+**Bad:** Widget renders “Open in Port” / entity links from mock fixtures; README **Local development** only lists mock files — contributors expect links to work at `localhost:9000`.
+
+**Good:** README **Local development** (and **Troubleshooting** when links exist) states that **portal links built from mock or fixture identifiers do not work outside Port’s iframe**; validate links via Port **Local development** or after deploy.
+
 ### ❌ Don't: Expose relation keys as string plugin params
 
 **Bad:**
@@ -365,3 +371,4 @@ If the widget needs to store records (e.g. comments, bookmarks, reactions):
 | Theme stuck after portal switch | Effect only runs once | Depend on SDK `applyThemeCss` (it changes when `theme.css` changes) or re-inject on each `PLUGIN_DATA` |
 | Colours look wrong in dev | Port CSS vars not injected | CSS must provide local fallbacks: `var(--text-high, #111827)` |
 | Links open wrong region/host | Hardcoded `app.port.io` or used `portApiBaseUrl` for UI links | Use `new URL(document.referrer).origin` with fallback `https://app.port.io`; keep API on `portApiBaseUrl` only |
+| Upload rejected (`Function` / eval) | Bundle contains `new Function` or `Function("return this")` (webpack polyfill, lodash via recharts, etc.) | Apply optional fixes in [webpack-port-upload-safety.md](webpack-port-upload-safety.md) only when this happens — not in the default template |

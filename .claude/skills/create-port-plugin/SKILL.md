@@ -136,7 +136,7 @@ Before marking the plugin done:
 | Portal URLs | `getPortalOrigin()` from `document.referrer`; `{origin}/{blueprint}Entity?identifier={id}` |
 | Blueprint params | `type: "blueprint"`; read `.identifier`; max **5** per plugin |
 | Relations | **Schema first:** MCP-inspect source + target blueprints before adding relations. **Catalog:** reuse or add blueprint relations; document in README. **No** relation-key `string` params by default. **Runtime:** `entity.relations` / `relationsObjects` → `relatedTo` search → blueprint GET using designed relation IDs → relation `string` param **only** as documented last-resort override |
-| Local dev | **`devServer.port: 9000`** always (`http://localhost:9000`); **small mocks** in `usePostMessageData.ts` + `src/dev/` or `api/` early returns when `DEV_MOCK` — enough to render loading/empty/happy paths outside Port’s iframe |
+| Local dev | **`devServer.port: 9000`** always (`http://localhost:9000`); **small mocks** in `usePostMessageData.ts` + `src/dev/` or `api/` early returns when `DEV_MOCK` — enough to render loading/empty/happy paths outside Port’s iframe. **Portal links from mock IDs do not work there** — document in README **Local development**; test links in Port **Local development** (iframe) or after deploy |
 | Subject blueprint | If widget targets one blueprint type, use **`PLUGIN_DATA.entity.blueprint`** + design default — skip blueprint param when not needed |
 | Param schema | Every param: **`type`**, **`isRequired`**, **`label`** |
 | Param labels | Short **`label`** in `upload-params.json`; defaults and detail in README **Widget parameters** |
@@ -158,6 +158,7 @@ Before marking the plugin done:
 | [scaffolding-and-implementation.md](references/scaffolding-and-implementation.md) | Templates, `App.tsx` implementation, params, relations, code layout, **optional palette + `-bg`/`-text` variants** |
 | [readme-and-audit.md](references/readme-and-audit.md) | Auditing existing plugins, PR checklist, per-plugin README §8 |
 | [plugin-architecture.md](references/plugin-architecture.md) | postMessage, `PLUGIN_DATA`, API, theming, build/deploy, local dev |
+| [webpack-port-upload-safety.md](references/webpack-port-upload-safety.md) | **Optional** `globalObject` / lodash shim when upload rejects `Function` or using chart libs |
 | [widget-conventions.md](references/widget-conventions.md) | Directory layout, naming, optional automation |
 | [guidelines.md](references/guidelines.md) | Anti-patterns, data persistence, troubleshooting |
 
@@ -179,6 +180,7 @@ Scaffold copies from `assets/` (skill root; in this repo also `.cursor/skills/cr
 | Template | Destination |
 |----------|-------------|
 | `template-webpack.config.js` | `<widget>/webpack.config.js` |
+| `webpack/lodash-root-shim.js` | `<widget>/webpack/lodash-root-shim.js` — **optional**; only with [webpack-port-upload-safety.md](references/webpack-port-upload-safety.md) |
 | `template-tsconfig.json` | `<widget>/tsconfig.json` |
 | `template-index.html` | `<widget>/src/index.html` |
 | `template-index.tsx` | `<widget>/src/index.tsx` |

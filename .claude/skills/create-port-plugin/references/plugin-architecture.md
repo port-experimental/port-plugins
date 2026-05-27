@@ -442,6 +442,10 @@ new HtmlWebpackPlugin({
 
 Without this, the inlined script executes before `#plugin-root` exists, causing a blank screen.
 
+### Port upload — optional `Function` / lodash fixes
+
+Port may reject uploads whose bundle contains the `Function` constructor. The **default template webpack config does not include workarounds** — add them only when upload fails or you depend on libs that pull in `lodash/_root.js` (e.g. recharts). See **[webpack-port-upload-safety.md](webpack-port-upload-safety.md)** for triggers, patch steps, and the optional `assets/webpack/lodash-root-shim.js` file.
+
 ### Critical CSS Configuration
 
 Root elements must have explicit heights to prevent layout collapse:

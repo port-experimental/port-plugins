@@ -31,6 +31,7 @@ Use this path when the goal is **not** greenfield scaffolding but to **audit and
 - [ ] **Persistence:** Meaningful saved state uses the Port API where feasible; browser storage only when intentionally local-only (see [guidelines.md](guidelines.md)).
 - [ ] **Layout:** Responsive behaviour verified; root fills iframe space; no duplicate plugin title, description, or icon (see [scaffolding-and-implementation.md](scaffolding-and-implementation.md)).
 - [ ] **Portal links:** User-facing URLs use **`document.referrer`** origin with **`https://app.port.io`** fallback; entity pages use **`{origin}/{blueprint}Entity?identifier={entityId}`**; not `portApiBaseUrl` and not a hardcoded region unless documented.
+- [ ] **Local dev / portal links:** When the widget renders in-app links, README **Local development** states that URLs built from **mock / fixture** entity identifiers do not work at `http://localhost:9000` outside Port’s iframe; link behaviour is validated via Port **Local development** (iframe) or after deploy.
 - [ ] **Catalog over params:** README **Prerequisites** document blueprints, properties, **Relations**, and any other required Port instances (automations, SSA, integrations, …) before the widget-parameters table; no relation-key `string` params unless explicitly documented as last-resort overrides.
 - [ ] **Params:** Every `upload-params.json` entry has **`type`**, **`isRequired`**, and **`label`**; labels are short; README **Widget parameters** holds defaults, examples, and operator-facing detail.
 - [ ] **Params vs API:** Catalog shape from Port API + host context; `upload-params.json` minimal — **no** params for blueprint lists, relations, entities, or schemas the API returns; **relations** from catalog + **`PLUGIN_DATA.entity`** + **`relatedTo` / `entities/search`**; subject blueprint param omitted when entity page + design default suffice.
@@ -72,6 +73,8 @@ Each **plugin directory must** include a `README.md` that follows **this section
 
 7. **Local development** — `npm run dev`, dev server URL, **small mock data** (`usePostMessageData.ts` for host context; `src/dev/mockData.ts` or `api/` early returns when `DEV_MOCK`); which files to edit; Port **Local development** toggle. Document the inner loop **before** production upload so contributors do not have to scroll past release steps.
 
+   **Portal / entity links (required when the widget has them):** If the UI links to Port entity pages, dashboards, or other portal routes (for example via `buildEntityPageUrl`), call out that **links built from mock or fixture data do not work in the standalone local env** (`http://localhost:9000` outside Port’s iframe). Outside the iframe there is no `document.referrer`, the origin falls back to **`https://app.port.io`**, and mock identifiers are not real catalog entities — clicks may 404 or open the wrong org. **Validate links** with Port’s **Local development** toggle (iframe + real `PLUGIN_DATA`) or after deploy; `npm run dev` alone is only for layout and data paths.
+
 8. **Setup** — Numbered substeps, **only** what this widget needs. Typical substeps (drop those that do not apply):
    - **Catalog** — Blueprint and property requirements (identifier, type, required fields, relations) in a table so admins can set them up before deploying the widget.
    - **Ingestion / integration** — Ocean or other mapping paths, resync, scoping, known pitfalls.
@@ -103,6 +106,6 @@ Each **plugin directory must** include a `README.md` that follows **this section
 
 9. **Project structure** — Directory tree for this plugin (`src/`, `upload-params.json`, webpack, `tsconfig.json`, and so on).
 
-10. **Troubleshooting** — Markdown table **Symptom | Cause | Fix** (search 422 / `query` nesting, theme / `applyThemeCss`, empty data, auth, wrong API host).
+10. **Troubleshooting** — Markdown table **Symptom | Cause | Fix** (search 422 / `query` nesting, theme / `applyThemeCss`, empty data, auth, wrong API host). When the widget has portal links, include a row for **mock/local link does not open the expected entity** (fixture IDs + `localhost:9000` outside the iframe — expected; test in Port **Local development** or production).
 
 **Quality bar:** A reader can follow **Port prerequisites (catalog, integrations, automations, SSA, …) → minimal widget parameters (detail in README, short labels in Port) → local development → setup (build, upload, add widget)** without reversing context. Relations and other catalog/setup objects belong in **Prerequisites**, not in the params table unless a documented last-resort override exists.

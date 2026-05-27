@@ -13,7 +13,7 @@ mkdir <widget-name>   # lowercase + hyphens only, e.g. service-health-panel
 
 ### 2. Copy template files verbatim
 
-Copy these from `.claude/skills/create-port-plugin/assets/` — do not modify them:
+Copy these from `.cursor/skills/create-port-plugin/assets/` — do not modify them:
 
 | Source | Destination |
 |--------|------------|
@@ -30,7 +30,7 @@ Copy these from `.claude/skills/create-port-plugin/assets/` — do not modify th
 | Source | Destination | Changes needed |
 |--------|------------|----------------|
 | `template-package.json` | `<widget>/package.json` | Update `name` to `port-<widget-name>-plugin`, update `description` |
-| `template-App.css` | `<plugin>/src/App.css` | Customize styles; includes thin scrollbars (`.shell`, `.scroll-area`) and optional wide-table pattern (`.table-scroll` / `.table-area` / `.scroll-mirror`) — see **Thin scrollbars** below |
+| `template-App.css` | `<widget>/src/App.css` | Customize styles; includes thin scrollbars (`.shell`, `.scroll-area`) and optional wide-table pattern (`.table-scroll` / `.table-area` / `.scroll-mirror`) — see **Thin scrollbars** below |
 | `template-useScrollMirror.ts` | `<widget>/src/hooks/useScrollMirror.ts` | **Optional** — only when using the table + bottom horizontal mirror pattern |
 | `template-App.tsx` | `<widget>/src/App.tsx` | Implement widget logic |
 | `template-types.ts` | `<widget>/src/types.ts` | Add fields to `PluginConfig` matching your params |
@@ -267,7 +267,7 @@ export async function searchComments(/* … */) {
 }
 ```
 
-Document in the per-plugin README **Local development**: which files to edit for host vs API mocks, and that full `postMessage` + token flow is validated via Port’s **Local development** toggle.
+Document in the per-plugin README **Local development**: which files to edit for host vs API mocks; that full `postMessage` + token flow is validated via Port’s **Local development** toggle; and — when the widget renders portal links — that **URLs built from mock/fixture entity identifiers do not work at `http://localhost:9000` outside Port’s iframe** (validate links in Port **Local development** or after deploy).
 
 #### Safe rendering — no `innerHTML`
 
@@ -329,7 +329,7 @@ export function buildEntityPageUrl(
 
 - Parse **`document.referrer`** with `new URL(document.referrer).origin` so EU/US and custom domains follow the user’s session automatically.
 - **Encode** the blueprint identifier in the path segment (`{blueprint}Entity`) and the entity identifier in the **`identifier`** query param (`URLSearchParams` handles encoding).
-- In **dev mock**, links may point at `https://app.port.io` until you test inside Port’s iframe (where referrer is set).
+- In **dev mock** outside Port’s iframe, links use the **`https://app.port.io`** fallback and **mock entity identifiers** — they are for UI wiring only and **will not open real entities** until you test inside Port’s iframe (referrer + real IDs via **Local development**) or after deploy.
 - If the SDK exposes link helpers (see [plugins-sdk on npm](https://www.npmjs.com/package/@port-labs/plugins-sdk)), prefer them when they align with this behaviour; otherwise use the pattern above.
 
 #### Searching blueprint entities (correct endpoint)
@@ -722,7 +722,7 @@ Write the per-plugin README per **[readme-and-audit.md](readme-and-audit.md)** (
 port-plugins upload \
   --file dist/index.html \
   --identifier <your-widget-name> \
-  --title "<widget title in Port>" \
+  --title "<plugin title in Port>" \
   --params "$(cat upload-params.json)" \
   --description "<short plugin description>" \
   --upsert

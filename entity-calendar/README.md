@@ -56,7 +56,9 @@ Open `http://localhost:9000` (webpack `devServer.port: 9000` — required for Po
 | `src/hooks/usePostMessageData.ts` | Host bridge + `DEV_MOCK` gate |
 | `src/dev/mockData.ts` | Blueprint param and sample entities for the calendar |
 
-Enable Port **Local development** on the widget to test real `postMessage` and API calls in the portal.
+**Portal links:** “Open in Port” in the entity modal uses mock fixture identifiers and `https://app.port.io` when there is no `document.referrer`. At `http://localhost:9000` outside Port’s iframe those URLs are for UI layout only — they will not open real catalog entities. Validate links with Port’s **Local development** toggle (iframe + real `PLUGIN_DATA`) or after deploy.
+
+Enable Port **Local development** on the widget to test real `postMessage`, API calls, and entity links in the portal.
 
 ## Setup
 
@@ -121,6 +123,7 @@ entity-calendar/
 | 422 on search | Malformed search body | Ensure `{ query: { combinator, rules } }` (already handled in `api/entities.ts`) |
 | “Configure Blueprint” | Param missing in widget instance | Set the blueprint parameter in Port |
 | Wrong portal link region | Empty `document.referrer` in dev | Test inside Port iframe; EU/US links follow referrer origin |
+| Entity link 404 or wrong org in local dev | Mock IDs + no referrer at `localhost:9000` | Expected outside Port’s iframe; test links via Port **Local development** or after deploy |
 | Local dev blank in Port | Wrong dev server port | Use port **9000** (`npm run dev`); Port Local development expects `http://localhost:9000` |
 | Theme mismatch in Port | `applyThemeCss()` not applied | Widget calls SDK theme on host path; surfaces use Port tokens in `App.css` `:root` |
 | Calendar empty in local dev | No mock entities | `DEV_MOCK` returns sample entities from `src/dev/mockData.ts` when not in Port’s iframe |
