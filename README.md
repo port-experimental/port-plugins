@@ -7,6 +7,7 @@ This repository contains plugins contributed by [Port.io](https://www.port.io).
 | Widget | Version | Description |
 |--------|---------|-------------|
 | [Entity Calendar](./entity-calendar) | 0.1.0 | Month calendar marking entity creation dates; click a day to view title and identifier |
+| [Scorecard Goals](./scorecard-goals) | 0.1.0 | Per-scorecard compliance bars for a chosen blueprint; show entities and rules still failing |
 | [TechDocs](./techdocs) | 0.1.0 | Documentation browser for ingested READMEs; sidebar navigation by repository and folder with GitHub-Flavored Markdown rendering |
 
 ## AI-assisted development - Skills (Cursor & Claude)
