@@ -1,6 +1,6 @@
 {
   "name": "port-entity-calendar-plugin",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "Calendar view of entities grouped by creation date — Port custom widget",
   "engines": {

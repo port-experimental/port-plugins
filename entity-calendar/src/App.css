@@ -12,7 +12,6 @@
   --radius: 8px;
 
   --hover-bg: var(--background-dim-transparent, rgba(0, 0, 0, 0.04));
-  --accent: rgb(var(--primary, 37, 99, 235));
   --overlay: color-mix(in srgb, var(--text) 40%, transparent);
   --shadow-dropdown: 0 8px 24px color-mix(in srgb, var(--text) 12%, transparent);
 }
@@ -102,6 +101,10 @@ body {
   height: 28px;
 }
 
+.today-btn--away {
+  font-weight: 600;
+}
+
 .status {
   text-align: center;
   color: var(--muted);
@@ -177,9 +180,38 @@ body {
   opacity: 0.35;
 }
 
+.day-cell--today.day-cell--outside {
+  opacity: 1;
+}
+
+.day-cell--today {
+  --today-blue-text: #2563eb;
+  --today-blue-bg: color-mix(in srgb, var(--today-blue-text) 16%, transparent);
+}
+
 .day-cell--today .day-number {
-  font-weight: 700;
-  color: var(--text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  font-weight: 600;
+  color: var(--today-blue-text);
+  background: var(--today-blue-bg);
+  border-radius: 50%;
+}
+
+.day-cell--today.day-cell--outside .day-number {
+  color: var(--today-blue-text);
+  background: color-mix(in srgb, var(--today-blue-text) 12%, transparent);
+}
+
+.day-cell--today.day-cell--marked:hover:not(:disabled) {
+  border-color: var(--today-blue-text);
+}
+
+.day-cell--today .day-dot {
+  background: var(--today-blue-text);
 }
 
 .day-cell--marked {
@@ -256,9 +288,11 @@ body {
 }
 
 .modal-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: none;
   background: transparent;
-  font-size: 22px;
   line-height: 1;
   cursor: pointer;
   color: var(--muted);
@@ -313,9 +347,10 @@ body {
 }
 
 .entity-link {
+  --link-color: rgb(var(--primary, 37, 99, 235));
   flex-shrink: 0;
   font-size: 12px;
-  color: var(--accent);
+  color: var(--link-color);
   text-decoration: none;
 }
 

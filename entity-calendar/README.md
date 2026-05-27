@@ -1,22 +1,25 @@
 # Entity Calendar
 
-A Port custom widget that shows a month calendar for a chosen blueprint. Days with at least one entity are highlighted using each entity’s creation date. Click a marked day to open a modal listing **title** and **identifier**, with a link to the entity page in Port.
+A [Port](https://app.getport.io) custom widget that shows a month calendar for a chosen blueprint. Days with at least one entity are highlighted using each entity’s creation date. Click a marked day to open a modal listing **title** and **identifier**, with a link to the entity page in Port.
 
 Designed for **dashboard** pages (not entity-scoped).
 
 ## Preview image
 
-<img width="633" height="606" alt="incidents calendar" src="https://github.com/user-attachments/assets/b3f35fb1-429f-4333-8f0a-3475029de4ec" />
+<img width="633" height="606" alt="Entity Calendar widget on a Port dashboard showing marked days in the current month" src="https://github.com/user-attachments/assets/b3f35fb1-429f-4333-8f0a-3475029de4ec" />
 
+## Badges
 
+Dashboard · React 19 · TypeScript · [Port Plugins](https://docs.getport.io/customize-pages-dashboards-and-plugins/plugins)
 
 ## Features
 
 - Native **blueprint** parameter to choose which entities to load
-- Marks calendar days from entity `createdAt`, optional `createdDate` property, or a custom datetime property
-- Month navigation and **Today** shortcut
+- Marks calendar days from entity `createdAt` or an optional blueprint **datetime** property
+- Month navigation and **Today** shortcut (today highlighted in blue)
 - Modal with entity title, identifier, and **Open in Port** link
 - Respects Port light/dark theme via `@port-labs/plugins-sdk`
+- Respects dashboard **page filters** via `mergePageFilters` — passes the **full** blueprint object from the widget param (so `$team` filters apply when the blueprint has `ownership`)
 
 ## Prerequisites
 
@@ -32,6 +35,7 @@ Designed for **dashboard** pages (not entity-scoped).
 |---------|-------------|
 | Blueprint | Any blueprint with entities you want on the calendar |
 | Date field | Port sets `createdAt` on every entity; optional `datetime` property (e.g. `createdDate`) if you override via parameter |
+| Dashboard page filters | Optional; when the dashboard applies filters (e.g. `$team`), the blueprint should include **`ownership`** in Port so team filters merge correctly |
 
 ## Widget parameters
 
@@ -79,6 +83,7 @@ port-plugins upload \
   --identifier entity-calendar \
   --title "Entity Calendar" \
   --params "$(cat upload-params.json)" \
+  --description "Show amount of entities based on date field" \
   --upsert
 ```
 
@@ -101,13 +106,17 @@ N/A — this widget is intended for dashboards. It does not require `PLUGIN_DATA
 ```
 entity-calendar/
 ├── src/
-│   ├── api/entities.ts
+│   ├── api/entities.ts          # search + mergePageFilters
 │   ├── components/Calendar.tsx
 │   ├── components/EntityModal.tsx
 │   ├── hooks/useCalendarEntities.ts
 │   ├── hooks/usePostMessageData.ts
 │   ├── dev/mockData.ts
-│   ├── utils/
+│   ├── utils/config.ts          # params → PluginConfig (full blueprint object)
+│   ├── utils/dates.ts
+│   ├── utils/entityDates.ts
+│   ├── utils/portalUrl.ts
+│   ├── types.ts
 │   ├── App.tsx
 │   └── App.css
 ├── upload-params.json
@@ -127,3 +136,5 @@ entity-calendar/
 | Local dev blank in Port | Wrong dev server port | Use port **9000** (`npm run dev`); Port Local development expects `http://localhost:9000` |
 | Theme mismatch in Port | `applyThemeCss()` not applied | Widget calls SDK theme on host path; surfaces use Port tokens in `App.css` `:root` |
 | Calendar empty in local dev | No mock entities | `DEV_MOCK` returns sample entities from `src/dev/mockData.ts` when not in Port’s iframe |
+| Page filters ignored (e.g. `$team`) | Only `{ identifier }` passed to `mergePageFilters` | Pass the full blueprint from `params.blueprint.value` via `config.blueprint` (see `utils/config.ts`) |
+| Fewer entities than dashboard table | Page filters applied to search | Expected — calendar search respects the same filters as other dashboard widgets |

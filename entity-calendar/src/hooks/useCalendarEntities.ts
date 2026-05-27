@@ -1,12 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { searchBlueprintEntities } from "../api/entities";
-import type { CalendarEntity, PluginConfig } from "../types";
+import type { CalendarEntity, Page, PluginConfig } from "../types";
 import { getEntityDateKey } from "../utils/entityDates";
 
 export function useCalendarEntities(
   config: PluginConfig | null,
   portToken: string | null,
-  portApiBaseUrl: string | null
+  portApiBaseUrl: string | null,
+  page?: Page
 ) {
   return useQuery({
     queryKey: [
@@ -14,6 +15,7 @@ export function useCalendarEntities(
       config?.blueprint.identifier,
       config?.createdDateProperty,
       portToken,
+      page?.pageFilters,
     ],
     queryFn: async () => {
       if (!config || !portToken || !portApiBaseUrl) {
@@ -23,7 +25,8 @@ export function useCalendarEntities(
       const entities = await searchBlueprintEntities(
         portApiBaseUrl,
         portToken,
-        config.blueprint.identifier
+        config.blueprint,
+        page
       );
 
       const dated: CalendarEntity[] = [];
