@@ -16,8 +16,8 @@ Use this path when the goal is **not** greenfield scaffolding but to **audit and
 1. **Read** — `README.md`, `upload-params.json`, `package.json` (`engines`, dependencies), `src/types.ts`, host hook (`usePostMessageData` / `usePortPluginData`), main UI entry, any API modules, `webpack.config.js`, root CSS.
 2. **Gap analysis** — Compare against the README standard below, params guidance in [scaffolding-and-implementation.md](scaffolding-and-implementation.md) (**Define parameters**), and [plugin-architecture.md](plugin-architecture.md) / [widget-conventions.md](widget-conventions.md).
 3. **Prioritize** — Correctness first (Port API request shapes, token usage, theme), then operator docs (README, param table), then polish (badges, screenshots, structure tree).
-4. **Patch** — Keep diffs focused: bump SDK with hook changes; keep `PluginConfig` and `upload-params.json` in lockstep; rewrite README sections rather than deleting useful catalog/integration detail.
-5. **Verify** — `npm ci` / `npm install`, `npm run build`, smoke in **Local development** mode and/or in Port; update the **repo-level** widgets table row (step 7 under scaffolding) if the public description or behaviour changed materially, and set the **Version** column to match `package.json` `version` when that field changed.
+4. **Patch** — Keep diffs focused: bump SDK with hook changes; keep `PluginConfig` and `upload-params.json` in lockstep; rewrite README sections rather than deleting useful catalog/integration detail. **Bump `package.json` `version`** for every functional change (patch / minor / major per semver); update the repo root **Plugins** table **Version** column to match.
+5. **Verify** — `npm ci` / `npm install`, `npm run build`, smoke in **Local development** mode and/or in Port; confirm root **`README.md` Plugins** **Version** matches `package.json`; update the row description if behaviour changed materially.
 
 ### PR checklist (copy into description)
 
@@ -37,6 +37,7 @@ Use this path when the goal is **not** greenfield scaffolding but to **audit and
 - [ ] **UX/UI:** Loading, empty, and error states; theme applied; responsive iframe layout; no duplicate plugin title/description/icon; no emoji — use **`<i>`** or an icon library for icons when needed.
 - [ ] **CSS:** `:root` = surfaces/text/borders only; optional palette at **300**; pills/badges use **`--{hue}-bg`** + **`--{hue}-text`** (not `color-mix` into `--card` for labels) — [Optional palette and shade variants](scaffolding-and-implementation.md#optional-palette-and-shade-variants-root); decorations otherwise use **class-local** vars — not shared `--accent` / `--primary` ([Surface vs decoration colors](scaffolding-and-implementation.md#surface-vs-decoration-colors)).
 - [ ] **Safe rendering:** No `innerHTML` / `dangerouslySetInnerHTML` for dynamic or user content.
+- [ ] **Version bump:** `package.json` `version` increased for this change (patch / minor / major); root **`README.md` Plugins** **Version** cell matches.
 - [ ] **Repo Plugins table:** Root `README.md` row includes **Version** matching `package.json` `version` when the plugin was added or version-bumped.
 
 ### 8. Per-plugin `README.md` standard (required)

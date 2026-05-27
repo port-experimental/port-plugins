@@ -1,6 +1,10 @@
 import { DEV_MOCK } from "../hooks/usePostMessageData";
 import { relationIdList } from "../utils/relationIdList";
 import type { TechDocEntity } from "../types";
+import {
+  filePathSearchCandidates,
+  normalizeRepoPath,
+} from "../utils/internalDocLinks";
 import { MOCK_DOCS } from "../utils/mocks";
 import { portFetch } from "./portFetch";
 
@@ -99,4 +103,74 @@ export async function fetchTechDocsPage(
     ),
     next,
   };
+}
+
+/**
+ * Fallback when a markdown link targets a techDoc not yet in the sidebar list.
+ * Uses the same blueprint search endpoint as {@link fetchTechDocsPage}.
+ */
+export async function fetchTechDocByFilePath(
+  baseUrl: string,
+  token: string,
+  techDocBlueprint: string,
+  techdocsSourceBlueprint: string,
+  repository: string,
+  filePath: string
+): Promise<TechDocEntity | null> {
+  const candidates = filePathSearchCandidates(filePath);
+
+  if (DEV_MOCK) {
+    await new Promise((r) => setTimeout(r, 120));
+    for (const fp of candidates) {
+      const found = MOCK_DOCS.find(
+        (d) =>
+          d.relations.repository === repository &&
+          normalizeRepoPath(d.properties.filePath ?? "") === fp
+      );
+      if (found) return found;
+    }
+    return null;
+  }
+
+  const filePathRules = candidates.map((fp) => ({
+    property: "filePath",
+    operator: "=",
+    value: fp,
+  }));
+
+  const path = `/v1/blueprints/${encodeURIComponent(techDocBlueprint)}/entities/search`;
+  const response = await portFetch(baseUrl, token, path, {
+    method: "POST",
+    body: JSON.stringify({
+      query: {
+        combinator: "and",
+        rules:
+          filePathRules.length === 1
+            ? filePathRules
+            : [{ combinator: "or", rules: filePathRules }],
+      },
+      limit: 20,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorBody = await response.text();
+    throw new Error(
+      `Failed to resolve doc by path (${response.status}):\n${errorBody}`
+    );
+  }
+
+  const data = await response.json();
+  const entities = (data.entities ?? []) as Record<string, unknown>[];
+
+  for (const row of entities) {
+    const entity = mapSearchEntity(row, techdocsSourceBlueprint);
+    if (entity.relations.repository !== repository) continue;
+    const entityPath = normalizeRepoPath(
+      entity.properties.filePath?.trim() ?? ""
+    );
+    if (candidates.includes(entityPath)) return entity;
+  }
+
+  return null;
 }

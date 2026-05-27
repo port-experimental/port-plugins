@@ -2,6 +2,7 @@
 
 A [Port](https://app.getport.io) plugin that provides a documentation browser for your repositories. It fetches `techDoc` entities from your Port catalog and renders their markdown content in a two-pane layout with sidebar navigation grouped by repository and folder.
 
+![Version](https://img.shields.io/badge/version-0.2.0-blue)
 ![Widget Type](https://img.shields.io/badge/type-dashboard%20widget-blue)
 ![React](https://img.shields.io/badge/react-19-blue)
 ![TypeScript](https://img.shields.io/badge/typescript-5.7-blue)
@@ -10,7 +11,9 @@ A [Port](https://app.getport.io) plugin that provides a documentation browser fo
 
 - Sidebar navigation grouped by repository and folder path
 - Full GitHub-Flavored Markdown rendering (tables, code blocks, etc.)
-- Copy file URL (GitHub) from the path chip in the header
+- **Internal markdown links** — relative links between ingested `.md` files (e.g. `[guide](docs/guide.md)`, `[root](../README.md)`) open in the sidebar viewer instead of leaving the widget
+- **External links** — `https://`, `mailto:`, and similar URLs open via Port’s link bridge (`@port-labs/plugins-sdk` ≥ 0.1.1)
+- Copy file URL (GitHub) from the **View source** control in the header
 - Inherits Port's theme (light/dark mode) automatically
 - Configurable blueprint identifiers via widget parameters
 
@@ -18,7 +21,26 @@ A [Port](https://app.getport.io) plugin that provides a documentation browser fo
 
 > **External image URLs do not load in the widget.** Repository README and other markdown ingested as `techDoc` entities often include images via absolute URLs, for example `![Architecture](https://example.com/diagram.png)` or GitHub `user-attachments` links. Port custom widgets run inside a sandboxed iframe with a **Content Security Policy** that blocks loading **external media** (images, video, embeds, and similar remote assets). Those references will appear as broken images in TechDocs even though the same markdown renders correctly on GitHub.
 >
-> **What to do instead:** Keep diagrams and screenshots as plain text or tables in the markdown, commit images into the repo and link via the **View on GitHub** path chip (readers open the file in GitHub where images work), or avoid relying on inline images inside Port. This limitation applies to **documentation content** shown in the widget, not to badge URLs in this plugin README (shields.io badges are outside the iframe).
+> **What to do instead:** Keep diagrams and screenshots as plain text or tables in the markdown, commit images into the repo and link via the **View source** control (readers open the file in GitHub where images work), or avoid relying on inline images inside Port. This limitation applies to **documentation content** shown in the widget, not to badge URLs in this plugin README (shields.io badges are outside the iframe).
+
+## Internal and external markdown links
+
+TechDocs resolves **relative** markdown links against the current document’s `filePath` and the **same** `repository` relation (from your tech doc blueprint / source blueprint wiring). When a matching `techDoc` entity exists, the link navigates in-widget (sidebar selection + viewer update). Otherwise the link is not treated as internal.
+
+| Link type | Example | Behaviour |
+|-----------|---------|-----------|
+| Internal (same repo) | `[Backend](../apps/Backend/README.md)` | Opens the matching ingested doc in the viewer |
+| Repo-root path | `[Guide](/docs/guide.md)` | Resolved from repository root (leading `/`) |
+| Same-page hash | `[Endpoints](#endpoints)` | Scrolls within the current doc (when a heading id exists) |
+| Cross-repo relative | `[Other](../README.md)` on repo B | Resolves within repo B only — not another repository’s docs |
+| External | `[Port](https://docs.getport.io)` | Opens via Port’s iframe link bridge |
+
+**Requirements for internal links to work in production:**
+
+- The GitHub `file` mapping must ingest the target paths as `techDoc` entities (see [integration mapping](#2-configure-the-github-ocean-integration-mapping)); each entity needs a correct **`filePath`** property.
+- If the target is not in the sidebar yet, TechDocs looks it up on click via the same blueprint search API (`filePath` + repository). If no entity exists, the link does nothing (it does not open Port’s external link flow).
+
+Port’s plugin SDK intercepts ordinary `<a href>` clicks in the iframe. Internal targets are rendered as controls that do not trigger that bridge, so navigation stays inside TechDocs.
 
 ## Prerequisites
 
@@ -46,7 +68,7 @@ Add the `file` resource mapping to your GitHub Ocean integration so it ingests R
 The mapping defines two resource types:
 
 - **`repository`** — Maps GitHub repos to `githubRepository` entities (includes README content)
-- **`file`** — Scans for `**/README.md` files and maps each to a `techDoc` entity with markdown content, file path, folder path, and a GitHub URL
+- **`file`** — Scans for `**/*.md` files and maps each to a `techDoc` entity with markdown content, **`filePath`**, **`folderPath`**, and a GitHub URL (internal link resolution uses **`filePath`**)
 
 #### Scoping to specific repositories
 
@@ -137,9 +159,16 @@ npm install
 npm run dev   # starts webpack-dev-server at http://localhost:9000
 ```
 
-The widget includes a **dev mock mode** that activates automatically when running outside Port's iframe. It renders sample documentation so you can develop the UI without a live Port connection.
+The widget includes a **dev mock mode** that activates automatically when running outside Port's iframe (`NODE_ENV=development` and not embedded in Port’s iframe). It renders sample documentation from [`src/utils/mocks.ts`](src/utils/mocks.ts) so you can develop the UI without a live Port connection. Mock responses are **paginated** (two entities per page) like the real API — scroll the sidebar to load more docs before testing links to pages that are not on the first page.
 
-To test **entity-page filtering** locally, in [`src/hooks/usePostMessageData.ts`](src/hooks/usePostMessageData.ts) set `MOCK_ENTITY_ID` and `MOCK_ENTITY_BLUEPRINT` (for example `"mock-backend-service"` and `"service"` — only **Backend Docs** mock has a `service` relation). 
+**Internal link examples in mocks** (open **Frontend Docs** after loading the Node repo pages):
+
+- `../../README.md` — repo root from `apps/Frontend/`
+- `https://react.dev` — external (opens via Port bridge when embedded; in standalone dev, behaves as a normal browser navigation)
+
+Other mocks: **Node Docs** (links into `apps/…` and `test/`), **Backend**, **test/README2.md**, and **FlameBot** (documents same-repo-only resolution).
+
+To test **entity-page filtering** locally, in [`src/hooks/usePostMessageData.ts`](src/hooks/usePostMessageData.ts) set `MOCK_ENTITY_ID` and `MOCK_ENTITY_BLUEPRINT` (for example `"mock-backend-service"` and `"service"` — only **Backend Docs** mock has a `service` relation).
 
 To test inside Port: edit a custom widget → toggle **"Local development"** → the iframe loads `http://localhost:9000`.
 
@@ -162,13 +191,21 @@ techdocs/
 │   │   ├── fetchRelatedTechDocSearch.ts  # Entity-page search rules + pagination
 │   │   └── fetchBlueprintSchema.ts       # Blueprint relations / path discovery
 │   ├── components/
-│   │   ├── Sidebar.tsx           # Tree navigation sidebar
-│   │   ├── DocViewer.tsx         # Markdown document viewer
+│   │   ├── Sidebar.tsx              # Tree navigation sidebar
+│   │   ├── DocViewer/
+│   │   │   ├── DocView.tsx          # Markdown document viewer
+│   │   │   ├── markdownComponents.tsx  # Internal vs external link rendering
+│   │   │   ├── LoadingDocsView.tsx
+│   │   │   └── ErrorDocView.tsx
 │   │   └── ColumnResizeHandle.tsx
 │   ├── hooks/
-│   │   ├── usePostMessageData.ts # Port iframe communication (via plugins-sdk)
+│   │   ├── usePostMessageData.ts    # Port iframe communication (via plugins-sdk)
+│   │   ├── useDocs.ts               # Paginated tech doc loading
 │   │   └── useMediaQuery.ts
-│   └── utils/                    # column widths, relation id helpers, mocks
+│   └── utils/
+│       ├── internalDocLinks.ts      # Relative path resolution + doc lookup
+│       ├── mocks.ts                 # Dev mock entities (incl. link examples)
+│       └── …                        # column widths, relation id helpers, etc.
 ├── package.json
 ├── upload-params.json            # Widget parameter definitions
 ├── webpack.config.js             # Builds single self-contained HTML
@@ -187,3 +224,6 @@ techdocs/
 | `Failed to load blueprint` in console | JWT can’t read blueprint schemas | Ensure the widget token can call **Get a blueprint** for the host and tech doc blueprints |
 | Widget ignores Port theme | `applyThemeCss()` not called | Ensure `usePostMessageData` hook calls `sdk.applyThemeCss()` on mount |
 | Broken images in doc body | README uses `https://…` image URLs | Port plugin CSP blocks external media; see [Images in ingested READMEs](#images-in-ingested-readmes) |
+| Internal markdown link does nothing | Wrong relative path, different `repository`, or target doc not loaded yet | Fix path (e.g. `../../README.md` from `apps/Frontend/`, not `../README.md`); ensure both docs share the same repo relation; scroll sidebar to load more entities |
+| Internal link opens Port / new tab | Link treated as external | Only same-repo relative paths matching an ingested `filePath` stay in-widget; `https://` links always use the SDK bridge |
+| External link fails in Port | Outdated SDK | Use `@port-labs/plugins-sdk` ≥ 0.1.1 (see [Internal and external markdown links](#internal-and-external-markdown-links)) |
