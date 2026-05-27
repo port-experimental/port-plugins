@@ -618,12 +618,26 @@ body {
   gap: 4px;
   max-width: 100%;
   padding: 4px 8px;
+  font: inherit;
   font-size: 12px;
   font-weight: 500;
+  text-align: left;
   border-radius: 6px;
   border: 1px solid color-mix(in srgb, var(--red) 35%, var(--border));
   background: var(--red-bg);
   color: var(--red-text);
+  cursor: help;
+  appearance: none;
+}
+
+.rule-chip:hover {
+  background: color-mix(in srgb, var(--red) 10%, var(--red-bg));
+  border-color: color-mix(in srgb, var(--red) 50%, var(--border));
+}
+
+.rule-chip:focus-visible {
+  outline: 2px solid var(--red-text);
+  outline-offset: 2px;
 }
 
 .rule-chip__label {
@@ -644,7 +658,7 @@ body {
   font-style: normal;
   font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
   color: var(--red-text);
-  cursor: help;
+  pointer-events: none;
   border: 1px solid color-mix(in srgb, var(--red) 40%, var(--border));
   border-radius: 999px;
   background: color-mix(in srgb, var(--red) 12%, var(--red-bg));
@@ -652,14 +666,8 @@ body {
   line-height: 1;
 }
 
-.rule-chip__hint:hover {
+.rule-chip:hover .rule-chip__hint {
   background: color-mix(in srgb, var(--red) 20%, var(--red-bg));
-}
-
-.rule-chip__hint:focus-visible {
-  outline: 2px solid var(--red-text);
-  outline-offset: 1px;
-  border-radius: 999px;
 }
 
 .sr-only {

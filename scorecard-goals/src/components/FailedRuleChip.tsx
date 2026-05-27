@@ -2,29 +2,23 @@ import type { FailedRuleInfo } from "../types";
 
 type FailedRuleChipProps = {
   rule: FailedRuleInfo;
-  entityKey: string;
 };
 
-export function FailedRuleChip({ rule, entityKey }: FailedRuleChipProps) {
-  const hintId = `rule-failure-${entityKey}-${rule.ruleIdentifier}`;
+export function FailedRuleChip({ rule }: FailedRuleChipProps) {
   const failureReason =
     rule.failureReason?.trim() || "No additional failure details provided.";
 
   return (
-    <span className="rule-chip">
+    <button
+      type="button"
+      className="rule-chip"
+      title={failureReason}
+      aria-label={`${rule.ruleTitle}: ${failureReason}`}
+    >
       <span className="rule-chip__label">{rule.ruleTitle}</span>
-      <button
-        type="button"
-        className="rule-chip__hint"
-        aria-label={`Why ${rule.ruleTitle} did not pass`}
-        aria-describedby={hintId}
-        title={failureReason}
-      >
+      <span className="rule-chip__hint" aria-hidden="true">
         i
-      </button>
-      <span id={hintId} className="sr-only">
-        {failureReason}
       </span>
-    </span>
+    </button>
   );
 }

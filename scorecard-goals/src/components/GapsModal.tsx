@@ -102,7 +102,6 @@ export function GapsModal({
                         <FailedRuleChip
                           key={`${entity.identifier}-${rule.ruleIdentifier}`}
                           rule={rule}
-                          entityKey={entity.identifier}
                         />
                       ))}
                     </div>
