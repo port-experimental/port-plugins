@@ -27,6 +27,7 @@ Strategic defaults — tactical checklist in **Non-negotiables**; anti-patterns 
 4. **Reuse before creating** — survey repo `README.md` and sibling plugins before scaffolding.
 5. **Relation strategy before params** — pick or add catalog relations first; resolve at runtime via `PLUGIN_DATA.entity` and `entities/search` — not relation-key `string` params by default.
 6. **Runtime via Port API; MCP at design-time only** — `portApiBaseUrl` + token in the iframe; `list_blueprints` / `upsert_blueprint` in the IDE only.
+7. **Charts → Recharts** — when the widget needs bar, line, area, pie, donut, or similar data visualization, prefer **[Recharts](https://recharts.org/)** over hand-rolled SVG/CSS charts. Apply [webpack-port-upload-safety.md](references/webpack-port-upload-safety.md) when adding Recharts. Details: [scaffolding-and-implementation.md](references/scaffolding-and-implementation.md) (**Charts and data visualization**).
 
 ## Overview
 
@@ -105,7 +106,7 @@ Use `upsert_blueprint` only when the user wants catalog changes applied via MCP.
 
 ### 5. Document and ship
 
-- **Bump `package.json` `version`** when the plugin changes (bugfix → patch, feature → minor, breaking → major). Sync the repo root **Plugins** table **Version** column to the same value.
+- **Bump `package.json` `version` once per branch** when the plugin has functional changes — based on **all** changes on the branch since merge base, **not** once per agent invocation or per feature while building. **New plugins:** stay at **`0.1.0`** for the whole first branch (do not stack `0.2.0`, `0.3.0`, … during development). Workflow: [readme-and-audit.md](references/readme-and-audit.md) (**Versioning — once per branch**, **Greenfield plugin**).
 - Per-plugin **README** (required section order): [references/readme-and-audit.md](references/readme-and-audit.md)
 - Repo-level widgets table row when adding a new plugin (include **Version** from that plugin’s `package.json` `version` field)
 - Canonical **`port-plugins upload`** command — exact flags in [references/readme-and-audit.md](references/readme-and-audit.md) (Setup → Upload); do not invent CLI flags
@@ -122,7 +123,7 @@ Before marking the plugin done:
 2. Validate the plugin identifier against Port’s regex (see **Non-negotiables** → Plugin identifier).
 3. Confirm per-plugin README section order and upload command per [readme-and-audit.md](references/readme-and-audit.md).
 4. Walk the **Non-negotiables** table and [guidelines.md](references/guidelines.md) anti-patterns.
-5. If the plugin code changed, confirm **`package.json` `version`** was bumped and the root **`README.md` Plugins** **Version** cell matches.
+5. If the branch has functional plugin changes, confirm **`package.json` `version`** was bumped **once for the branch** (not re-bumped every invocation) and the root **`README.md` Plugins** **Version** cell matches — [readme-and-audit.md](references/readme-and-audit.md) (**Versioning — once per branch**).
 
 ## Non-negotiables (always apply)
 
@@ -130,34 +131,37 @@ Before marking the plugin done:
 |-------|------|
 | Rendering | **No** `innerHTML`, `outerHTML`, or `dangerouslySetInnerHTML` for dynamic/user content — React text/elements or vetted sanitizer only |
 | UX / UI | Loading, empty, and error states; `applyThemeCss()`; responsive full-iframe layout; accessible controls — treat widgets as product UI |
+| Charts | **Recharts** for bar/line/area/pie/donut and similar viz — not custom SVG/CSS chart implementations unless trivial (e.g. a single progress bar). Webpack upload safety when Recharts is added — [scaffolding-and-implementation.md](references/scaffolding-and-implementation.md) (**Charts**), [webpack-port-upload-safety.md](references/webpack-port-upload-safety.md) |
 | CSS decorations | `:root` = surfaces/text/borders only; optional palette aliases (`--gold`, `--bronze`, …) at **300**; add **`--{hue}-bg`** / **`--{hue}-text`** when pills/badges need visible backgrounds + readable labels — see scaffolding **Optional palette and shade variants** |
 | Runtime vs params | Fetch blueprints, schema, relations, entities via Port API + `PLUGIN_DATA` — **no** params that duplicate that data |
 | API host | `portApiBaseUrl` + token for `/v1/...` only |
 | Portal URLs | `getPortalOrigin()` from `document.referrer`; `{origin}/{blueprint}Entity?identifier={id}` |
 | Blueprint params | `type: "blueprint"`; read `.identifier`; max **5** per plugin |
 | Relations | **Schema first:** MCP-inspect source + target blueprints before adding relations. **Catalog:** reuse or add blueprint relations; document in README. **No** relation-key `string` params by default. **Runtime:** `entity.relations` / `relationsObjects` → `relatedTo` search → blueprint GET using designed relation IDs → relation `string` param **only** as documented last-resort override |
-| Local dev | **`devServer.port: 9000`** always (`http://localhost:9000`); **small mocks** in `usePostMessageData.ts` + `src/dev/` or `api/` early returns when `DEV_MOCK` — enough to render loading/empty/happy paths outside Port’s iframe |
+| Local dev | **`devServer.port: 9000`** always (`http://localhost:9000`); **small mocks** in `usePostMessageData.ts` + `src/dev/` or `api/` early returns when `DEV_MOCK` — enough to render loading/empty/happy paths outside Port’s iframe. **Portal links from mock IDs do not work there** — document in README **Local development**; test links in Port **Local development** (iframe) or after deploy |
 | Subject blueprint | If widget targets one blueprint type, use **`PLUGIN_DATA.entity.blueprint`** + design default — skip blueprint param when not needed |
 | Param schema | Every param: **`type`**, **`isRequired`**, **`label`** |
 | Param labels | Short **`label`** in `upload-params.json`; defaults and detail in README **Widget parameters** |
 | README prerequisites | Tables for catalog **and** other Port setup (relations, automations, SSA, integrations, …) — see [readme-and-audit.md](references/readme-and-audit.md) |
 | Search | Nested `query`; not top-level `combinator`/`rules` |
+| Dashboard page filters | On `POST .../entities/search` with a `query`, merge `page.pageFilters` via **`mergePageFilters`**; pass the **full blueprint** from **`params.blueprint.value`** as the third argument (not `{ identifier }` only) — [plugin-architecture.md](references/plugin-architecture.md) |
 | Errors | Include full response body text |
 | Iframe UI | Full width/height; **no** plugin title, description, or icon inside the iframe |
 | Icons | icon library; **never** hardcoded emoji |
 | Plugin identifier | `PLUGIN_IDENTIFIER_REGEX` — validate `--identifier` (and folder name when aligned) **before** every `port-plugins upload`; reject `.`, `..`, spaces, and other disallowed characters |
 | Persistence | Port entities/properties unless explicitly local-only UI state |
 | Upload CLI | `port-plugins upload` with **`--file`**, **`--identifier`**, **`--title`**, **`--params`**, **`--description`**, **`--upsert`** only — see [readme-and-audit.md](references/readme-and-audit.md) |
-| Versioning | On any functional change to a plugin, **bump** its `package.json` **`version`** (semver) and update the root **`README.md` Plugins** table **Version** cell to match |
+| Versioning | **Once per git branch** per plugin: bump from merge-base semver using **cumulative** changes — **not** per agent run or per feature. **Greenfield:** **`0.1.0`** for the entire first branch until publish/merge; see [readme-and-audit.md](references/readme-and-audit.md) (**Versioning — once per branch**, **Greenfield plugin**) |
 
 ## Reference index
 
 | File | Contents |
 |------|----------|
 | [reuse-workflow.md](references/reuse-workflow.md) | Reuse steps 1–5, blueprint matrix, checklist, adapt vs create, code-reuse patterns |
-| [scaffolding-and-implementation.md](references/scaffolding-and-implementation.md) | Templates, `App.tsx` implementation, params, relations, code layout, **optional palette + `-bg`/`-text` variants** |
+| [scaffolding-and-implementation.md](references/scaffolding-and-implementation.md) | Templates, `App.tsx` implementation, params, relations, code layout, **charts (Recharts)**, **optional palette + `-bg`/`-text` variants** |
 | [readme-and-audit.md](references/readme-and-audit.md) | Auditing existing plugins, PR checklist, per-plugin README §8 |
 | [plugin-architecture.md](references/plugin-architecture.md) | postMessage, `PLUGIN_DATA`, API, theming, build/deploy, local dev |
+| [webpack-port-upload-safety.md](references/webpack-port-upload-safety.md) | `globalObject` / lodash shim — **required with Recharts**; also when upload rejects `Function` |
 | [widget-conventions.md](references/widget-conventions.md) | Directory layout, naming, optional automation |
 | [guidelines.md](references/guidelines.md) | Anti-patterns, data persistence, troubleshooting |
 
@@ -179,6 +183,7 @@ Scaffold copies from `assets/` (skill root; in this repo also `.cursor/skills/cr
 | Template | Destination |
 |----------|-------------|
 | `template-webpack.config.js` | `<widget>/webpack.config.js` |
+| `webpack/lodash-root-shim.js` | `<widget>/webpack/lodash-root-shim.js` — **required** when using Recharts; see [webpack-port-upload-safety.md](references/webpack-port-upload-safety.md) |
 | `template-tsconfig.json` | `<widget>/tsconfig.json` |
 | `template-index.html` | `<widget>/src/index.html` |
 | `template-index.tsx` | `<widget>/src/index.tsx` |

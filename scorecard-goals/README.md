@@ -58,7 +58,9 @@ Open `http://localhost:9000` (webpack `devServer.port: 9000` — required for Po
 | `src/hooks/usePostMessageData.ts` | Host bridge + `DEV_MOCK` gate |
 | `src/dev/mockData.ts` | Sample blueprint, scorecards, and entities |
 
-Enable Port **Local development** on the widget to test real `postMessage` and API calls in the portal.
+**Portal links:** Entity links in the gaps modal use mock fixture identifiers and `https://app.port.io` when there is no `document.referrer`. At `http://localhost:9000` outside Port’s iframe those URLs are for UI layout only — they will not open real catalog entities. Validate links with Port’s **Local development** toggle (iframe + real `PLUGIN_DATA`) or after deploy.
+
+Enable Port **Local development** on the widget to test real `postMessage`, API calls, and entity links in the portal.
 
 ## Setup
 
@@ -76,7 +78,7 @@ Artifact: `dist/index.html`
 ```bash
 port-plugins upload \
   --file dist/index.html \
-  --identifier scorecard-goals \
+  --identifier scorecard-goals-port-plugin \
   --title "Scorecard goals" \
   --params "$(cat upload-params.json)" \
   --description "Per-scorecard compliance bars for a chosen blueprint" \
@@ -123,3 +125,4 @@ scorecard-goals/
 | Counts ignore dashboard filters | Page filters not applied | Widget merges `page.pageFilters` into entity search; confirm filters are set on the dashboard page |
 | API 422 on search | Malformed query body | Ensure search uses `{ query: { combinator, rules } }` |
 | Blank / unstyled UI | Theme not applied | Widget uses `applyThemeCss()` when embedded in Port |
+| Entity link 404 or wrong org in local dev | Mock IDs + no referrer at `localhost:9000` | Expected outside Port’s iframe; test links via Port **Local development** or after deploy |

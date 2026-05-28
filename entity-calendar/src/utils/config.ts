@@ -7,9 +7,11 @@ function readBlueprintParam(raw: unknown): BlueprintParam | null {
     return null;
   }
   return {
+    ...obj,
     identifier: obj.identifier.trim(),
-    title: typeof obj.title === "string" ? obj.title : obj.identifier,
-  };
+    title:
+      typeof obj.title === "string" ? obj.title : String(obj.identifier).trim(),
+  } as BlueprintParam;
 }
 
 function readBooleanParam(value: unknown): boolean {

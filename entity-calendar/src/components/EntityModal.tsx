@@ -1,3 +1,4 @@
+import { X } from "lucide-react";
 import type { CalendarEntity } from "../types";
 import { buildEntityPageUrl } from "../utils/portalUrl";
 
@@ -31,7 +32,7 @@ export function EntityModal({
             onClick={onClose}
             aria-label="Close"
           >
-            ×
+            <X size={18} strokeWidth={2} aria-hidden />
           </button>
         </header>
         <ul className="entity-list">
