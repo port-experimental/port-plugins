@@ -6,7 +6,7 @@ Designed for **dashboard** pages (not entity-scoped).
 
 ## Preview image
 
-<img width="633" height="606" alt="Entity Calendar widget on a Port dashboard showing marked days in the current month" src="https://github.com/user-attachments/assets/b3f35fb1-429f-4333-8f0a-3475029de4ec" />
+<img width="633" height="606" alt="Incidents Calendar" src="https://github.com/user-attachments/assets/b3f35fb1-429f-4333-8f0a-3475029de4ec" />
 
 ## Badges
 

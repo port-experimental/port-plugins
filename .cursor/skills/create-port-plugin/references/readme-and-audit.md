@@ -41,6 +41,13 @@ Bump a plugin’s `package.json` **`version` at most once per git branch** for t
 | **minor** | New user-visible behaviour or params (non-breaking) |
 | **major** | Breaking changes for operators (param removals/renames, required new catalog setup, incompatible behaviour) |
 
+**Greenfield plugin (new directory, not on merge base):**
+
+- Scaffold with **`"version": "0.1.0"`** in `package.json` and sync the root **Plugins** table **once**.
+- **Do not** bump `0.1.0` → `0.2.0` → `0.3.0` across agent runs or commits while still building the **first** release on the same branch — that violates “once per branch” and “do not stack … per invocation.”
+- All first-release features (charts, params, format breakdown, etc.) ship together under **`0.1.0`**. The semver table applies when choosing the version **after** a published baseline exists (e.g. next branch bumps `0.1.0` → `0.2.0` once if only minor features landed since release).
+- If `git show <merge-base>:<plugin>/package.json` fails (plugin did not exist), there is no merge-base version to bump **from** — stay at **`0.1.0`** until the branch merges or the operator publishes; only then do follow-up branches bump from the released version.
+
 **Workflow (run before finishing work on a branch):**
 
 1. Resolve merge base: `git merge-base HEAD origin/main` (or `main` / `master` if `origin/main` is unavailable).

@@ -106,7 +106,7 @@ Use `upsert_blueprint` only when the user wants catalog changes applied via MCP.
 
 ### 5. Document and ship
 
-- **Bump `package.json` `version` once per branch** when the plugin has functional changes — based on **all** changes on the branch since merge base, not once per agent invocation. Semver from the aggregate change (patch / minor / major). Sync the repo root **Plugins** table **Version** column. Workflow: [readme-and-audit.md](references/readme-and-audit.md) (**Versioning — once per branch**).
+- **Bump `package.json` `version` once per branch** when the plugin has functional changes — based on **all** changes on the branch since merge base, **not** once per agent invocation or per feature while building. **New plugins:** stay at **`0.1.0`** for the whole first branch (do not stack `0.2.0`, `0.3.0`, … during development). Workflow: [readme-and-audit.md](references/readme-and-audit.md) (**Versioning — once per branch**, **Greenfield plugin**).
 - Per-plugin **README** (required section order): [references/readme-and-audit.md](references/readme-and-audit.md)
 - Repo-level widgets table row when adding a new plugin (include **Version** from that plugin’s `package.json` `version` field)
 - Canonical **`port-plugins upload`** command — exact flags in [references/readme-and-audit.md](references/readme-and-audit.md) (Setup → Upload); do not invent CLI flags
@@ -151,7 +151,7 @@ Before marking the plugin done:
 | Plugin identifier | `PLUGIN_IDENTIFIER_REGEX` — validate `--identifier` (and folder name when aligned) **before** every `port-plugins upload`; reject `.`, `..`, spaces, and other disallowed characters |
 | Persistence | Port entities/properties unless explicitly local-only UI state |
 | Upload CLI | `port-plugins upload` with **`--file`**, **`--identifier`**, **`--title`**, **`--params`**, **`--description`**, **`--upsert`** only — see [readme-and-audit.md](references/readme-and-audit.md) |
-| Versioning | **Once per git branch** per plugin: bump `package.json` **`version`** from merge-base semver using **cumulative** branch changes (patch / minor / major); sync root **`README.md` Plugins** **Version** — **not** on every agent invocation; see [readme-and-audit.md](references/readme-and-audit.md) (**Versioning — once per branch**) |
+| Versioning | **Once per git branch** per plugin: bump from merge-base semver using **cumulative** changes — **not** per agent run or per feature. **Greenfield:** **`0.1.0`** for the entire first branch until publish/merge; see [readme-and-audit.md](references/readme-and-audit.md) (**Versioning — once per branch**, **Greenfield plugin**) |
 
 ## Reference index
 
