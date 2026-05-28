@@ -2,6 +2,12 @@
 
 A scorecard compliance dashboard widget for [Port](https://app.port.io) dashboards. Groups services by org leader (via team relations), shows overall and per-scorecard compliance grades, and lets you drill into individual service compliance across all configured scorecards.
 
+## Preview image
+
+<!-- Add a screenshot here once the widget is running in your Port environment.
+     Upload the image to a GitHub issue or PR, then replace this comment with:
+     <img alt="Scorecard Dashboard widget" src="https://github.com/user-attachments/assets/..." /> -->
+
 ## Features
 
 - Overall compliance grade card with passing/failing rule counts
@@ -85,7 +91,7 @@ npm run build   # output: dist/index.html
 ```bash
 port-plugins upload \
   --file dist/index.html \
-  --identifier scorecard-dashboard \
+  --identifier scorecard-dashboard-port-plugin \
   --title "Scorecard Dashboard" \
   --params "$(cat upload-params.json)" \
   --upsert
