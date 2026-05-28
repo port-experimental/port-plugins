@@ -78,7 +78,7 @@ Artifact: `dist/index.html`
 ```bash
 port-plugins upload \
   --file dist/index.html \
-  --identifier scorecard-goals \
+  --identifier scorecard-goals-port-plugin \
   --title "Scorecard goals" \
   --params "$(cat upload-params.json)" \
   --description "Per-scorecard compliance bars for a chosen blueprint" \

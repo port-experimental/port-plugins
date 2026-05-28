@@ -79,7 +79,7 @@ Artifact: `dist/index.html`
 ```bash
 port-plugins upload \
   --file dist/index.html \
-  --identifier entity-calendar \
+  --identifier entity-calendar-port-plugin \
   --title "Entity Calendar" \
   --params "$(cat upload-params.json)" \
   --description "Show amount of entities based on date field" \
