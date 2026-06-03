@@ -492,6 +492,13 @@ body {
   min-width: 0;
 }
 
+.entity-card__title .truncated-text {
+  color: inherit;
+  font-weight: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
 .entity-card__title:hover {
   text-decoration: underline;
 }
@@ -548,51 +555,83 @@ body {
 }
 
 .entity-card__row {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: minmax(0, 42%) minmax(0, 58%);
+  gap: 4px 10px;
+  align-items: start;
   font-size: 12px;
 }
 
 .entity-card__row dt {
-  flex: 1 1 0;
   min-width: 0;
   color: var(--muted);
   font-weight: 500;
   line-height: 1.35;
 }
 
+.entity-card__label {
+  color: inherit;
+  font-weight: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
 .entity-card__row dd {
-  flex: 0 0 auto;
-  margin-left: auto;
+  margin: 0;
   color: var(--text);
   min-width: 0;
-  text-align: right;
+  text-align: end;
   padding-top: 1px;
+  overflow: hidden;
+}
+
+.truncated-text {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.truncated-text:focus-visible {
+  outline: 2px solid var(--btn-primary-bg);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.truncated-text__tooltip {
+  z-index: 10000;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: var(--text);
+  color: var(--card);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-break: break-word;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+  pointer-events: none;
 }
 
 .prop-value {
-  display: inline-block;
-  max-width: 100%;
-  word-break: break-word;
+  line-height: 1.35;
   font-weight: 500;
 }
 
+.entity-card__row dd .prop-value {
+  text-align: inherit;
+}
+
 .prop-value--count {
+  display: inline-block;
   color: var(--muted);
   font-weight: 500;
 }
 
 .prop-value--items {
-  text-align: end;
-  line-height: 1.35;
-  word-break: break-word;
-}
-
-.prop-value__more {
-  color: var(--muted);
-  font-weight: 500;
-  white-space: nowrap;
+  text-align: inherit;
 }
 
 .prop-value--empty {
@@ -781,9 +820,7 @@ body {
 }
 
 [dir="rtl"] .entity-card__row dd {
-  margin-left: 0;
-  margin-right: auto;
-  text-align: left;
+  text-align: start;
 }
 
 [dir="rtl"] .entity-card__row dd .status-pill {

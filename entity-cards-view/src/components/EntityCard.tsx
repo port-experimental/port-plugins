@@ -7,6 +7,7 @@ import {
   splitPropertiesByKind,
 } from "../utils/propertyFormat";
 import { PropertyValue } from "./PropertyValue";
+import { TruncatedText } from "./TruncatedText";
 
 type EntityCardProps = {
   entity: PortEntity;
@@ -45,7 +46,7 @@ export function EntityCard({
             target="_top"
             rel="noopener noreferrer"
           >
-            {title}
+            <TruncatedText text={title} />
           </a>
           <p className="entity-card__path">/{entity.identifier}</p>
         </div>
@@ -84,7 +85,12 @@ export function EntityCard({
             const raw = getEntityPropertyValue(entity, prop.identifier);
             return (
               <div key={prop.identifier} className="entity-card__row">
-                <dt title={prop.title}>{prop.title}</dt>
+                <dt>
+                  <TruncatedText
+                    text={prop.title}
+                    className="entity-card__label"
+                  />
+                </dt>
                 <dd>
                   <PropertyValue
                     prop={prop}
