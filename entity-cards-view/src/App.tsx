@@ -52,6 +52,7 @@ export function App() {
     getBooleanDisplayModeForProperty,
     setVisiblePropertyIds,
     toggleProperty,
+    reorderVisibleProperties,
     setArrayDisplayMode,
     setBooleanDisplayMode,
     isLoading: schemaLoading,
@@ -150,12 +151,18 @@ export function App() {
           arrayDisplayModes={arrayDisplayModes}
           booleanDisplayModes={booleanDisplayModes}
           onToggle={toggleProperty}
+          onReorder={reorderVisibleProperties}
           onArrayDisplayChange={setArrayDisplayMode}
           onBooleanDisplayChange={setBooleanDisplayMode}
-          onSelectAll={() =>
-            setVisiblePropertyIds(available.map((p) => p.identifier))
+          onShowAllHidden={() =>
+            setVisiblePropertyIds([
+              ...visibleIds,
+              ...available
+                .filter((p) => !visibleIds.includes(p.identifier))
+                .map((p) => p.identifier),
+            ])
           }
-          onClearAll={() => setVisiblePropertyIds([])}
+          onHideAllShown={() => setVisiblePropertyIds([])}
         />
       </div>
 
