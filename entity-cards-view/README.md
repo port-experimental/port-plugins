@@ -19,7 +19,7 @@ Dashboard **page filters** are merged into entity search when present.
 - **Arrays** show a numeric count only (e.g. `3`)
 - **Refresh** in the toolbar and on each card
 - **Multilingual UI** (en, he, fr, de, es, pt) — follows Port user locale when provided, else browser language; RTL for Hebrew
-- **Sentiment colors** for status-like values work across languages (entity values are shown as stored in Port, not translated)
+- **Coordinated enum colors** — the same value gets the same pill color on every property (e.g. `active` and `Automatic` are green, `inactive` is red, `Approval Required` is orange); works across languages (values are shown as stored in Port, not translated)
 - Loading, empty, and error states
 - Port theme via `@port-labs/plugins-sdk` (`applyThemeCss`)
 - Icons via [lucide-react](https://lucide.dev/)

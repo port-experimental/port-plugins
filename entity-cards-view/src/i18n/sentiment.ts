@@ -1,4 +1,4 @@
-import type { BlueprintPropertyMeta, StatusTone } from "../types";
+import type { StatusTone } from "../types";
 import { normalizeForComparison } from "../utils/normalizeText";
 
 function tokenSet(...groups: string[][]): Set<string> {
@@ -90,6 +90,11 @@ const SUCCESS_ACTIVE = tokenSet(
     "valid",
     "validated",
     "green",
+    "automatic",
+    "auto",
+    "autonomous",
+    "automation",
+    "automated",
   ],
   [
     "actif",
@@ -312,6 +317,8 @@ const WARNING = tokenSet(
     "delayed",
     "at risk",
     "at_risk",
+    "approval",
+    "awaiting",
   ],
   ["avertissement", "dégradé", "degrade", "en attente", "partiel", "en pause"],
   ["warnung", "degradiert", "ausstehend", "teilweise", "pausiert", "wartend"],
@@ -390,40 +397,36 @@ function matchesOffPhrase(value: string): boolean {
   );
 }
 
-function isTypeProperty(prop: BlueprintPropertyMeta): boolean {
-  const id = prop.identifier.toLowerCase();
-  const title = prop.title.toLowerCase();
-  return id === "type" || title === "type" || id.endsWith("_type");
+function matchesAutomaticPhrase(value: string): boolean {
+  const v = normalizeForComparison(value);
+  return /\b(automatic|autonomous|auto mode|auto-run|auto run)\b/.test(v);
 }
 
-function isPriorityProperty(prop: BlueprintPropertyMeta): boolean {
-  const id = prop.identifier.toLowerCase();
-  const title = prop.title.toLowerCase();
-  return /priority|severity/.test(id) || /priority|severity/.test(title);
-}
-
-function isStatusLikeProperty(prop: BlueprintPropertyMeta): boolean {
-  const id = prop.identifier.toLowerCase();
-  const title = prop.title.toLowerCase();
+function matchesApprovalPhrase(value: string): boolean {
+  const v = normalizeForComparison(value);
+  if (!v) return false;
   return (
-    /status|state|health|phase|stage|lifecycle|availability|operational/.test(
-      id
+    /\b(approval required|requires approval|require approval|awaiting approval|pending approval|needs approval|waiting for approval)\b/.test(
+      v
     ) ||
-    /status|state|health|phase|stage/.test(title) ||
-    id.endsWith("_status") ||
-    id.endsWith("_state")
+    (/\bapproval\b/.test(v) &&
+      /\b(required|pending|awaiting|needed|waiting)\b/.test(v))
   );
 }
 
-function priorityTone(value: string): StatusTone {
+function matchesManualPhrase(value: string): boolean {
   const v = normalizeForComparison(value);
-  if (/highest|critical|blocker|p0|p1|urgent|sev.?0|sev.?1/.test(v)) {
-    return "danger";
-  }
-  if (/high|major|p2|sev.?2/.test(v)) return "warning";
-  if (/medium|normal|p3|moderate/.test(v)) return "info";
-  return "neutral";
+  return /\b(manual|manually|hand.?off|human.?in.?the.?loop)\b/.test(v);
 }
+
+const MANUAL = tokenSet(
+  ["manual", "manually"],
+  ["manuel", "manuellement"],
+  ["manuell", "manuell"],
+  ["manual", "manualmente"],
+  ["manual", "manualmente"],
+  ["ידני", "באופן ידני"]
+);
 
 /** Standalone "on" only when value is exactly on/yes (avoid "on hold", "ontario") */
 function isStandaloneOn(value: string): boolean {
@@ -431,31 +434,39 @@ function isStandaloneOn(value: string): boolean {
   return v === "on" || v === "yes";
 }
 
-export function enumStatusTone(
-  value: string,
-  prop?: BlueprintPropertyMeta
-): StatusTone {
+/**
+ * Value-only sentiment — same enum label gets the same pill color on every property
+ * (Status, Execution Mode, Type, Priority, etc.).
+ */
+export function resolveValueSentiment(value: string): StatusTone {
   const raw = value.trim();
   if (!raw || raw === "—") return "neutral";
 
-  if (prop && isTypeProperty(prop)) {
-    if (matchesSet(TYPE_BUG, raw)) return "danger";
-    if (matchesSet(TYPE_FEATURE, raw)) return "info";
-    if (matchesSet(TYPE_TASK, raw)) return "violet";
-    return "neutral";
-  }
+  const v = normalizeForComparison(raw);
 
-  if (prop && isPriorityProperty(prop)) {
-    return priorityTone(raw);
+  // Work item / issue type labels
+  if (matchesSet(TYPE_BUG, raw)) return "danger";
+  if (matchesSet(TYPE_FEATURE, raw)) return "info";
+  if (matchesSet(TYPE_TASK, raw)) return "violet";
+
+  // Priority / severity labels (any property)
+  if (/highest|critical|blocker|p0|p1|urgent|sev.?0|sev.?1/.test(v)) {
+    return "danger";
   }
+  if (/high|major|p2|sev.?2/.test(v)) return "warning";
+  if (/medium|normal|p3|moderate/.test(v)) return "info";
+  if (/low|minor|p4|trivial|minimal/.test(v)) return "neutral";
 
   // Negative before positive (inactive before active)
   if (matchesSet(DANGER, raw) || matchesOffPhrase(raw)) return "danger";
-  if (matchesSet(WARNING, raw)) return "warning";
+  if (matchesApprovalPhrase(raw) || matchesSet(WARNING, raw)) return "warning";
+
+  if (matchesSet(MANUAL, raw) || matchesManualPhrase(raw)) return "info";
 
   if (
     matchesSet(SUCCESS_DONE, raw) ||
     matchesSet(SUCCESS_ACTIVE, raw) ||
+    matchesAutomaticPhrase(raw) ||
     matchesActivePhrase(raw) ||
     isStandaloneOn(raw)
   ) {
@@ -465,11 +476,14 @@ export function enumStatusTone(
   if (matchesSet(IN_PROGRESS, raw)) return "info";
   if (matchesSet(TODO, raw)) return "backlog";
 
-  // Status-like fields: lone "run" / short operational tokens → green
-  if (prop && isStatusLikeProperty(prop)) {
-    const v = normalizeForComparison(raw);
-    if (v === "run" || v === "on" || v === "up") return "success";
-  }
-
   return "neutral";
+}
+
+export function enumStatusTone(value: string): StatusTone {
+  return resolveValueSentiment(value);
+}
+
+/** Whether a display label maps to a non-neutral sentiment color. */
+export function hasKnownEnumSentiment(value: string): boolean {
+  return resolveValueSentiment(value) !== "neutral";
 }

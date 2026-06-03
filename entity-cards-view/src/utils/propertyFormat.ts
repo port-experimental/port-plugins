@@ -1,9 +1,17 @@
 import { t } from "../i18n/instance";
 import type { MessageKey } from "../i18n/types";
-import { enumStatusTone } from "../i18n/sentiment";
+import {
+  enumStatusTone,
+  hasKnownEnumSentiment,
+  resolveValueSentiment,
+} from "../i18n/sentiment";
 import type { BlueprintPropertyMeta, PortEntity, StatusTone } from "../types";
 
-export { enumStatusTone } from "../i18n/sentiment";
+export {
+  enumStatusTone,
+  hasKnownEnumSentiment,
+  resolveValueSentiment,
+} from "../i18n/sentiment";
 
 export function getEntityPropertyValue(
   entity: PortEntity,
@@ -122,22 +130,43 @@ export function formatEnumLabel(value: unknown): string {
   return String(value);
 }
 
+function isLongTextProperty(prop: BlueprintPropertyMeta): boolean {
+  const id = prop.identifier.toLowerCase();
+  const title = prop.title.toLowerCase();
+  return (
+    /description|content|summary|notes|comment|message|body|details|readme/.test(
+      id
+    ) ||
+    /description|content|summary|notes/.test(title)
+  );
+}
+
 /** Properties whose string values should render as sentiment-colored pills. */
 export function isSentimentEnumProperty(prop: BlueprintPropertyMeta): boolean {
   if (prop.kind === "enum") return true;
+  if (isLongTextProperty(prop)) return false;
 
   const id = prop.identifier.toLowerCase();
   const title = prop.title.toLowerCase();
 
   if (
-    /^(status|state|stage|phase|priority|severity|type|risk|health|resolution)$/.test(
+    /^(status|state|stage|phase|priority|severity|type|risk|health|resolution|mode)$/.test(
       id
     )
   ) {
     return true;
   }
 
-  if (/^(status|state|priority|severity|type)$/.test(title)) {
+  if (
+    /^(status|state|priority|severity|type|execution mode|run mode)$/.test(title)
+  ) {
+    return true;
+  }
+
+  if (
+    /mode|execution|lifecycle|availability|operational|health|run/.test(id) ||
+    /mode|execution|lifecycle|operational/.test(title)
+  ) {
     return true;
   }
 
@@ -145,6 +174,7 @@ export function isSentimentEnumProperty(prop: BlueprintPropertyMeta): boolean {
     id.endsWith("_status") ||
     id.endsWith("_state") ||
     id.endsWith("_priority") ||
+    id.endsWith("_mode") ||
     id.endsWith("Status")
   );
 }
@@ -153,8 +183,11 @@ export function shouldRenderSentimentEnum(
   prop: BlueprintPropertyMeta,
   value: unknown
 ): boolean {
-  if (!isSentimentEnumProperty(prop)) return false;
-  return formatEnumLabel(value) !== "—";
+  const label = formatEnumLabel(value);
+  if (label === "—" || isLongTextProperty(prop)) return false;
+  if (prop.kind === "enum") return true;
+  if (isSentimentEnumProperty(prop)) return true;
+  return label.length <= 64 && hasKnownEnumSentiment(label);
 }
 
 export function booleanStatusTone(value: boolean): StatusTone {

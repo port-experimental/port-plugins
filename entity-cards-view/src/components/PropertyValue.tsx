@@ -81,7 +81,7 @@ export function PropertyValue({
 
   if (shouldRenderSentimentEnum(prop, value)) {
     const label = formatEnumLabel(value);
-    const tone = enumStatusTone(label, prop);
+    const tone = enumStatusTone(label);
     return <StatusPill label={label} tone={tone} />;
   }
 
