@@ -7,7 +7,7 @@ This repository contains plugins contributed by [Port.io](https://www.port.io).
 | Widget | Version | Description |
 |--------|---------|-------------|
 | [Entity Calendar](./entity-calendar) | 0.2.0 | Month calendar marking entity creation dates; click a day to view title and identifier |
-| [Entity Cards View](./entity-cards-view) | 0.1.0 | Display Blueprint entities as customizable cards with configurable properties |
+| [Entity Cards View](./entity-cards-view) | 0.1.1 | Display Blueprint entities as customizable cards with configurable properties |
 | [Scorecard Dashboard](./scorecard-dashboard) | 0.1.0 | Scorecard compliance dashboard grouped by team with grade thresholds and per-rule breakdown |
 | [Scorecard Goals](./scorecard-goals) | 0.1.0 | Per-scorecard compliance bars for a selected blueprint, with drill-down into failing entities and rules |
 | [TechDocs](./techdocs) | 0.2.0 | Documentation browser for ingested markdown; sidebar by repository and folder, in-widget relative links between docs, external URLs via Port link bridge |
