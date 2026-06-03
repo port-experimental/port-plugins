@@ -70,15 +70,37 @@ body {
   color: var(--text);
 }
 
-/* ── Optional thin scrollbars (apply to main iframe scroll regions) ──
-   Use on .shell and any .scroll-area. Thumb uses --text-faint; hover uses --muted. */
+#plugin-root {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* ── Main shell: flex column fills iframe; min-height avoids 0px blank cards ── */
 .shell {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  width: 100%;
+  min-height: 120px;
   padding: 16px;
-  min-height: 100%;
+  gap: 12px;
   overflow-x: hidden;
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: var(--text-faint) transparent;
+}
+
+.shell--message {
+  justify-content: flex-start;
+}
+
+.main {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .shell::-webkit-scrollbar {
@@ -239,10 +261,11 @@ body {
 }
 
 .muted {
-  color: var(--muted);
-  font-style: italic;
-  text-align: center;
-  padding: 32px 0;
+  color: var(--muted, #6b7280);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0;
+  padding: 8px 0;
 }
 
 /* Decoration example — copy pattern for dots, pills, links, chart marks */

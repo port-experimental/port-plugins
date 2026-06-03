@@ -1,3 +1,41 @@
+# Guidelines
+
+Anti-patterns, persistence, and troubleshooting for Port plugins.
+
+## Table of contents
+
+- [Guidelines](#guidelines)
+- [Anti-Patterns to Avoid](#anti-patterns-to-avoid)
+  - [❌ Don't: Use `innerHTML` or `dangerouslySetInnerHTML`](#dont-use-innerhtml-or-dangerouslysetinnerhtml)
+  - [❌ Don't: Add plugin params for data the Port API provides at runtime](#dont-add-plugin-params-for-data-the-port-api-provides-at-runtime)
+  - [❌ Don't: Put long explanations in param labels](#dont-put-long-explanations-in-param-labels)
+  - [❌ Don't: Omit Port setup from README prerequisites](#dont-omit-port-setup-from-readme-prerequisites)
+  - [❌ Don't: Ship bare-minimum UI](#dont-ship-bare-minimum-ui)
+  - [❌ Don't: Call hooks after early returns (blank iframe in Port)](#dont-call-hooks-after-early-returns-blank-iframe-in-port)
+  - [❌ Don't: Hand-roll chart UIs when Recharts fits](#dont-hand-roll-chart-uis-when-recharts-fits)
+  - [❌ Don't: Use `:root` accent tokens for decorations](#dont-use-root-accent-tokens-for-decorations)
+  - [❌ Don't: Use one palette shade for pill background and text](#dont-use-one-palette-shade-for-pill-background-and-text)
+  - [❌ Don't: Repeat plugin title, description, or icon in the iframe](#dont-repeat-plugin-title-description-or-icon-in-the-iframe)
+  - [❌ Don't: Use emoji or omit param fields](#dont-use-emoji-or-omit-param-fields)
+  - [❌ Don't: Create Duplicate Blueprints](#dont-create-duplicate-blueprints)
+  - [❌ Don't: Reinvent Existing Functionality](#dont-reinvent-existing-functionality)
+  - [❌ Don't: Create Monolithic Widgets](#dont-create-monolithic-widgets)
+  - [❌ Don't: Add a catalog relation without reading blueprint schemas](#dont-add-a-catalog-relation-without-reading-blueprint-schemas)
+  - [❌ Don't: Ship without local dev mocks (or with huge fixtures)](#dont-ship-without-local-dev-mocks-or-with-huge-fixtures)
+  - [❌ Don't: Omit README notice when portal links use mock data](#dont-omit-readme-notice-when-portal-links-use-mock-data)
+  - [❌ Don't: Expose relation keys as string plugin params](#dont-expose-relation-keys-as-string-plugin-params)
+  - [❌ Don't: Add a blueprint param when the subject blueprint is fixed](#dont-add-a-blueprint-param-when-the-subject-blueprint-is-fixed)
+  - [❌ Don't: Hardcode Blueprint-Specific Logic](#dont-hardcode-blueprint-specific-logic)
+  - [✅ Do: Design for Extension](#do-design-for-extension)
+  - [❌ Don’t: Shrink the model to avoid catalog work](#dont-shrink-the-model-to-avoid-catalog-work)
+- [Data Persistence — Prefer Port Entities over localStorage](#data-persistence-prefer-port-entities-over-localstorage)
+  - [When to prefer Port](#when-to-prefer-port)
+  - [Use `localStorage` / `sessionStorage` only for:](#use-localstorage-sessionstorage-only-for)
+  - [Saving data to a Port entity property](#saving-data-to-a-port-entity-property)
+  - [Creating a new entity to persist a record](#creating-a-new-entity-to-persist-a-record)
+  - [Designing blueprints for widget-owned data](#designing-blueprints-for-widget-owned-data)
+- [Troubleshooting](#troubleshooting)
+
 ## Anti-Patterns to Avoid
 
 ### ❌ Don't: Use `innerHTML` or `dangerouslySetInnerHTML`
@@ -63,7 +101,7 @@ when the widget could call `GET /v1/blueprints`, `GET /v1/blueprints/{identifier
   }
 }
 ```
-Document default `dueDate`, override behaviour, and validation in README **Widget parameters** and **Prerequisites**.
+Document default `dueDate`, override behaviour, and validation in README **Plugin parameters** and **Prerequisites**.
 
 ### ❌ Don't: Omit Port setup from README prerequisites
 
@@ -75,13 +113,41 @@ Document default `dueDate`, override behaviour, and validation in README **Widge
 
 **Bad:** Blank iframe until data arrives; raw API error JSON; no empty state when search returns zero rows; fixed 400px card in a full-width column; hard-coded colours that ignore Port dark mode.
 
-**Good:** Skeleton or spinner while loading; friendly empty state with next step; actionable error copy (retry, check catalog); flex/grid layout that fills the iframe; `applyThemeCss()` and CSS variables with fallbacks (`var(--text-high, #111827)`). See [UX and UI](scaffolding-and-implementation.md#ux-and-ui) in scaffolding-and-implementation.md.
+**Good:** Skeleton or spinner while loading; friendly empty state with next step; actionable error copy (retry, check catalog); flex/grid layout that fills the iframe; `applyThemeCss()` and CSS variables with fallbacks (`var(--text-high, #111827)`). See [ui-and-styling.md](ui-and-styling.md).
+
+### ❌ Don't: Call hooks after early returns (blank iframe in Port)
+
+**Bad:**
+```tsx
+export function App() {
+  const { portToken, entity } = usePostMessageData();
+  if (!portToken) return <p>Waiting…</p>;
+  const { data } = useQuery({ … }); // hook count changes when token arrives → React crash
+}
+```
+
+**Good:**
+```tsx
+export function App() {
+  const { portToken, entity } = usePostMessageData();
+  const host = resolveHostSubject(entity);
+  const { data, isPending, isLoading } = useQuery({
+    enabled: !!portToken && !!host,
+    …
+  });
+  if (!portToken) return <ShellMessage>Waiting…</ShellMessage>;
+  const showLoading = isPending || isLoading;
+  …
+}
+```
+
+See [production-readiness.md](production-readiness.md) §1–§2 and **`assets/template-App.tsx`**.
 
 ### ❌ Don't: Hand-roll chart UIs when Recharts fits
 
 **Bad:** Custom SVG pie sectors, CSS-only column charts, or canvas drawing for standard bar/line/pie/donut breakdowns and trends.
 
-**Good:** [Recharts](https://recharts.org/) with `ResponsiveContainer`, themed axes/tooltips, and [webpack-port-upload-safety.md](webpack-port-upload-safety.md) applied when the dependency is added. See [Charts and data visualization](scaffolding-and-implementation.md#charts-and-data-visualization).
+**Good:** [Recharts](https://recharts.org/) with `ResponsiveContainer`, themed axes/tooltips, and [webpack-port-upload-safety.md](webpack-port-upload-safety.md) applied when the dependency is added. See [ui-and-styling.md](ui-and-styling.md) (**Charts**).
 
 ### ❌ Don't: Use `:root` accent tokens for decorations
 
@@ -106,7 +172,7 @@ Document default `dueDate`, override behaviour, and validation in README **Widge
 }
 ```
 
-See [Surface vs decoration colors](scaffolding-and-implementation.md#surface-vs-decoration-colors).
+See [ui-and-styling.md](ui-and-styling.md) (**Surface vs decoration colors**).
 
 ### ❌ Don't: Use one palette shade for pill background and text
 
@@ -118,7 +184,7 @@ See [Surface vs decoration colors](scaffolding-and-implementation.md#surface-vs-
 }
 ```
 
-**Good:** Base alias at **300** for strokes/dots; **`-bg`** (100/200) and **`-text`** (600–800) on `:root` for labels — see [Optional palette and shade variants](scaffolding-and-implementation.md#optional-palette-and-shade-variants-root).
+**Good:** Base alias at **300** for strokes/dots; **`-bg`** (100/200) and **`-text`** (600–800) on `:root` for labels — see [ui-and-styling.md](ui-and-styling.md) (**Optional palette**).
 
 ### ❌ Don't: Repeat plugin title, description, or icon in the iframe
 
@@ -198,7 +264,7 @@ Both represent the same concept (comments/discussions) but use different paramet
 
 **Bad:** `npm run dev` shows “Waiting for Port” or blank lists because API modules always `fetch` with a fake token; or `mockData.ts` contains hundreds of copied production entities.
 
-**Good:** Small mocks in `usePostMessageData.ts` + `src/dev/mockData.ts` / `api/` early returns when `DEV_MOCK` — enough to preview loading, empty, and one happy path. See [Local dev mock data](scaffolding-and-implementation.md#local-dev-mock-data-outside-ports-iframe).
+**Good:** Small mocks in `usePostMessageData.ts` + `src/dev/mockData.ts` / `api/` early returns when `DEV_MOCK` — enough to preview loading, empty, and one happy path. See [implementation.md](implementation.md) (**Local dev mocks**).
 
 ### ❌ Don't: Omit README notice when portal links use mock data
 
@@ -222,7 +288,7 @@ Operators must type catalog structure that should live in **blueprint relations*
 2. Document it in README **Prerequisites → Relations**.
 3. At runtime: `entity.relationsObjects.parent`, or `relatedTo` search — relation identifier is a **code constant** aligned with the catalog.
 
-Optional relation override params are **last resort only** — see [Relation string params — do not use by default](scaffolding-and-implementation.md#relation-string-params--do-not-use-by-default).
+Optional relation override params are **last resort only** — see [params-and-relations.md](params-and-relations.md).
 
 ### ❌ Don't: Add a blueprint param when the subject blueprint is fixed
 
@@ -273,7 +339,7 @@ export type PluginConfig = {
 // No subjectRelation param unless documented last-resort override
 ```
 
-Same widget code works across catalogs (task vs bug vs PR) when relations are modeled in Port and resolved from **entity context + search** — not from relation string params; see [Prefer discovering relations](scaffolding-and-implementation.md#prefer-discovering-relations-from-the-entity-or-port-api).
+Same plugin code works across catalogs when relations are modeled in Port and resolved from **entity context + search** — not from relation string params; see [params-and-relations.md](params-and-relations.md).
 
 ### ❌ Don’t: Shrink the model to avoid catalog work
 
@@ -371,7 +437,10 @@ If the widget needs to store records (e.g. comments, bookmarks, reactions):
 | Symptom | Cause | Fix |
 |---------|-------|-----|
 | Blank/dark screen locally | Script runs before DOM ready | Add `inject: "body"` to HtmlWebpackPlugin |
-| Blank screen, no errors | Missing height on html/body | Add `height: 100%` to html, body, #plugin-root |
+| Blank screen, no errors | Missing height on html/body | Add `height: 100%` to html, body, #plugin-root; `#plugin-root` + `.shell` flex — [production-readiness.md](production-readiness.md) §3 |
+| Blank white iframe in Port (no UI at all) | Hooks after `if (!portToken) return` | Move all hooks before early returns; use `enabled` in `useQuery` — [production-readiness.md](production-readiness.md) §1 |
+| Blank while “loading” | Only `isLoading`, not `isPending` | Use `query.isPending \|\| query.isLoading` — [production-readiness.md](production-readiness.md) §2 |
+| Setup message never appears | Strict `params.x.value` / `entity.blueprint` only | Use `template-config.ts` + `template-resolveHostEntity.ts` |
 | "Waiting for Port" message | Running outside iframe without mock | Enable `DEV_MOCK` in usePostMessageData.ts |
 | API calls fail locally | Mock not returning data | Add small fixtures in `src/dev/mockData.ts` and `if (DEV_MOCK) return …` in `api/` modules |
 | Widget works locally but not in Port | DEV_MOCK blocking real data | Ensure DEV_MOCK is false when `window.parent !== window` |

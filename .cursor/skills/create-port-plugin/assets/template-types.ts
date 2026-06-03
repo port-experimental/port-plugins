@@ -10,6 +10,12 @@ export type User = {
   picture?: string;
 };
 
+import type { mergePageFilters } from "@port-labs/plugins-sdk";
+
+export type BlueprintParam = NonNullable<
+  Parameters<typeof mergePageFilters>[2]
+> & { title?: string };
+
 export type Entity = {
   identifier: string;
   title?: string;
@@ -34,5 +40,6 @@ export type Params = Record<string, ParamValue>;
  * Add one field per parameter key defined in upload-params.json.
  */
 export type PluginConfig = {
-  // exampleParam: string;
+  blueprint: BlueprintParam;
+  // Add optional string overrides per upload-params.json
 };

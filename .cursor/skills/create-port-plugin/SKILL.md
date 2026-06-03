@@ -1,7 +1,7 @@
 ---
 name: create-port-plugin
 description: >-
-   Build Port custom plugins and widgets from scratch, or reuse and verify existing ones in the repo, as self-contained React/TypeScript iframe widgets (@port-labs/plugins-sdk, port-plugins-cli) uploaded as Port plugins. Use for greenfield scaffolding, copying/adapting plugins, recommending an existing match, or auditing upload-params.json and per-plugin README. Do not use for Ocean integrations, generic Port admin without plugin code, or blueprint-only catalog work with no widget implementation.
+   Build Port custom plugins from scratch, or reuse and verify existing ones in the repo, as self-contained React/TypeScript iframe plugins (@port-labs/plugins-sdk, port-plugins-cli) uploaded via CLI. Use for greenfield scaffolding, copying/adapting plugins, recommending an existing match, or auditing upload-params.json and per-plugin README. Do not use for Ocean integrations, generic Port admin without plugin code, or blueprint-only catalog work with no plugin implementation.
 metadata:
   title: Create Plugin
 ---
@@ -19,175 +19,173 @@ Platform rules (CSP, upload limits, param metadata), SDK APIs, and CLI behavior 
 
 ## Core principles
 
-Strategic defaults — tactical checklist in **Non-negotiables**; anti-patterns in [guidelines.md](references/guidelines.md).
+Tactical rules in **Non-negotiables**; anti-patterns in [guidelines.md](references/guidelines.md).
 
-1. **Catalog over plugin params** — design and document the catalog first (MCP + README **Prerequisites**). `upload-params.json` only scopes behaviour the API and `PLUGIN_DATA` cannot supply.
-2. **UX and UI matter** — loading, empty, and error states; theme alignment; full-iframe layout. See [scaffolding-and-implementation.md](references/scaffolding-and-implementation.md) (**UX and UI**).
-3. **Safe rendering only** — React text/elements only for dynamic content; no `innerHTML`, `outerHTML`, or `dangerouslySetInnerHTML` (vetted sanitizer only if unavoidable).
-4. **Reuse before creating** — survey repo `README.md` and sibling plugins before scaffolding.
-5. **Relation strategy before params** — pick or add catalog relations first; resolve at runtime via `PLUGIN_DATA.entity` and `entities/search` — not relation-key `string` params by default.
-6. **Runtime via Port API; MCP at design-time only** — `portApiBaseUrl` + token in the iframe; `list_blueprints` / `upsert_blueprint` in the IDE only.
-7. **Charts → Recharts** — when the widget needs bar, line, area, pie, donut, or similar data visualization, prefer **[Recharts](https://recharts.org/)** over hand-rolled SVG/CSS charts. Apply [webpack-port-upload-safety.md](references/webpack-port-upload-safety.md) when adding Recharts. Details: [scaffolding-and-implementation.md](references/scaffolding-and-implementation.md) (**Charts and data visualization**).
+1. **Catalog over plugin params** — design catalog first (MCP + README **Prerequisites**). `upload-params.json` only scopes what API + `PLUGIN_DATA` cannot supply.
+2. **UX and UI matter** — loading, empty, error states; theme; full-iframe layout. [ui-and-styling.md](references/ui-and-styling.md).
+3. **Safe rendering only** — React text/elements; no `innerHTML`, `outerHTML`, or `dangerouslySetInnerHTML`.
+4. **Reuse before creating** — survey repo `README.md` and sibling plugins first.
+5. **Relation strategy before params** — catalog relations first; runtime via `PLUGIN_DATA.entity` and `entities/search` — not relation-key string params by default.
+6. **Runtime via Port API; MCP at design-time only** — `portApiBaseUrl` + token in iframe; MCP in IDE only.
+7. **Charts → Recharts** — bar/line/area/pie/donut viz; apply [webpack-port-upload-safety.md](references/webpack-port-upload-safety.md). [ui-and-styling.md](references/ui-and-styling.md) (**Charts**).
 
 ## Overview
 
-Plugins in this repo are **custom widgets**: each compiles to a single `dist/index.html` (webpack, inlined assets), runs in a Port `<iframe>`, and is registered via the CLI. Use this skill to **reuse** an existing plugin (configure or recommend as-is) or **create** a new one from the bundled templates. Params live in `upload-params.json`; see `assets/` and `references/`.
+Each plugin compiles to **`dist/index.html`** (webpack, inlined assets), runs in a Port `<iframe>`, registers via CLI. **Reuse** an existing plugin or **create** from `assets/` templates.
 
 ## Choose a workflow
 
 | Goal | Follow |
 |------|--------|
-| **Reuse** an existing plugin (exact or superset match — configure, don’t rebuild) | [references/reuse-workflow.md](references/reuse-workflow.md) (stop when a match is found) |
-| **Audit or align** an existing plugin (README, params, SDK, build, upload docs) | [references/readme-and-audit.md](references/readme-and-audit.md) |
-| **Copy, adapt, or scaffold** a new plugin | Steps below → [references/reuse-workflow.md](references/reuse-workflow.md) then [references/scaffolding-and-implementation.md](references/scaffolding-and-implementation.md) |
+| **Reuse** existing plugin (exact/superset — configure, don't rebuild) | [reuse-workflow.md](references/reuse-workflow.md) — stop when matched |
+| **Audit or align** existing plugin | [readme-and-audit.md](references/readme-and-audit.md) |
+| **Copy, adapt, or scaffold** | [reuse-workflow.md](references/reuse-workflow.md) → [scaffolding.md](references/scaffolding.md) |
 
 ## Quick decision tree
 
 ```
-User requests a widget
-        ↓
-Read repo README.md — what widgets exist? (note Version column vs package.json)
-        ↓
-Exact match? → Recommend existing widget; stop
-        ↓
-Similar (60%+)? → Copy & adapt (reuse-workflow.md)
-Else → Scaffold from assets/ (scaffolding-and-implementation.md)
-        ↓
-Query Port catalog via MCP — blueprint, property, and relation strategy (document in README)
-        ↓
-Inspect blueprint schemas — reuse existing relations/properties before adding new relations
-        ↓
-Add or reuse catalog relations; resolve links at runtime from entity + search — no relation string params by default
-        ↓
-Define minimal upload-params.json only after catalog strategy is settled (no params for API-fetchable catalog data)
-        ↓
-Implement with strong UX/UI + safe React rendering → plugin-architecture.md + scaffolding-and-implementation.md
-        ↓
-Document → readme-and-audit.md (per-plugin README §8)
+User request
+  → Read repo README.md (plugins + versions)
+  → Exact match? → Recommend; stop
+  → Similar 60%+? → Copy & adapt (reuse-workflow.md)
+  → Else → Scaffold (scaffolding.md)
+  → MCP catalog + relation strategy → README Prerequisites
+  → Minimal upload-params.json (params-and-relations.md)
+  → Implement (implementation.md + ui-and-styling.md + plugin-architecture.md)
+  → Document (readme-and-audit.md + template-README.md)
+  → Review (guidelines.md)
 ```
 
 ## Step-by-step workflow
 
-### 1. Survey and decide widget strategy
+### 1. Survey and decide
 
-Before scaffolding or editing blueprints:
+1. Read root `README.md` and related plugins' `package.json`, `upload-params.json`, `types.ts`, `App.tsx`.
+2. Choose: **reuse as-is**, **copy & adapt**, **shared params**, or **greenfield scaffold**.
 
-1. Read the project `README.md` (Plugins table: widget link, **Version**, description) and related plugins’ `package.json`, `upload-params.json`, `src/types.ts`, and `src/App.tsx`.
-2. Choose: **reuse as-is**, **copy & adapt**, **new widget with shared params**, or **greenfield scaffold**.
+Details: [reuse-workflow.md](references/reuse-workflow.md) Steps 1–3.
 
-Full decision matrix, checklist, and examples: **[references/reuse-workflow.md](references/reuse-workflow.md)**.
+### 2. Design catalog strategy (MCP, design-time)
 
-### 2. Design catalog strategy (MCP, design-time only)
+Before `upload-params.json`:
 
-With the widget strategy set, inspect the live catalog **before** drafting `upload-params.json`:
+1. `list_blueprints` (summary) → `list_blueprints` with `identifiers` for schemas.
+2. Pick blueprint strategy: existing properties, extend blueprint, or new blueprint.
+3. Inspect **both** source and target schemas before new relations.
+4. Document in README **Prerequisites**; `upsert_blueprint` only when user approves.
 
-1. Call `list_blueprints` (summary) then `list_blueprints` with `identifiers` for full schema on candidates.
-2. Pick: **existing blueprint + existing properties**, **existing + new properties**, or **new blueprint**.
-3. For each cross-blueprint link, **read both source and target blueprint schemas** before proposing a new relation — prefer an existing relation or a property on the target blueprint when it already exposes the data the widget needs.
-4. Explain the choice to the user; document schema changes in the plugin README **Prerequisites** tables.
+**Runtime relation order:** `PLUGIN_DATA.entity` → `relatedTo` search → blueprint GET → optional string override (last resort). [params-and-relations.md](references/params-and-relations.md).
 
-Use `upsert_blueprint` only when the user wants catalog changes applied via MCP. Widget **runtime** code still uses the REST API, not MCP.
+### 3. Scaffold or adapt
 
-**Relation resolution order (runtime):** `PLUGIN_DATA.entity` → `POST .../entities/search` (`relatedTo` / relation rules) → pick unambiguously from `GET /v1/blueprints/{identifier}` using the **designed** relation identifiers → optional string override **only** when the user explicitly needs multi-tenant relation-key variance the catalog cannot normalize. Details: [scaffolding-and-implementation.md](references/scaffolding-and-implementation.md) (**Catalog over plugin params**, **Prefer discovering relations**).
+- Templates: [scaffolding.md](references/scaffolding.md) + [assets/](assets/)
+- Runtime patterns: [implementation.md](references/implementation.md)
+- Host bridge, build, API: [plugin-architecture.md](references/plugin-architecture.md)
+- Layout, naming: [plugin-conventions.md](references/plugin-conventions.md)
 
-### 3. Scaffold or adapt implementation
+### 4. Verify build and production readiness
 
-- **Templates:** copy verbatim/adapt from [assets/](assets/) per [references/scaffolding-and-implementation.md](references/scaffolding-and-implementation.md).
-- **Host bridge, local dev mocks, API calls, search body shape, portal URLs, params, relations, layout, theming:** same reference + [references/plugin-architecture.md](references/plugin-architecture.md).
-- **Repo layout, naming, optional CI upload:** [references/widget-conventions.md](references/widget-conventions.md).
-
-### 4. Verify build and configuration
-
-- `npm run dev` → `http://localhost:9000` (`devServer.port: 9000` in `webpack.config.js`)
-- `npm run build` → artifact `dist/index.html`
-- Webpack `inject: "body"` and root `height: 100%` — [references/plugin-architecture.md](references/plugin-architecture.md) (Critical Webpack/CSS)
-- Entity search: `{ query: { combinator, rules } }` on `POST /v1/blueprints/{blueprint}/entities/search`
-- `applyThemeCss()` when using the SDK
+- `npm run dev` → `http://localhost:9000` (port **9000** always) — UI must be **visible**, not a blank panel
+- `npm run build` → `dist/index.html`
+- Webpack `inject: "body"`; root `height: 100%`; `#plugin-root` flex column — [ui-and-styling.md](references/ui-and-styling.md)
+- Entity search: `{ query: { combinator, rules } }`
+- `applyThemeCss()` on every host path (including Port iframe)
+- **Mandatory:** [production-readiness.md](references/production-readiness.md) — hooks order, query UI states, param/entity resolution
 
 ### 5. Document and ship
 
-- **Bump `package.json` `version` once per branch** when the plugin has functional changes — based on **all** changes on the branch since merge base, **not** once per agent invocation or per feature while building. **New plugins:** stay at **`0.1.0`** for the whole first branch (do not stack `0.2.0`, `0.3.0`, … during development). Workflow: [readme-and-audit.md](references/readme-and-audit.md) (**Versioning — once per branch**, **Greenfield plugin**).
-- Per-plugin **README** (required section order): [references/readme-and-audit.md](references/readme-and-audit.md)
-- Repo-level widgets table row when adding a new plugin (include **Version** from that plugin’s `package.json` `version` field)
-- Canonical **`port-plugins upload`** command — exact flags in [references/readme-and-audit.md](references/readme-and-audit.md) (Setup → Upload); do not invent CLI flags
+- Version bump **once per branch** — [readme-and-audit.md](references/readme-and-audit.md) (**Versioning**)
+- README from `assets/template-README.md` — [readme-and-audit.md](references/readme-and-audit.md)
+- Root Plugins table row with **Version** from `package.json`
+- Canonical upload command in README — no invented CLI flags
 
-### 6. Review anti-patterns and persistence
+### 6. Final review
 
-Before finishing: [references/guidelines.md](references/guidelines.md) (anti-patterns, Port vs `localStorage`, troubleshooting table).
+[guidelines.md](references/guidelines.md) — anti-patterns, persistence, troubleshooting.  
+[production-readiness.md](references/production-readiness.md) — **blank iframe / hooks / layout checklist**.
 
-## Verify
+## Verify (before done)
 
-Before marking the plugin done:
+1. [production-readiness.md](references/production-readiness.md) — all §1–§9 (especially hooks before early returns, `isPending`, iframe layout).
+2. `npm run dev` shows guard or functional UI (not empty white); `npm run build` → `dist/index.html`.
+3. Plugin identifier passes regex (Non-negotiables).
+4. README section order + upload command per [readme-and-audit.md](references/readme-and-audit.md).
+5. Non-negotiables + [guidelines.md](references/guidelines.md) anti-patterns.
+6. If functional changes on branch: **one** version bump; root Plugins **Version** matches.
 
-1. Run `npm run dev` on `http://localhost:9000` and `npm run build` — confirm `dist/index.html` exists.
-2. Validate the plugin identifier against Port’s regex (see **Non-negotiables** → Plugin identifier).
-3. Confirm per-plugin README section order and upload command per [readme-and-audit.md](references/readme-and-audit.md).
-4. Walk the **Non-negotiables** table and [guidelines.md](references/guidelines.md) anti-patterns.
-5. If the branch has functional plugin changes, confirm **`package.json` `version`** was bumped **once for the branch** (not re-bumped every invocation) and the root **`README.md` Plugins** **Version** cell matches — [readme-and-audit.md](references/readme-and-audit.md) (**Versioning — once per branch**).
-
-## Non-negotiables (always apply)
+## Non-negotiables
 
 | Topic | Rule |
 |-------|------|
-| Rendering | **No** `innerHTML`, `outerHTML`, or `dangerouslySetInnerHTML` for dynamic/user content — React text/elements or vetted sanitizer only |
-| UX / UI | Loading, empty, and error states; `applyThemeCss()`; responsive full-iframe layout; accessible controls — treat widgets as product UI |
-| Charts | **Recharts** for bar/line/area/pie/donut and similar viz — not custom SVG/CSS chart implementations unless trivial (e.g. a single progress bar). Webpack upload safety when Recharts is added — [scaffolding-and-implementation.md](references/scaffolding-and-implementation.md) (**Charts**), [webpack-port-upload-safety.md](references/webpack-port-upload-safety.md) |
-| CSS decorations | `:root` = surfaces/text/borders only; optional palette aliases (`--gold`, `--bronze`, …) at **300**; add **`--{hue}-bg`** / **`--{hue}-text`** when pills/badges need visible backgrounds + readable labels — see scaffolding **Optional palette and shade variants** |
-| Runtime vs params | Fetch blueprints, schema, relations, entities via Port API + `PLUGIN_DATA` — **no** params that duplicate that data |
+| Rendering | No `innerHTML` / `outerHTML` / `dangerouslySetInnerHTML` for dynamic content |
+| UX / UI | Loading, empty, error; `applyThemeCss()`; full-iframe layout — [ui-and-styling.md](references/ui-and-styling.md) |
+| Hooks | **All** hooks at top of `App` before any `return`; gate fetches with `enabled` — [production-readiness.md](references/production-readiness.md) §1 |
+| Port iframe | No blank main while loading; `isPending \|\| isLoading`; `#plugin-root` flex + `min-height` on shell — [production-readiness.md](references/production-readiness.md) §2–§3 |
+| Params / entity | `template-config.ts` + `template-resolveHostEntity.ts` for blueprint params and entity pages — [production-readiness.md](references/production-readiness.md) §5–§6 |
+| Charts | Recharts unless trivial; webpack safety — [webpack-port-upload-safety.md](references/webpack-port-upload-safety.md) |
+| CSS | `:root` = surfaces/text/borders; decorations class-local; palette `-bg`/`-text` for pills |
+| Runtime vs params | Fetch catalog via API + `PLUGIN_DATA` — no duplicate params |
 | API host | `portApiBaseUrl` + token for `/v1/...` only |
 | Portal URLs | `getPortalOrigin()` from `document.referrer`; `{origin}/{blueprint}Entity?identifier={id}` |
-| Blueprint params | `type: "blueprint"`; read `.identifier`; max **5** per plugin |
-| Relations | **Schema first:** MCP-inspect source + target blueprints before adding relations. **Catalog:** reuse or add blueprint relations; document in README. **No** relation-key `string` params by default. **Runtime:** `entity.relations` / `relationsObjects` → `relatedTo` search → blueprint GET using designed relation IDs → relation `string` param **only** as documented last-resort override |
-| Local dev | **`devServer.port: 9000`** always (`http://localhost:9000`); **small mocks** in `usePostMessageData.ts` + `src/dev/` or `api/` early returns when `DEV_MOCK` — enough to render loading/empty/happy paths outside Port’s iframe. **Portal links from mock IDs do not work there** — document in README **Local development**; test links in Port **Local development** (iframe) or after deploy |
-| Subject blueprint | If widget targets one blueprint type, use **`PLUGIN_DATA.entity.blueprint`** + design default — skip blueprint param when not needed |
-| Param schema | Every param: **`type`**, **`isRequired`**, **`label`** |
-| Param labels | Short **`label`** in `upload-params.json`; defaults and detail in README **Widget parameters** |
-| README prerequisites | Tables for catalog **and** other Port setup (relations, automations, SSA, integrations, …) — see [readme-and-audit.md](references/readme-and-audit.md) |
+| Blueprint params | `type: "blueprint"`; read `.identifier`; max **5** |
+| Relations | Schema-first MCP; catalog + README; no relation string params by default |
+| Local dev | Port **9000**; small mocks; document mock portal link limits in README |
+| Subject blueprint | `PLUGIN_DATA.entity.blueprint` on entity pages when design default suffices |
+| Param schema | Every param: `type`, `isRequired`, `label` |
+| Param labels | Short in JSON; detail in README **Plugin parameters** |
+| README | Prerequisites tables before params — [readme-and-audit.md](references/readme-and-audit.md) |
 | Search | Nested `query`; not top-level `combinator`/`rules` |
-| Dashboard page filters | On `POST .../entities/search` with a `query`, merge `page.pageFilters` via **`mergePageFilters`**; pass the **full blueprint** from **`params.blueprint.value`** as the third argument (not `{ identifier }` only) — [plugin-architecture.md](references/plugin-architecture.md) |
+| Page filters | `mergePageFilters` with **full** blueprint object — [plugin-architecture.md](references/plugin-architecture.md) |
 | Errors | Include full response body text |
-| Iframe UI | Full width/height; **no** plugin title, description, or icon inside the iframe |
-| Icons | icon library; **never** hardcoded emoji |
-| Plugin identifier | `PLUGIN_IDENTIFIER_REGEX` — validate `--identifier` (and folder name when aligned) **before** every `port-plugins upload`; reject `.`, `..`, spaces, and other disallowed characters |
-| Persistence | Port entities/properties unless explicitly local-only UI state |
-| Upload CLI | `port-plugins upload` with **`--file`**, **`--identifier`**, **`--title`**, **`--params`**, **`--description`**, **`--upsert`** only — see [readme-and-audit.md](references/readme-and-audit.md) |
-| Versioning | **Once per git branch** per plugin: bump from merge-base semver using **cumulative** changes — **not** per agent run or per feature. **Greenfield:** **`0.1.0`** for the entire first branch until publish/merge; see [readme-and-audit.md](references/readme-and-audit.md) (**Versioning — once per branch**, **Greenfield plugin**) |
+| Iframe UI | Full width/height; no duplicate plugin title/description/icon |
+| Icons | Icon library; never emoji |
+| Plugin identifier | Validate `--identifier` against regex before upload |
+| Persistence | Port entities unless explicitly local-only UI — [guidelines.md](references/guidelines.md) |
+| Upload CLI | `--file`, `--identifier`, `--title`, `--params`, `--description`, `--upsert` only |
+| Versioning | Once per branch; greenfield stays `0.1.0` — [readme-and-audit.md](references/readme-and-audit.md) |
 
 ## Reference index
 
-| File | Contents |
-|------|----------|
-| [reuse-workflow.md](references/reuse-workflow.md) | Reuse steps 1–5, blueprint matrix, checklist, adapt vs create, code-reuse patterns |
-| [scaffolding-and-implementation.md](references/scaffolding-and-implementation.md) | Templates, `App.tsx` implementation, params, relations, code layout, **charts (Recharts)**, **optional palette + `-bg`/`-text` variants** |
-| [readme-and-audit.md](references/readme-and-audit.md) | Auditing existing plugins, PR checklist, per-plugin README §8 |
-| [plugin-architecture.md](references/plugin-architecture.md) | postMessage, `PLUGIN_DATA`, API, theming, build/deploy, local dev |
-| [webpack-port-upload-safety.md](references/webpack-port-upload-safety.md) | `globalObject` / lodash shim — **required with Recharts**; also when upload rejects `Function` |
-| [widget-conventions.md](references/widget-conventions.md) | Directory layout, naming, optional automation |
-| [guidelines.md](references/guidelines.md) | Anti-patterns, data persistence, troubleshooting |
+Reference files **over 100 lines** must start with a **`## Table of contents`** (after the title) listing all major sections — so partial reads still show full scope.
 
-## Tools reference (design-time)
+| File | Read when |
+|------|-----------|
+| [reuse-workflow.md](references/reuse-workflow.md) | Deciding reuse vs adapt vs scaffold; catalog MCP steps |
+| [scaffolding.md](references/scaffolding.md) | Copying templates; code layout; local verify |
+| [implementation.md](references/implementation.md) | API calls, search, portal links, mocks, safe rendering |
+| [params-and-relations.md](references/params-and-relations.md) | `upload-params.json`; relation resolution; blueprint params |
+| [ui-and-styling.md](references/ui-and-styling.md) | UX, layout, CSS, Recharts, scrollbars |
+| [plugin-architecture.md](references/plugin-architecture.md) | postMessage, `PLUGIN_DATA`, mergePageFilters, build, deploy |
+| [readme-and-audit.md](references/readme-and-audit.md) | Audit, versioning, PR checklist, README standard |
+| [plugin-conventions.md](references/plugin-conventions.md) | Naming, repo layout, optional CI upload |
+| [guidelines.md](references/guidelines.md) | Anti-patterns, persistence, troubleshooting |
+| [production-readiness.md](references/production-readiness.md) | **Mandatory** before done — hooks, layout, query states, Port smoke test |
+| [webpack-port-upload-safety.md](references/webpack-port-upload-safety.md) | Recharts / lodash upload fixes |
 
-Use Port MCP while planning the widget and catalog — **not** from widget runtime code.
+## MCP tools (design-time only)
 
 | Tool | Purpose |
 |------|---------|
-| `list_blueprints` | Discover blueprints; pass `identifiers` for full property/relation schemas |
-| `upsert_blueprint` | Create or extend blueprints when the user approves catalog changes |
-| `list_entities` | Sample entities to validate identifiers and property shapes |
-| `upsert_entity` | Rare during widget work; seed or fix test data if needed |
+| `list_blueprints` | Discover schemas; pass `identifiers` for full detail |
+| `upsert_blueprint` | Create/extend blueprints when user approves |
+| `list_entities` | Sample entities for validation |
+| `upsert_entity` | Rare — seed test data |
 
 ## Assets
 
-Scaffold copies from `assets/` (skill root; in this repo also `.cursor/skills/create-port-plugin/assets/`):
+From `.cursor/skills/create-port-plugin/assets/`:
 
 | Template | Destination |
 |----------|-------------|
-| `template-webpack.config.js` | `<widget>/webpack.config.js` |
-| `webpack/lodash-root-shim.js` | `<widget>/webpack/lodash-root-shim.js` — **required** when using Recharts; see [webpack-port-upload-safety.md](references/webpack-port-upload-safety.md) |
-| `template-tsconfig.json` | `<widget>/tsconfig.json` |
-| `template-index.html` | `<widget>/src/index.html` |
-| `template-index.tsx` | `<widget>/src/index.tsx` |
-| `template-usePostMessageData.ts` | `<widget>/src/hooks/usePostMessageData.ts` |
-| `template-useScrollMirror.ts` | `<widget>/src/hooks/useScrollMirror.ts` (optional; wide tables with bottom horizontal scrollbar) |
-| `template-package.json` | `<widget>/package.json` (adapt `name`) |
-| `template-App.tsx`, `template-App.css`, `template-types.ts`, `template-upload-params.json` | Adapt under `<widget>/src/` and root |
+| `template-webpack.config.js` | `<plugin>/webpack.config.js` |
+| `webpack/lodash-root-shim.js` | `<plugin>/webpack/` — required with Recharts |
+| `template-tsconfig.json` | `<plugin>/tsconfig.json` |
+| `template-index.html` | `<plugin>/src/index.html` |
+| `template-index.tsx` | `<plugin>/src/index.tsx` |
+| `template-usePostMessageData.ts` | `<plugin>/src/hooks/usePostMessageData.ts` |
+| `template-useScrollMirror.ts` | `<plugin>/src/hooks/useScrollMirror.ts` (optional) |
+| `template-package.json` | `<plugin>/package.json` |
+| `template-App.tsx`, `template-App.css`, `template-types.ts`, `template-upload-params.json` | Adapt under `<plugin>/` |
+| `template-config.ts` | `<plugin>/src/utils/config.ts` — blueprint/string param readers |
+| `template-resolveHostEntity.ts` | `<plugin>/src/utils/resolveHostEntity.ts` — **entity-page** widgets |
+| `template-README.md` | `<plugin>/README.md` — [readme-and-audit.md](references/readme-and-audit.md) |
