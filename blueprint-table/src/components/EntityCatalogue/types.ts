@@ -26,6 +26,5 @@ export interface Column {
 export interface Tab {
   id: string;    // 'all' or a blueprint identifier
   label: string;
-  icon?: string;
   count: number;
 }

@@ -81,8 +81,6 @@
   border-bottom-color: var(--ec-accent);
   font-weight: 600;
 }
-.ec-tabbar__tab-icon { font-size: 1rem; line-height: 1; }
-
 .ec-tabbar__badge {
   background: var(--ec-accent-bg);
   color: var(--ec-accent-text);
@@ -309,7 +307,6 @@
   text-underline-offset: 3px;
 }
 .ec-table__blueprint { display: flex; align-items: center; gap: 6px; }
-.ec-table__bp-icon   { font-size: 1rem; line-height: 1; }
 .ec-table__title     { font-weight: 600; }
 .ec-table__date      { color: var(--ec-text-muted); font-size: 0.8rem; }
 .ec-table__num       { color: var(--ec-num-color); font-weight: 500; font-variant-numeric: tabular-nums; }

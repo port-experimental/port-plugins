@@ -201,11 +201,6 @@
   gap: 8px;
   margin-bottom: 7px;
 }
-.entity-node__icon {
-  font-size: 18px;
-  flex-shrink: 0;
-  line-height: 1;
-}
 .entity-node__title-group {
   min-width: 0;
 }

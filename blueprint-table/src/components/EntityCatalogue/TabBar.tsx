@@ -28,7 +28,6 @@ export function TabBar({
             className={`ec-tabbar__tab${tab.id === activeTab ? ' ec-tabbar__tab--active' : ''}`}
             onClick={() => onSelect(tab.id)}
           >
-            {tab.icon && <span className="ec-tabbar__tab-icon">{tab.icon}</span>}
             {tab.label}
             <span className="ec-tabbar__badge">{tab.count}</span>
           </button>

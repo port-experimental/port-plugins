@@ -49,7 +49,6 @@ function renderCell(
     const bp = blueprintMap[String(value ?? '')];
     return (
       <span className="ec-table__blueprint">
-        {bp?.icon && <span className="ec-table__bp-icon">{bp.icon}</span>}
         {bp?.title ?? String(value ?? '—')}
       </span>
     );

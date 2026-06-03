@@ -128,7 +128,6 @@ export function EntityCatalogue() {
     ...selectedBlueprints.map(bp => ({
       id:    bp.identifier,
       label: bp.title || bp.identifier,
-      icon:  bp.icon,
       count: allEntities.filter(e => e.blueprint === bp.identifier).length,
     })),
   ], [selectedBlueprints, allEntities]);
