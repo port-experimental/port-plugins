@@ -16,6 +16,9 @@ export function getEntityPropertyValue(
   const nested = entity.properties?.[propertyId];
   if (nested !== undefined) return nested;
 
+  const mirrored = entity.mirrorProperties?.[propertyId];
+  if (mirrored !== undefined) return mirrored;
+
   const top = entity as Record<string, unknown>;
   if (propertyId in top) return top[propertyId];
 

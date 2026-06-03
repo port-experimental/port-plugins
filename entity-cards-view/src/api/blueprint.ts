@@ -49,16 +49,19 @@ function resolvePropertyKind(
   return { kind: "default" };
 }
 
-export function extractBlueprintProperties(
-  blueprintPayload: unknown
+function propertyTitle(
+  def: Record<string, unknown> | undefined,
+  identifier: string
+): string {
+  return typeof def?.title === "string" && def.title.trim()
+    ? def.title.trim()
+    : identifier;
+}
+
+function extractSchemaBlueprintProperties(
+  schema: Record<string, unknown>
 ): BlueprintPropertyMeta[] {
-  const bp = pickBlueprintRecord(blueprintPayload);
-  if (!bp) return [];
-
-  const schema = bp.schema;
-  if (!schema || typeof schema !== "object") return [];
-
-  const properties = (schema as Record<string, unknown>).properties;
+  const properties = schema.properties;
   if (!properties || typeof properties !== "object") return [];
 
   const reserved = new Set(["$identifier", "$title", "$team", "$icon"]);
@@ -69,18 +72,53 @@ export function extractBlueprintProperties(
       const { kind, enumValues } = resolvePropertyKind(def ?? {});
       return {
         identifier,
-        title:
-          typeof def?.title === "string" && def.title.trim()
-            ? def.title.trim()
-            : identifier,
+        title: propertyTitle(def, identifier),
         type: typeof def?.type === "string" ? def.type : undefined,
         kind,
         ...(enumValues ? { enumValues } : {}),
       };
-    })
-    .sort((a, b) =>
-      a.title.localeCompare(b.title, getI18nLocale(), { sensitivity: "base" })
-    );
+    });
+}
+
+function extractMirrorBlueprintProperties(
+  mirrorProperties: unknown
+): BlueprintPropertyMeta[] {
+  if (!mirrorProperties || typeof mirrorProperties !== "object") return [];
+
+  return Object.entries(
+    mirrorProperties as Record<string, Record<string, unknown>>
+  ).map(([identifier, def]) => ({
+    identifier,
+    title: propertyTitle(def, identifier),
+    kind: "default" as const,
+  }));
+}
+
+export function extractBlueprintProperties(
+  blueprintPayload: unknown
+): BlueprintPropertyMeta[] {
+  const bp = pickBlueprintRecord(blueprintPayload);
+  if (!bp) return [];
+
+  const schema = bp.schema;
+  const schemaProps =
+    schema && typeof schema === "object"
+      ? extractSchemaBlueprintProperties(schema as Record<string, unknown>)
+      : [];
+
+  const byId = new Map<string, BlueprintPropertyMeta>();
+  for (const prop of schemaProps) {
+    byId.set(prop.identifier, prop);
+  }
+  for (const prop of extractMirrorBlueprintProperties(bp.mirrorProperties)) {
+    if (!byId.has(prop.identifier)) {
+      byId.set(prop.identifier, prop);
+    }
+  }
+
+  return [...byId.values()].sort((a, b) =>
+    a.title.localeCompare(b.title, getI18nLocale(), { sensitivity: "base" })
+  );
 }
 
 export async function fetchBlueprintProperties(

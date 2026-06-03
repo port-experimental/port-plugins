@@ -4,6 +4,9 @@ A [Port](https://app.getport.io) custom widget for **dashboard** pages. Pick a b
 
 Dashboard **page filters** are merged into entity search when present.
 
+## Preview image
+
+
 ## Features
 
 - **Blueprint** parameter to scope entities

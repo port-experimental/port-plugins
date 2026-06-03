@@ -12,6 +12,11 @@ export const MOCK_BLUEPRINT_PROPERTIES: BlueprintPropertyMeta[] = [
   { identifier: "language", title: "Language", type: "string", kind: "default" },
   { identifier: "on_call", title: "On-call", type: "string", kind: "default" },
   {
+    identifier: "team_name",
+    title: "Team name",
+    kind: "default",
+  },
+  {
     identifier: "status",
     title: "Status",
     type: "string",
@@ -42,6 +47,7 @@ export const MOCK_ENTITIES_PAGE: PortEntity[] = [
       tags: ["payments", "critical", "pci"],
       language: "TypeScript",
       on_call: "payments-oncall",
+      team_name: "Payments Squad",
       status: "In Progress",
       issue_type: "Story",
       enabled: true,

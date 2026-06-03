@@ -18,6 +18,8 @@ export type PortEntity = {
   icon?: string;
   blueprint?: string;
   properties?: Record<string, unknown>;
+  /** Present on some API responses when mirror values are not inlined in `properties`. */
+  mirrorProperties?: Record<string, unknown>;
   relations?: Record<string, unknown>;
 };
 
