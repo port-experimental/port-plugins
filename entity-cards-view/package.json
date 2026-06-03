@@ -1,6 +1,6 @@
 {
   "name": "port-entity-cards-view-plugin",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "Paginated entity cards with search and configurable properties — Port custom widget",
   "engines": {

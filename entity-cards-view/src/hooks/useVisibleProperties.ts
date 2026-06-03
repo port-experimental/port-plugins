@@ -119,6 +119,20 @@ export function useVisibleProperties(
     [visibleIds, setVisiblePropertyIds]
   );
 
+  const reorderVisibleProperties = useCallback(
+    (activeId: string, overId: string) => {
+      const from = visibleIds.indexOf(activeId);
+      const to = visibleIds.indexOf(overId);
+      if (from === -1 || to === -1 || from === to) return;
+
+      const next = [...visibleIds];
+      const [removed] = next.splice(from, 1);
+      next.splice(to, 0, removed);
+      setVisiblePropertyIds(next);
+    },
+    [visibleIds, setVisiblePropertyIds]
+  );
+
   const setArrayDisplayMode = useCallback(
     (propertyId: string, mode: ArrayDisplayMode) => {
       const prop = available.find((p) => p.identifier === propertyId);
@@ -168,6 +182,7 @@ export function useVisibleProperties(
     getBooleanDisplayModeForProperty,
     setVisiblePropertyIds,
     toggleProperty,
+    reorderVisibleProperties,
     setArrayDisplayMode,
     setBooleanDisplayMode,
     isLoading: schemaQuery.isLoading,

@@ -12,14 +12,14 @@ Dashboard **page filters** are merged into entity search when present.
 - **Blueprint** parameter to scope entities
 - **Search** by entity title and property values (e.g. typing `active` finds entities whose Status is `active`; case-insensitive)
 - **Pagination** (12 entities per page) with previous/next controls
-- **Manage properties** — toggle which blueprint properties show on cards; selection persists in browser `localStorage` per blueprint
+- **Manage properties** — Port-style **Shown** / **Hidden** lists with search, drag-and-drop order for card properties, and per-blueprint **array** (count vs list items) and **boolean** (pill vs labeled) display options; persisted in browser `localStorage`
 - Scrollable card grid with Port-style surfaces, borders, and typography
 - Entity titles use neutral text (not accent-colored); links open the Port entity page
 - **Booleans** render as labeled rows by default (property name + status pill), or as footer pills only when configured in **Manage properties**; **enums** and sentiment fields (e.g. Status, Type, Priority) render as colored pills in the property list
-- **Arrays** show a numeric count only (e.g. `3`)
+- **Arrays** — default to count on cards; switch to list items in **Manage properties**
 - **Refresh** in the toolbar and on each card
 - **Multilingual UI** (en, he, fr, de, es, pt) — follows Port user locale when provided, else browser language; RTL for Hebrew
-- **Sentiment colors** for status-like values work across languages (entity values are shown as stored in Port, not translated)
+- **Coordinated enum colors** — the same value gets the same pill color on every property (e.g. `active` and `Automatic` are green, `inactive` is red, `Approval Required` is orange); works across languages (values are shown as stored in Port, not translated)
 - Loading, empty, and error states
 - Port theme via `@port-labs/plugins-sdk` (`applyThemeCss`)
 - Icons via [lucide-react](https://lucide.dev/)
