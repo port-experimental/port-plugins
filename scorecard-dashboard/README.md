@@ -4,9 +4,7 @@ A scorecard compliance dashboard widget for [Port](https://app.port.io) dashboar
 
 ## Preview image
 
-<!-- Add a screenshot here once the widget is running in your Port environment.
-     Upload the image to a GitHub issue or PR, then replace this comment with:
-     <img alt="Scorecard Dashboard widget" src="https://github.com/user-attachments/assets/..." /> -->
+<img alt="Scorecard Dashboard widget" src="assets/preview.png" />
 
 ## Features
 

@@ -2,6 +2,10 @@
 
 An interactive dependency graph widget for [Port](https://app.port.io) entity pages. Performs a BFS traversal of an entity's relations up to a configurable depth and renders the result as a zoomable, pannable flow graph using ReactFlow and a Dagre layout engine.
 
+## Preview image
+
+<img alt="Dependency Tree widget" src="assets/preview.png" />
+
 ## Features
 
 - BFS traversal downstream (dependencies) and optionally upstream (dependents)
@@ -61,7 +65,7 @@ npm run build   # output: dist/index.html
 ```bash
 port-plugins upload \
   --file dist/index.html \
-  --identifier dependency-tree \
+  --identifier dependency-tree-port-plugin \
   --title "Dependency Tree" \
   --params "$(cat upload-params.json)" \
   --upsert
