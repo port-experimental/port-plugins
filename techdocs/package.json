@@ -1,6 +1,6 @@
 {
   "name": "port-techdocs-widget-plugin",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "TechDocs Viewer — Port custom widget for browsing repository documentation",
   "engines": {

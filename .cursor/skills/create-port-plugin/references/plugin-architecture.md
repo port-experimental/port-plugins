@@ -120,6 +120,68 @@ const res = await fetch(
 > - Using the generic `/v1/entities/search` endpoint instead of the
 >   blueprint-scoped version above.
 
+### Dashboard page filters (`mergePageFilters`)
+
+On **dashboard** pages, Port passes active page filters on **`PLUGIN_DATA.page.pageFilters`**
+(access via `usePortPluginData().page` or the `usePostMessageData` template wrapper). When the
+widget searches entities with a **`query`** body, merge those filters into the widget query —
+do **not** ignore them and do **not** hand-roll AND rules.
+
+Use **`mergePageFilters`** from **`@port-labs/plugins-sdk`**:
+
+| Argument | Source |
+|----------|--------|
+| `widgetQuery` | Your widget’s base search query (`{ combinator, rules }`) |
+| `pageQuery` | `page?.pageFilters` (cast to `PageQuery[]` when typing) |
+| `blueprint` | **Required when merging page filters** — the **full blueprint object** for the searched blueprint (see below) |
+
+The third argument lets the SDK keep only page rules for that blueprint (and dashboard-wide
+filters). Without it, page filters may not apply correctly.
+
+**Pass the full blueprint object — not `{ identifier }` alone.** Port’s `type: "blueprint"`
+widget param delivers a blueprint record on **`PLUGIN_DATA.params.<key>.value`** (includes
+`identifier`, `title`, and fields such as **`ownership`** when present). Preserve that object in
+`readBlueprintParam` / `PluginConfig` and pass it to `mergePageFilters`. If you pass only
+`{ identifier }`, the SDK treats the blueprint as having no `ownership` and **drops `$team` page
+filters** even when the host sent them.
+
+Use **`GET /v1/blueprints/{identifier}`** for the third argument only when the widget has **no**
+blueprint param (rare) or you already fetch the schema for other reasons — do not add a blueprint
+GET solely to satisfy `mergePageFilters` when the param object is already available.
+
+```ts
+import { mergePageFilters, type PageQuery } from '@port-labs/plugins-sdk';
+import type { PluginConfig } from './types';
+
+let widgetQuery = { combinator: 'and' as const, rules: [] as unknown[] };
+
+if (page?.pageFilters) {
+  widgetQuery = mergePageFilters(
+    widgetQuery,
+    page.pageFilters as PageQuery[],
+    config.blueprint // full object from params.blueprint.value — not { identifier } only
+  );
+}
+
+const res = await fetch(
+  `${portApiBaseUrl}/v1/blueprints/${encodeURIComponent(config.blueprint.identifier)}/entities/search`,
+  {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${portToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ query: widgetQuery, limit: 100 }),
+  }
+);
+```
+
+**Hook wiring:** pass `page` from the host bridge into your data hook and include `page?.pageFilters`
+in the React Query `queryKey` so results refetch when dashboard filters change.
+
+**Entity pages:** `page.pageFilters` is usually empty — call `mergePageFilters` only when
+`page?.pageFilters` is present.
+
 ### GET all entities (simpler, no filtering)
 
 ```ts
@@ -263,7 +325,7 @@ body {
 3. **Separate decorations from surfaces** — `:root` aliases are for **backgrounds, body text, and borders**. UI **decorations** (dots, badges, accent labels, entity links, chart marks) should define **class-local** color variables with a hex fallback (e.g. `--day-dot-color: #2563eb`), not a global `--accent` tied to `var(--primary)`. Marked/highlighted **cell backgrounds** may use `color-mix` on a local token on that class. Full pattern: [scaffolding-and-implementation.md — Surface vs decoration colors](scaffolding-and-implementation.md#surface-vs-decoration-colors).
 
 4. **Avoid fighting the host** — Prefer Port tokens over `prefers-color-scheme`
-   blocks that hard-code a second palette; when embedded, **`theme.css`** should
+   blocks that hard-code a second palette; when embedded, the **host-injected theme** should
    drive light/dark.
 
 ### Widgets without the SDK
@@ -423,7 +485,7 @@ const apply = (next: Data) => {
 ## Build Requirements
 
 - Output **must be a single self-contained `dist/index.html`** — all JS and CSS inlined
-- Use `InlineChunkHtmlPlugin` from `react-dev-utils` in the webpack config (see `.cursor/skills/create-port-plugin/assets/template-webpack.config.js`)
+- Use `InlineChunkHtmlPlugin` from `react-dev-utils` in the webpack config (see `assets/template-webpack.config.js`)
 - No external CDN/asset requests from the built file — Port hosts it
 
 ### Critical Webpack Configuration
@@ -441,6 +503,10 @@ new HtmlWebpackPlugin({
 ```
 
 Without this, the inlined script executes before `#plugin-root` exists, causing a blank screen.
+
+### Port upload — optional `Function` / lodash fixes
+
+Port may reject uploads whose bundle contains the `Function` constructor. The **default template webpack config does not include workarounds** — apply **[webpack-port-upload-safety.md](webpack-port-upload-safety.md)** whenever the widget uses **Recharts** (preferred chart library; see [Charts and data visualization](scaffolding-and-implementation.md#charts-and-data-visualization)), or when upload fails / the built HTML contains `Function("return this")` from lodash via other chart libs.
 
 ### Critical CSS Configuration
 
@@ -472,12 +538,13 @@ npm install -g @port-labs/port-plugins-cli
 # Configure credentials (interactive — needs Port client ID + secret)
 port-plugins config
 
-# Upload or update a plugin
+# Upload or update a plugin (canonical flags only — see readme-and-audit.md)
 port-plugins upload \
   --file dist/index.html \
-  --identifier your-widget-name \
-  --title "Your Widget Title" \
+  --identifier <your-widget-name> \
+  --title "<plugin title in Port>" \
   --params "$(cat upload-params.json)" \
+  --description "<short plugin description>" \
   --upsert
 ```
 

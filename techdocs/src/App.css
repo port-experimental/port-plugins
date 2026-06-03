@@ -938,7 +938,8 @@ body {
   color: var(--doc-prose-heading);
 }
 
-.doc-content a {
+.doc-content a,
+.doc-content .doc-inline-link {
   color: var(--blue);
   text-decoration: none;
   font-weight: 500;
@@ -946,9 +947,30 @@ body {
   transition: border-color 0.12s, color 0.12s;
 }
 
-.doc-content a:hover {
+.doc-content .doc-inline-link {
+  display: inline;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+  background: none;
+  border: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--blue) 45%, transparent);
+  border-radius: 0;
+  cursor: pointer;
+  text-align: inherit;
+}
+
+.doc-content a:hover,
+.doc-content .doc-inline-link:hover {
   border-bottom-color: var(--blue);
   color: var(--blue-hover);
+}
+
+.doc-content .doc-inline-link:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
 }
 
 .doc-content blockquote {

@@ -110,10 +110,15 @@ export function Calendar({
                 hasEntities && onSelectDate(cell.dateKey, cell.entities)
               }
               aria-label={
-                hasEntities
-                  ? `${cell.date.getDate()}, ${cell.entities.length} entities`
-                  : `${cell.date.getDate()}`
+                cell.dateKey === todayKey
+                  ? hasEntities
+                    ? `Today, ${cell.date.getDate()}, ${cell.entities.length} entities`
+                    : `Today, ${cell.date.getDate()}`
+                  : hasEntities
+                    ? `${cell.date.getDate()}, ${cell.entities.length} entities`
+                    : `${cell.date.getDate()}`
               }
+              aria-current={cell.dateKey === todayKey ? "date" : undefined}
             >
               <span className="day-number">{cell.date.getDate()}</span>
               {hasEntities && (

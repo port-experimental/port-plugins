@@ -30,7 +30,8 @@ Copy these from `.cursor/skills/create-port-plugin/assets/` — do not modify th
 | Source | Destination | Changes needed |
 |--------|------------|----------------|
 | `template-package.json` | `<widget>/package.json` | Update `name` to `port-<widget-name>-plugin`, update `description` |
-| `template-App.css` | `<widget>/src/App.css` | Customize styles |
+| `template-App.css` | `<widget>/src/App.css` | Customize styles; includes thin scrollbars (`.shell`, `.scroll-area`) and optional wide-table pattern (`.table-scroll` / `.table-area` / `.scroll-mirror`) — see **Thin scrollbars** below |
+| `template-useScrollMirror.ts` | `<widget>/src/hooks/useScrollMirror.ts` | **Optional** — only when using the table + bottom horizontal mirror pattern |
 | `template-App.tsx` | `<widget>/src/App.tsx` | Implement widget logic |
 | `template-types.ts` | `<widget>/src/types.ts` | Add fields to `PluginConfig` matching your params |
 | `template-upload-params.json` | `<widget>/upload-params.json` | Define widget parameters |
@@ -81,7 +82,7 @@ In `App.tsx`:
 
 **Runtime data — use the Port API only.** For every live read or write (search entities, get entity by identifier, create/update entities, relations, scores, or any other Port-backed data), call the **Port REST API** with `Authorization: Bearer ${portToken}` and base URL `portApiBaseUrl` from the SDK. Centralize calls in `api/` modules; keep TanStack React Query in hooks with `enabled: !!portToken && !!portApiBaseUrl`. Do not use MCP from widget code, and do not bake in static catalog dumps from planning time as if they were live data.
 
-- When search results must respect **dashboard page filters**, merge with **`mergePageFilters`** from **`@port-labs/plugins-sdk`** (see npm docs).
+- When search results must respect **dashboard page filters**, use **`mergePageFilters`** from **`@port-labs/plugins-sdk`** on the widget’s `query` (see [plugin-architecture.md](plugin-architecture.md) — **Dashboard page filters**). Pass **`page.pageFilters`** and the **full blueprint object** from **`params.blueprint.value`** as the third argument — not optional when page filters are present. Do **not** pass `{ identifier }` only.
 - Remove the entity guard block if the widget is for dashboards (not entity pages).
 
 #### Responsive layout
@@ -128,6 +129,28 @@ Widgets are embedded product UI — not internal admin tools. **Prioritize UX** 
 
 Extract reusable shells: `LoadingState.tsx`, `EmptyState.tsx`, `ErrorBanner.tsx` under `components/` when the widget has more than one view.
 
+#### Charts and data visualization
+
+When the widget shows **quantitative breakdowns, trends, or distributions** (bars, columns, lines, areas, pie, donut, stacked series), **prefer [Recharts](https://recharts.org/)** (`recharts` on npm) instead of hand-rolled SVG paths, CSS-only bar charts, or ad hoc canvas.
+
+| Use Recharts | Hand-roll only when |
+|--------------|---------------------|
+| Bar/column (horizontal or vertical), line, area, pie, donut, composed charts | A single progress bar, sparkline, or one static bar with no axes/legend/tooltip |
+| Multiple chart types behind a view toggle | Recharts would materially exceed upload size *and* the viz is trivial |
+
+**Implementation checklist:**
+
+1. **Dependency** — add `"recharts": "^2.15.0"` (align with [`entity-timeline`](../../../../entity-timeline/package.json) / [`blueprint-field-types`](../../../../blueprint-field-types/package.json) in this repo unless a newer major is explicitly chosen).
+2. **Webpack** — apply **[webpack-port-upload-safety.md](webpack-port-upload-safety.md)** when adding Recharts (copy `assets/webpack/lodash-root-shim.js`, `globalObject: "self"`, lodash replacement, `DefinePlugin`). Do this **proactively** with Recharts, not only after a failed upload.
+3. **Layout** — wrap charts in `<ResponsiveContainer width="100%" height={…}>`; height may scale with series count for horizontal bar charts.
+4. **Theming** — axis/grid `stroke` and tick `fill` use Port CSS variables (`var(--muted)`, `var(--border)`); series colors via `Cell` `fill` from a small palette (Port `--color-*-300` tokens + hex fallbacks). Custom `<Tooltip content={…} />` styled like `--card` / `--border`.
+5. **UX** — keep loading/empty/error around the chart; tooltips show human-readable labels and counts; optional view toggle (bars / columns / pie / donut) when operators benefit.
+6. **README** — mention Recharts in **Features**; note upload-safety webpack files under **Troubleshooting** if applicable.
+
+**Repo references:** [`entity-timeline`](../../../../entity-timeline/) (line/time series), [`blueprint-field-types`](../../../../blueprint-field-types/) (bar/column/pie/donut + view toggle).
+
+Do **not** add Chart.js, D3-only, or heavy viz stacks unless the user explicitly requires them and Recharts cannot meet the need.
+
 #### Surface vs decoration colors
 
 Port’s injected theme drives **backgrounds and typography**. Widget **decorations** should not reuse those semantic aliases for non-surface UI — otherwise a host `--primary` or dark-mode tweak can make dots, links, and badges clash with adjacent surfaces.
@@ -167,6 +190,57 @@ Port’s injected theme drives **backgrounds and typography**. Widget **decorati
 ```
 
 When several decorations share one hue, repeat the same fallback hex on each class (or scope a **component block** e.g. `.calendar { --event-blue: #2563eb; }` and reference `--event-blue` only inside that block — still **not** on `:root` as a global accent). See `assets/template-App.css` (`.example-dot`, `.example-link`) and `entity-calendar/src/App.css`.
+
+#### Thin scrollbars
+
+`template-App.css` ships scrollbar styling aligned with Port catalogue tables:
+
+| Class | Use |
+|-------|-----|
+| `.shell` | Main iframe vertical scroll — `overflow-x: hidden`, thin 6px thumb via `--text-faint` |
+| `.scroll-area` | Any other scrollable panel (errors, sidebars) — same thin thumb |
+| `.table-scroll` + `.table-area` + `.table-area__body` + `.scroll-mirror` | Wide tables: **one** vertical bar on `.table-area`, **one** horizontal bar on `.scroll-mirror` only |
+
+Do **not** put `overflow-x: scroll` on the same node as the mirror — Chromium will draw two horizontal bars. The split layout hides horizontal scrollbars on `.table-area__body` and syncs scroll position with the mirror.
+
+Copy `template-useScrollMirror.ts` → `src/hooks/useScrollMirror.ts` when using the table pattern. Reference: `ai-invocation-stats` (`UserStatsTable.tsx`).
+
+#### Optional palette and shade variants (`:root`)
+
+After surfaces, `App.css` may define a **shared optional palette** on `:root` — still **not** a global `--accent`. These are **short aliases** to Port **`--color-*`** tokens the host injects via **`applyThemeCss()`**. Provide a **fallback hex** in each `var(...)` for local dev.
+
+**Default shade for the base alias:** use **`--color-{hue}-300`** (readable strokes, dots, chart series, icon tint):
+
+```css
+--gold: var(--color-gold-300, #eec355);
+--bronze: var(--color-bronze-300, #eb977d); /* Port has bronze; not every hue has -50/-100 */
+```
+
+**Infer `-bg` and `-text` when the UI needs pills, badges, or status labels** on white/neutral cards (`--card`). Do **not** use `color-mix(…, var(--card))` at low percentages for pill backgrounds — it disappears on white cards. Do **not** use the **300** alias for both background and label text (low contrast).
+
+| Suffix | Typical Port token | Use for |
+|--------|-------------------|---------|
+| *(none)* | `--color-{hue}-300` | Strokes, dots, rings, links via `var(--ocean-blue)` |
+| `-bg` | `--color-{hue}-100` or `-200` | Solid pill/badge **background** visible on `--card` |
+| `-text` | `--color-{hue}-700`, `-800`, or `-600` | Pill/badge **label** on `-bg` |
+
+**How to pick `-bg` / `-text` for a hue:**
+
+1. Pick the Port token name for the hue (e.g. `--color-gold-300`); copy fallback hex from an existing plugin’s `App.css` or Port’s design tokens when embedded.
+2. Add `--{hue}-bg` pointing at the lightest usable tint (**`-100`**, else **`-200`**; bronze often uses **`--color-bronze-200`**).
+3. Add `--{hue}-text` pointing at a **dark** step (**`-700`** or **`-800`**; red may use **`-600`**).
+4. Wire decoration classes to the variants, not raw `var(--gold)` for both bg and text:
+
+```css
+.level--gold {
+  --level-pill-bg: var(--gold-bg);
+  --level-pill-text: var(--gold-text);
+}
+```
+
+**Only define variants for hues the widget actually uses** (e.g. scorecard levels → `gold`, `silver`, `bronze`, `green`, `orange`, `red`, `gray`; skip `lime` if unused).
+
+**Rings / progress / single-hue marks:** base **`--{hue}`** (300) on the element class is enough; add `-bg`/`-text` only when that hue also appears on pills or badges.
 
 #### Local dev mock data (outside Port’s iframe)
 
@@ -215,7 +289,7 @@ export async function searchComments(/* … */) {
 }
 ```
 
-Document in the per-plugin README **Local development**: which files to edit for host vs API mocks, and that full `postMessage` + token flow is validated via Port’s **Local development** toggle.
+Document in the per-plugin README **Local development**: which files to edit for host vs API mocks; that full `postMessage` + token flow is validated via Port’s **Local development** toggle; and — when the widget renders portal links — that **URLs built from mock/fixture entity identifiers do not work at `http://localhost:9000` outside Port’s iframe** (validate links in Port **Local development** or after deploy).
 
 #### Safe rendering — no `innerHTML`
 
@@ -277,30 +351,43 @@ export function buildEntityPageUrl(
 
 - Parse **`document.referrer`** with `new URL(document.referrer).origin` so EU/US and custom domains follow the user’s session automatically.
 - **Encode** the blueprint identifier in the path segment (`{blueprint}Entity`) and the entity identifier in the **`identifier`** query param (`URLSearchParams` handles encoding).
-- In **dev mock**, links may point at `https://app.port.io` until you test inside Port’s iframe (where referrer is set).
+- In **dev mock** outside Port’s iframe, links use the **`https://app.port.io`** fallback and **mock entity identifiers** — they are for UI wiring only and **will not open real entities** until you test inside Port’s iframe (referrer + real IDs via **Local development**) or after deploy.
 - If the SDK exposes link helpers (see [plugins-sdk on npm](https://www.npmjs.com/package/@port-labs/plugins-sdk)), prefer them when they align with this behaviour; otherwise use the pattern above.
 
 #### Searching blueprint entities (correct endpoint)
 
-Use `POST /v1/blueprints/{blueprint}/entities/search` — **not** the generic search endpoint. The body must nest filter rules inside a `query` key:
+Use `POST /v1/blueprints/{blueprint}/entities/search` — **not** the generic search endpoint. The body must nest filter rules inside a `query` key.
+
+**Dashboard widgets:** merge **`PLUGIN_DATA.page.pageFilters`** into the widget query with **`mergePageFilters(widgetQuery, page.pageFilters, blueprint)`**. Pass the **full** blueprint from **`config.blueprint`** (parsed from `params.blueprint.value`) when page filters are present — not `{ identifier }` only. Wire `page` from `usePostMessageData()` / `usePortPluginData()` and include `page?.pageFilters` in query keys. Full pattern: [plugin-architecture.md](plugin-architecture.md) — **Dashboard page filters**.
 
 ```ts
+import { mergePageFilters, type PageQuery } from "@port-labs/plugins-sdk";
+import type { PluginConfig } from "../types";
+
+let query = { combinator: "and" as const, rules: [] as unknown[] };
+
+if (page?.pageFilters) {
+  query = mergePageFilters(
+    query,
+    page.pageFilters as PageQuery[],
+    config.blueprint
+  );
+}
+
 const res = await fetch(
-  `${baseUrl}/v1/blueprints/${encodeURIComponent(blueprint)}/entities/search`,
+  `${baseUrl}/v1/blueprints/${encodeURIComponent(config.blueprint.identifier)}/entities/search`,
   {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      query: { combinator: "and", rules: [] },
-    }),
+    body: JSON.stringify({ query }),
   }
 );
 ```
 
-> **Avoid:** placing `combinator`/`rules` at the top level (causes 422), passing `page`/`page_size` query params, or using the generic `/v1/entities/search` route.
+> **Avoid:** placing `combinator`/`rules` at the top level (causes 422), passing `page`/`page_size` query params, using the generic `/v1/entities/search` route, calling `mergePageFilters` **without** the blueprint argument when `page.pageFilters` is set, or passing **`{ identifier }` only** to `mergePageFilters` when the full blueprint param object is available (breaks `$team` page filters).
 
 #### Error handling
 
@@ -417,15 +504,22 @@ const parentEntity = pluginData.entity?.relationsObjects?.[PARENT_RELATION];
 
 When the admin should **pick a blueprint** (not type a free-form ID), use **`"type": "blueprint"`**. Port renders the native blueprint control.
 
-> **Runtime shape:** A `blueprint` param is **not** a plain string. Port delivers it as a **blueprint object**:
-> ```typescript
-> { identifier: string; title: string; /* …other blueprint fields */ }
-> ```
-> Always read `.identifier` (and optionally `.title`) instead of treating the value as a raw string.
+> **Runtime shape:** A `blueprint` param is **not** a plain string. Port delivers it as a **blueprint object** (e.g. `identifier`, `title`, `ownership`, …). Always read `.identifier` for API paths; **preserve the full object** for `mergePageFilters` and other SDK helpers.
 
 **Type it correctly in `PluginConfig`:**
 ```typescript
-export type BlueprintParam = { identifier: string; title: string };
+import type { mergePageFilters } from "@port-labs/plugins-sdk";
+
+export type BlueprintParam = NonNullable<
+  Parameters<typeof mergePageFilters>[2]
+> & { title?: string };
+
+function readBlueprintParam(raw: unknown): BlueprintParam | null {
+  if (!raw || typeof raw !== "object") return null;
+  const obj = raw as Record<string, unknown>;
+  if (typeof obj.identifier !== "string" || !obj.identifier.trim()) return null;
+  return { ...obj, identifier: obj.identifier.trim() } as BlueprintParam;
+}
 
 export type PluginConfig = {
   discussionBlueprint: BlueprintParam; // NOT string — omit when host entity + design default suffice
@@ -629,6 +723,8 @@ If your widget reuses blueprints from other widgets, document this in your widge
 
 ```typescript
 // types.ts
+import type { mergePageFilters } from "@port-labs/plugins-sdk";
+
 /**
  * Param lineage (update names to match sibling widgets in your project):
  * - discussionBlueprint: align with existing discussion-style widgets if any
@@ -637,7 +733,10 @@ If your widget reuses blueprints from other widgets, document this in your widge
  * New concepts introduced by this widget:
  * - milestoneBlueprint — example only; use type: "blueprint" in upload-params.json
  */
-export type BlueprintParam = { identifier: string; title: string };
+// Preserve full params.blueprint.value — required for mergePageFilters (ownership, etc.)
+export type BlueprintParam = NonNullable<
+  Parameters<typeof mergePageFilters>[2]
+> & { title?: string };
 
 export type PluginConfig = {
   discussionBlueprint: BlueprintParam;
@@ -646,9 +745,9 @@ export type PluginConfig = {
 };
 ```
 
-### 7. Update the README
+### 7. Bump version and update the README
 
-Add a row to the repo-level **Plugins** widgets table in the project root `README.md`. Read **`version`** from the plugin’s `package.json` (same semver you ship with the build) and keep the table in sync when you bump that field.
+When the branch changes plugin behaviour or fixes user-visible bugs, bump **`version`** in that plugin’s `package.json` **once per git branch** — semver from **all** functional changes on the branch since merge base (patch / minor / major), **not** on every agent invocation. Full workflow: [readme-and-audit.md](readme-and-audit.md) (**Versioning — once per branch**). Then add or update a row in the repo-level **Plugins** widgets table in the project root `README.md` — the **Version** column must match `package.json` exactly.
 
 ```markdown
 | [Widget Title](./widget-name) | 1.0.0 | One-sentence description |
@@ -660,9 +759,21 @@ If the widget reuses or extends existing blueprints, mention this in the descrip
 | [Project Dashboard](./project-dashboard) | 0.2.1 | Example: combines work-tracking and discussion plugins already in the same project, plus any new blueprint-backed features |
 ```
 
-When auditing or releasing, update the **Version** cell if `package.json` `version` changed and the description still matches.
+Do not ship plugin code changes on a branch without a version bump (once per branch) and a matching root **Plugins** table **Version** cell. When auditing or releasing, update the description if behaviour changed materially.
 
 ### 8. Per-plugin `README.md`
 
-Write the per-plugin README per **[readme-and-audit.md](readme-and-audit.md)** (required section order, preview image, params table before setup, canonical upload command, troubleshooting).
+Write the per-plugin README per **[readme-and-audit.md](readme-and-audit.md)** (required section order, preview image, params table before setup, canonical upload command, troubleshooting). The **Upload** step must use this exact `port-plugins upload` shape (substitute per-plugin values only):
+
+```bash
+port-plugins upload \
+  --file dist/index.html \
+  --identifier <your-widget-name> \
+  --title "<plugin title in Port>" \
+  --params "$(cat upload-params.json)" \
+  --description "<short plugin description>" \
+  --upsert
+```
+
+Do **not** document invented flags (`--name`, `--path`, `--plugin-id`, etc.) — see the flag table in readme-and-audit.md.
 

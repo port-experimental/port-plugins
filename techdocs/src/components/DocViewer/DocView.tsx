@@ -1,10 +1,25 @@
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import type { TechDocEntity } from "../../types";
 import { pickLastUpdatedRaw } from "../../utils/techDocProperties";
+import {
+  buildDocPathIndex,
+  type InternalDocTarget,
+} from "../../utils/internalDocLinks";
+import {
+  useMarkdownComponents,
+  type MarkdownNavigate,
+} from "./markdownComponents";
 
 interface DocViewerProps {
   doc: TechDocEntity | null;
+  docs: TechDocEntity[];
+  resolveLinkTarget: (
+    href: string | undefined,
+    currentDoc: TechDocEntity
+  ) => Promise<InternalDocTarget | null>;
+  onSelectDoc: (docId: string) => void;
 }
 
 function formatDisplayDate(iso: string): string {
@@ -16,7 +31,22 @@ function formatDisplayDate(iso: string): string {
   });
 }
 
-export function DocViewer({ doc }: DocViewerProps) {
+type PendingDocScroll = { docId: string; hash: string };
+
+function scrollToHash(hash: string) {
+  const id = decodeURIComponent(hash);
+  const el = document.getElementById(id);
+  if (el) {
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}
+
+export function DocViewer({
+  doc,
+  docs,
+  resolveLinkTarget,
+  onSelectDoc,
+}: DocViewerProps) {
   if (!doc) {
     return (
       <div className="doc-viewer doc-empty">
@@ -29,6 +59,64 @@ export function DocViewer({ doc }: DocViewerProps) {
       </div>
     );
   }
+
+  return (
+    <DocViewerContent
+      doc={doc}
+      docs={docs}
+      resolveLinkTarget={resolveLinkTarget}
+      onSelectDoc={onSelectDoc}
+    />
+  );
+}
+
+function DocViewerContent({
+  doc,
+  docs,
+  resolveLinkTarget,
+  onSelectDoc,
+}: {
+  doc: TechDocEntity;
+  docs: TechDocEntity[];
+  resolveLinkTarget: (
+    href: string | undefined,
+    currentDoc: TechDocEntity
+  ) => Promise<InternalDocTarget | null>;
+  onSelectDoc: (docId: string) => void;
+}) {
+  const pendingScrollRef = useRef<PendingDocScroll | null>(null);
+
+  const onNavigate: MarkdownNavigate = useCallback(
+    (target: InternalDocTarget) => {
+      if (target.kind === "hash") {
+        scrollToHash(target.hash);
+        return;
+      }
+      if (target.hash) {
+        pendingScrollRef.current = { docId: target.docId, hash: target.hash };
+      } else {
+        pendingScrollRef.current = null;
+      }
+      onSelectDoc(target.docId);
+    },
+    [onSelectDoc]
+  );
+
+  const docPathIndex = useMemo(() => buildDocPathIndex(docs), [docs]);
+
+  const markdownComponents = useMarkdownComponents({
+    currentDoc: doc,
+    docPathIndex,
+    resolveLinkTarget,
+    onNavigate,
+  });
+
+  useEffect(() => {
+    const pending = pendingScrollRef.current;
+    if (!pending || pending.docId !== doc.identifier) return;
+    pendingScrollRef.current = null;
+    requestAnimationFrame(() => scrollToHash(pending.hash));
+  }, [doc.identifier]);
 
   const { content, filePath, url } = doc.properties;
   const breadcrumb = filePath || "README.md";
@@ -108,7 +196,10 @@ export function DocViewer({ doc }: DocViewerProps) {
             </header>
             <div className="doc-prose-region">
               <article className="doc-content">
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  components={markdownComponents}
+                >
                   {content || "*No content available.*"}
                 </ReactMarkdown>
               </article>

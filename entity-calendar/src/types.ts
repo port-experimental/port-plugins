@@ -1,3 +1,5 @@
+import type { mergePageFilters } from "@port-labs/plugins-sdk";
+
 export type Page = {
   identifier?: string;
   pageFilters?: unknown;
@@ -32,9 +34,11 @@ export type ParamValue = {
 
 export type Params = Record<string, ParamValue>;
 
-export type BlueprintParam = {
-  identifier: string;
-  title: string;
+/** Blueprint object from the `blueprint` upload param (`PLUGIN_DATA.params`). */
+export type BlueprintParam = NonNullable<
+  Parameters<typeof mergePageFilters>[2]
+> & {
+  title?: string;
 };
 
 export type PluginConfig = {

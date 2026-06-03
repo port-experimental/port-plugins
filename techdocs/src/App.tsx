@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
+import { flushSync } from "react-dom";
 import "./App.css";
 import { usePostMessageData } from "./hooks/usePostMessageData";
 import { useMediaQuery } from "./hooks/useMediaQuery";
@@ -10,7 +11,15 @@ import {
   writeSidebarWidth,
 } from "./utils/columnWidthStorage";
 import type { PluginConfig, Params } from "./types";
+import { fetchTechDocByFilePath } from "./api/fetchDocs";
 import { useDocs } from "./hooks/useDocs";
+import type { TechDocEntity } from "./types";
+import {
+  buildDocPathIndex,
+  resolveInternalDocTarget,
+  resolveInternalHrefSpec,
+  type InternalDocTarget,
+} from "./utils/internalDocLinks";
 import { LoadingDocsView } from "./components/DocViewer/LoadingDocsView";
 import { ErrorDocView } from "./components/DocViewer/ErrorDocView";
 
@@ -51,13 +60,64 @@ export function App() {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState(readSidebarWidth);
   const {
-    docs,
+    docs: loadedDocs,
     isLoading,
     error,
     fetchMoreDocs,
     hasMoreDocs,
     isFetchingMoreDocs,
   } = useDocs(config);
+
+  const [fetchedDocs, setFetchedDocs] = useState<TechDocEntity[]>([]);
+
+  const docs = useMemo(() => {
+    const seen = new Set<string>();
+    const out: TechDocEntity[] = [];
+    for (const doc of [...loadedDocs, ...fetchedDocs]) {
+      if (seen.has(doc.identifier)) continue;
+      seen.add(doc.identifier);
+      out.push(doc);
+    }
+    return out;
+  }, [loadedDocs, fetchedDocs]);
+
+  const resolveLinkTarget = useCallback(
+    async (
+      href: string | undefined,
+      currentDoc: TechDocEntity
+    ): Promise<InternalDocTarget | null> => {
+      const index = buildDocPathIndex(docs);
+      const loaded = resolveInternalDocTarget(href, currentDoc, index);
+      if (loaded) return loaded;
+
+      const spec = resolveInternalHrefSpec(href, currentDoc);
+      if (!spec || spec.kind === "hash") return spec;
+
+      const repository = currentDoc.relations.repository;
+      if (!repository || !portApiBaseUrl || !portToken) return null;
+
+      const fetched = await fetchTechDocByFilePath(
+        portApiBaseUrl,
+        portToken,
+        config.techDocBlueprint,
+        config.techdocsSourceBlueprint,
+        repository,
+        spec.filePath
+      );
+      if (!fetched) return null;
+
+      flushSync(() => {
+        setFetchedDocs((prev) =>
+          prev.some((d) => d.identifier === fetched.identifier)
+            ? prev
+            : [...prev, fetched]
+        );
+      });
+
+      return { kind: "doc", docId: fetched.identifier, hash: spec.hash };
+    },
+    [docs, portApiBaseUrl, portToken, config]
+  );
 
   const onSidebarDrag = useCallback((deltaX: number) => {
     setSidebarWidth((w) => {
@@ -193,7 +253,12 @@ export function App() {
           />
         </>
       )}
-      <DocViewer doc={activeDoc} />
+      <DocViewer
+        doc={activeDoc}
+        docs={docs}
+        resolveLinkTarget={resolveLinkTarget}
+        onSelectDoc={handleSelectDoc}
+      />
     </div>
   );
 }

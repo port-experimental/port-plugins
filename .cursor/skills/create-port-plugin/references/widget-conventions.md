@@ -11,7 +11,7 @@ Each widget lives in its own top-level directory:
 
 ```
 <plugins-repo>/
-├── README.md                     # Plugins table (Widget, Version, Description) — update when adding one or bumping package.json version
+├── README.md                     # Plugins table (Widget, Version, Description) — bump package.json version once per branch (cumulative changes); sync Version column
 ├── .cursor/                      # Optional — e.g. editor skills / templates
 │   └── skills/
 │       └── create-port-plugin/
@@ -95,14 +95,14 @@ If validation fails, rename the plugin folder and update README upload commands 
 ## Theming
 
 Port sends **`theme: { mode, css }`** on **`PLUGIN_DATA`**. The SDK’s **`applyThemeCss()`**
-injects **`theme.css`** into the iframe so the widget matches the portal (light/dark and
+injects that CSS string into the iframe so the widget matches the portal (light/dark and
 design tokens). Widget CSS should use **`var(--background-primary, …)`**-style mappings with
 **fallbacks** for local dev.
 
 - **Spec and checklist:** [plugin-architecture.md — Theming](./plugin-architecture.md) (also
   documents widgets that do not use the SDK).
 - **Scaffold defaults:** `assets/template-usePostMessageData.ts` calls **`applyThemeCss()`**;
-  `assets/template-App.css` shows **surface** token mapping and **decoration** examples (`.example-dot`, `.example-link`).
+  `assets/template-App.css` shows **surface** tokens, **optional palette (300)**, and **decoration** examples (`.example-dot`, `.example-link`). For pills/badges, add **`--{hue}-bg` / `--{hue}-text`** per [Optional palette and shade variants](../references/scaffolding-and-implementation.md#optional-palette-and-shade-variants-root).
 
 ## Upload automation (optional)
 
@@ -112,7 +112,18 @@ If you add a **build-and-upload** workflow (for example under `.github/workflows
 
 1. Detect which plugin directories changed
 2. Run `npm ci && npm run build` in each changed directory
-3. Upload `dist/index.html` with `port-plugins upload --upsert` (see npm docs for auth: token or client ID + secret)
+3. Upload `dist/index.html` with the canonical command (per-plugin values; see [readme-and-audit.md](readme-and-audit.md)):
+
+   ```bash
+   port-plugins upload \
+     --file dist/index.html \
+     --identifier <your-widget-name> \
+     --title "<plugin title in Port>" \
+     --params "$(cat upload-params.json)" \
+     --description "<short plugin description>" \
+     --upsert
+   ```
+(see npm docs for auth: token or client ID + secret)
 
 ### Secrets (only if you automate uploads)
 

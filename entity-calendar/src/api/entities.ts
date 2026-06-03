@@ -1,16 +1,19 @@
+import { mergePageFilters, type PageQuery } from "@port-labs/plugins-sdk";
 import { MOCK_ENTITIES } from "../dev/mockData";
 import { DEV_MOCK } from "../hooks/usePostMessageData";
-import type { PortEntity } from "../types";
+import type { BlueprintParam, Page, PortEntity } from "../types";
+
+const PAGE_LIMIT = 100;
 
 type SearchResponse = {
   entities?: PortEntity[];
-  ok?: boolean;
+  next?: string | null;
 };
 
-type ListResponse = {
-  entities?: PortEntity[];
-  ok?: boolean;
-};
+function normalizeNext(next: unknown): string | null {
+  if (next == null || next === "") return null;
+  return String(next);
+}
 
 async function parseError(response: Response): Promise<never> {
   const body = await response.text();
@@ -20,36 +23,53 @@ async function parseError(response: Response): Promise<never> {
 export async function searchBlueprintEntities(
   baseUrl: string,
   token: string,
-  blueprintIdentifier: string
+  blueprint: BlueprintParam,
+  page?: Page
 ): Promise<PortEntity[]> {
   if (DEV_MOCK) return MOCK_ENTITIES;
 
-  const res = await fetch(
-    `${baseUrl}/v1/blueprints/${encodeURIComponent(blueprintIdentifier)}/entities/search`,
-    {
+  let baseQuery: Record<string, unknown> = {
+    combinator: "and",
+    rules: [],
+  };
+
+  if (page?.pageFilters) {
+    baseQuery = mergePageFilters(
+      baseQuery as Parameters<typeof mergePageFilters>[0],
+      page.pageFilters as PageQuery[],
+      blueprint
+    ) as Record<string, unknown>;
+  }
+
+  const path = `/v1/blueprints/${encodeURIComponent(blueprint.identifier)}/entities/search`;
+  const all: PortEntity[] = [];
+  let from: string | undefined;
+
+  for (; ;) {
+    const body: Record<string, unknown> = {
+      query: baseQuery,
+      limit: PAGE_LIMIT,
+      ...(from ? { from } : {}),
+    };
+
+    const res = await fetch(`${baseUrl}${path}`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        query: { combinator: "and", rules: [] },
-      }),
-    }
-  );
+      body: JSON.stringify(body),
+    });
 
-  if (!res.ok) await parseError(res);
+    if (!res.ok) await parseError(res);
 
-  const data = (await res.json()) as SearchResponse;
-  if (Array.isArray(data.entities)) return data.entities;
+    const data = (await res.json()) as SearchResponse;
+    all.push(...(data.entities ?? []));
 
-  const listRes = await fetch(
-    `${baseUrl}/v1/blueprints/${encodeURIComponent(blueprintIdentifier)}/entities`,
-    { headers: { Authorization: `Bearer ${token}` } }
-  );
+    const next = normalizeNext(data.next);
+    if (!next) break;
+    from = next;
+  }
 
-  if (!listRes.ok) await parseError(listRes);
-
-  const listData = (await listRes.json()) as ListResponse;
-  return listData.entities ?? [];
+  return all;
 }

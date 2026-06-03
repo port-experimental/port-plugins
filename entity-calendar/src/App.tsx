@@ -18,7 +18,7 @@ import { configFromParams } from "./utils/config";
 import { firstDayOfWeekFromConfig } from "./utils/dates";
 
 export function App() {
-  const { params, portToken, portApiBaseUrl } = usePostMessageData();
+  const { params, page, portToken, portApiBaseUrl } = usePostMessageData();
   const config = configFromParams(params);
 
   const [viewMonth, setViewMonth] = useState(() => {
@@ -32,7 +32,7 @@ export function App() {
   } | null>(null);
 
   const { data: entities = [], isLoading, isError, error } =
-    useCalendarEntities(config, portToken, portApiBaseUrl);
+    useCalendarEntities(config, portToken, portApiBaseUrl, page);
 
   const entitiesByDate = useMemo(
     () => groupEntitiesByDate(entities),
@@ -46,6 +46,14 @@ export function App() {
         : 0,
     [config]
   );
+
+  const isViewingCurrentMonth = useMemo(() => {
+    const now = new Date();
+    return (
+      viewMonth.getFullYear() === now.getFullYear() &&
+      viewMonth.getMonth() === now.getMonth()
+    );
+  }, [viewMonth]);
 
   if (!portApiBaseUrl || !portToken) {
     return (
@@ -90,7 +98,9 @@ export function App() {
         </button>
         <button
           type="button"
-          className="today-btn"
+          className={
+            isViewingCurrentMonth ? "today-btn" : "today-btn today-btn--away"
+          }
           onClick={() => {
             const now = new Date();
             setViewMonth(new Date(now.getFullYear(), now.getMonth(), 1));
@@ -120,7 +130,10 @@ export function App() {
           {entities.length === 0 && (
             <p className="status muted-inline">
               No entities with a date found for{" "}
-              <strong>{config.blueprint.title}</strong>.{" "}
+              <strong>
+                {config.blueprint.title ?? config.blueprint.identifier}
+              </strong>
+              .{" "}
               {config.createdDateProperty ? (
                 <>
                   Dates use blueprint property{" "}
