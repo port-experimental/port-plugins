@@ -12,5 +12,6 @@ metadata:
 
 1. **Read** `.cursor/skills/create-port-plugin/SKILL.md` in full before any plugin work.
 2. **Use** templates from `.cursor/skills/create-port-plugin/assets/` and references from `.cursor/skills/create-port-plugin/references/` — do not use `.claude/skills/create-port-plugin/` for content.
+3. **Build and commit** — for new plugins or version bumps, run **`build`** and commit `<plugin>/dist/index.html` per the skill (**Build artifact — commit `dist/index.html`**).
 
 All instructions, checklists, and links live in the Cursor skill path above.

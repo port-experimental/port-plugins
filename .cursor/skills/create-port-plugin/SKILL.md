@@ -63,7 +63,7 @@ Define minimal upload-params.json only after catalog strategy is settled (no par
         ↓
 Implement with strong UX/UI + safe React rendering → plugin-architecture.md + scaffolding-and-implementation.md
         ↓
-Document → readme-and-audit.md (per-plugin README §8)
+Build, commit dist/index.html, document → readme-and-audit.md (per-plugin README §8, Build artifact)
 ```
 
 ## Step-by-step workflow
@@ -98,15 +98,16 @@ Use `upsert_blueprint` only when the user wants catalog changes applied via MCP.
 
 ### 4. Verify build and configuration
 
+- Install dependencies, then run **`build`** → artifact **`dist/index.html`**
+- **Commit `dist/index.html`** on the branch — required for **new plugins** and whenever **`package.json` `version`** is bumped for functional changes ([readme-and-audit.md](references/readme-and-audit.md) — **Build artifact — commit `dist/index.html`**)
 - `npm run dev` → `http://localhost:9000` (`devServer.port: 9000` in `webpack.config.js`)
-- `npm run build` → artifact `dist/index.html`
 - Webpack `inject: "body"` and root `height: 100%` — [references/plugin-architecture.md](references/plugin-architecture.md) (Critical Webpack/CSS)
 - Entity search: `{ query: { combinator, rules } }` on `POST /v1/blueprints/{blueprint}/entities/search`
 - `applyThemeCss()` when using the SDK
 
 ### 5. Document and ship
 
-- **Bump `package.json` `version` once per branch** when the plugin has functional changes — based on **all** changes on the branch since merge base, **not** once per agent invocation or per feature while building. **New plugins:** stay at **`0.1.0`** for the whole first branch (do not stack `0.2.0`, `0.3.0`, … during development). Workflow: [readme-and-audit.md](references/readme-and-audit.md) (**Versioning — once per branch**, **Greenfield plugin**).
+- **Bump `package.json` `version` once per branch** when the plugin has functional changes — based on **all** changes on the branch since merge base, **not** once per agent invocation or per feature while building. **New plugins:** stay at **`0.1.0`** for the whole first branch (do not stack `0.2.0`, `0.3.0`, … during development). Workflow: [readme-and-audit.md](references/readme-and-audit.md) (**Versioning — once per branch**, **Greenfield plugin**). **After any version bump (or before shipping a new plugin), rebuild and commit `dist/index.html`.**
 - Per-plugin **README** (required section order): [references/readme-and-audit.md](references/readme-and-audit.md)
 - Repo-level widgets table row when adding a new plugin (include **Version** from that plugin’s `package.json` `version` field)
 - Canonical **`port-plugins upload`** command — exact flags in [references/readme-and-audit.md](references/readme-and-audit.md) (Setup → Upload); do not invent CLI flags
@@ -119,11 +120,11 @@ Before finishing: [references/guidelines.md](references/guidelines.md) (anti-pat
 
 Before marking the plugin done:
 
-1. Run `npm run dev` on `http://localhost:9000` and `npm run build` — confirm `dist/index.html` exists.
+1. Install dependencies, run **`build`**, and optionally `npm run dev` on `http://localhost:9000` — confirm **`dist/index.html`** exists and **`git add dist/index.html`** (committed on the branch for new plugins and whenever version is bumped).
 2. Validate the plugin identifier against Port’s regex (see **Non-negotiables** → Plugin identifier).
 3. Confirm per-plugin README section order and upload command per [readme-and-audit.md](references/readme-and-audit.md).
 4. Walk the **Non-negotiables** table and [guidelines.md](references/guidelines.md) anti-patterns.
-5. If the branch has functional plugin changes, confirm **`package.json` `version`** was bumped **once for the branch** (not re-bumped every invocation) and the root **`README.md` Plugins** **Version** cell matches — [readme-and-audit.md](references/readme-and-audit.md) (**Versioning — once per branch**).
+5. If the branch has functional plugin changes, confirm **`package.json` `version`** was bumped **once for the branch** (not re-bumped every invocation), the root **`README.md` Plugins** **Version** cell matches, and **`dist/index.html`** matches the built output of that source — [readme-and-audit.md](references/readme-and-audit.md) (**Versioning — once per branch**, **Build artifact — commit `dist/index.html`**).
 
 ## Non-negotiables (always apply)
 
@@ -152,6 +153,7 @@ Before marking the plugin done:
 | Persistence | Port entities/properties unless explicitly local-only UI state |
 | Upload CLI | `port-plugins upload` with **`--file`**, **`--identifier`**, **`--title`**, **`--params`**, **`--description`**, **`--upsert`** only — see [readme-and-audit.md](references/readme-and-audit.md) |
 | Versioning | **Once per git branch** per plugin: bump from merge-base semver using **cumulative** changes — **not** per agent run or per feature. **Greenfield:** **`0.1.0`** for the entire first branch until publish/merge; see [readme-and-audit.md](references/readme-and-audit.md) (**Versioning — once per branch**, **Greenfield plugin**) |
+| Build artifact | Run **`build`** before finishing; **commit `<plugin>/dist/index.html`** for **new plugins** and whenever **`version`** is bumped or functional source changes ship — see [readme-and-audit.md](references/readme-and-audit.md) (**Build artifact — commit `dist/index.html`**) |
 
 ## Reference index
 

@@ -745,9 +745,17 @@ export type PluginConfig = {
 };
 ```
 
-### 7. Bump version and update the README
+### 7. Bump version, build, and update the README
 
-When the branch changes plugin behaviour or fixes user-visible bugs, bump **`version`** in that plugin’s `package.json` **once per git branch** — semver from **all** functional changes on the branch since merge base (patch / minor / major), **not** on every agent invocation. Full workflow: [readme-and-audit.md](readme-and-audit.md) (**Versioning — once per branch**). Then add or update a row in the repo-level **Plugins** widgets table in the project root `README.md` — the **Version** column must match `package.json` exactly.
+When the branch changes plugin behaviour or fixes user-visible bugs, bump **`version`** in that plugin’s `package.json` **once per git branch** — semver from **all** functional changes on the branch since merge base (patch / minor / major), **not** on every agent invocation. Full workflow: [readme-and-audit.md](readme-and-audit.md) (**Versioning — once per branch**).
+
+**Build and commit the artifact (required):**
+
+1. From the plugin directory: install dependencies, then run **`build`**.
+2. Stage **`dist/index.html`** — mandatory for **new plugins** and whenever **`version`** is bumped or functional source under `<plugin>/` ships on the branch.
+3. Details: [readme-and-audit.md](readme-and-audit.md) (**Build artifact — commit `dist/index.html`**).
+
+Then add or update a row in the repo-level **Plugins** widgets table in the project root `README.md` — the **Version** column must match `package.json` exactly.
 
 ```markdown
 | [Widget Title](./widget-name) | 1.0.0 | One-sentence description |
@@ -759,7 +767,7 @@ If the widget reuses or extends existing blueprints, mention this in the descrip
 | [Project Dashboard](./project-dashboard) | 0.2.1 | Example: combines work-tracking and discussion plugins already in the same project, plus any new blueprint-backed features |
 ```
 
-Do not ship plugin code changes on a branch without a version bump (once per branch) and a matching root **Plugins** table **Version** cell. When auditing or releasing, update the description if behaviour changed materially.
+Do not ship plugin code changes on a branch without a version bump (once per branch), a matching root **Plugins** table **Version** cell, and a **committed `dist/index.html`** built from that source. When auditing or releasing, update the description if behaviour changed materially.
 
 ### 8. Per-plugin `README.md`
 

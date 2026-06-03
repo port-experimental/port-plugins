@@ -485,6 +485,7 @@ const apply = (next: Data) => {
 ## Build Requirements
 
 - Output **must be a single self-contained `dist/index.html`** — all JS and CSS inlined
+- **Commit `dist/index.html` to the repo** when shipping a **new plugin** or when the branch **bumps `package.json` `version`** for functional changes — root `.gitignore` tracks only this file under `dist/` ([readme-and-audit.md](readme-and-audit.md) — **Build artifact — commit `dist/index.html`**)
 - Use `InlineChunkHtmlPlugin` from `react-dev-utils` in the webpack config (see `assets/template-webpack.config.js`)
 - No external CDN/asset requests from the built file — Port hosts it
 

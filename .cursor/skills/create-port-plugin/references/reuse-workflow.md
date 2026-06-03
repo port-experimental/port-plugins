@@ -229,6 +229,7 @@ Sample names in this skill are **illustrative**; blueprint identifiers and relat
 11. **Icons** — no hardcoded emoji in widget UI; use **`<i>`** or an icon library when icons are needed (see [scaffolding-and-implementation.md](scaffolding-and-implementation.md) (**Icons (no hardcoded emoji)**)).
 12. **Param schema** — every `upload-params.json` param object includes **`type`**, **`isRequired`**, and **`label`** (all three required; no partial objects).
 13. **Portal links via `document.referrer`** — build in-app URLs from the embedding Port page’s origin; default **`https://app.port.io`** when running outside Port (local dev). Entity pages: **`{origin}/{blueprint}Entity?identifier={entityId}`**. Never use `portApiBaseUrl` for user-facing links.
+14. **Build artifact** — run **`build`** in the plugin dir; **commit `dist/index.html`** for new plugins and when **`version`** is bumped ([readme-and-audit.md](readme-and-audit.md) — **Build artifact — commit `dist/index.html`**).
 
 ### Illustrated examples
 
@@ -332,6 +333,10 @@ Before proceeding with scaffolding, complete this checklist in order:
 - [ ] Optional property-key `string` overrides only when schema-driven defaults are insufficient
 
 **Only proceed to implementation once widget strategy, blueprint strategy, and relation strategy are decided.**
+
+**Ship (before PR / merge)**
+- [ ] Install dependencies + run **`build`** in `<plugin-dir>`; **`dist/index.html` committed** ([readme-and-audit.md](readme-and-audit.md) — **Build artifact — commit `dist/index.html`**)
+- [ ] **`package.json` `version`** bumped once per branch (if functional changes); root **Plugins** table **Version** synced
 
 ### Practical Reuse Workflow Examples
 

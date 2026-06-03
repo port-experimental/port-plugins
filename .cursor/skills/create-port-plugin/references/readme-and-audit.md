@@ -17,7 +17,7 @@ Use this path when the goal is **not** greenfield scaffolding but to **audit and
 2. **Gap analysis** — Compare against the README standard below, params guidance in [scaffolding-and-implementation.md](scaffolding-and-implementation.md) (**Define parameters**), and [plugin-architecture.md](plugin-architecture.md) / [widget-conventions.md](widget-conventions.md).
 3. **Prioritize** — Correctness first (Port API request shapes, token usage, theme), then operator docs (README, param table), then polish (badges, screenshots, structure tree).
 4. **Patch** — Keep diffs focused: bump SDK with hook changes; keep `PluginConfig` and `upload-params.json` in lockstep; rewrite README sections rather than deleting useful catalog/integration detail. **Version bump:** follow **Versioning — once per branch** below (not once per agent invocation).
-5. **Verify** — `npm ci` / `npm install`, `npm run build`, smoke in **Local development** mode and/or in Port; confirm root **`README.md` Plugins** **Version** matches `package.json`; update the row description if behaviour changed materially.
+5. **Verify** — install dependencies, run **`build`**, **commit `dist/index.html`**, smoke in **Local development** mode and/or in Port; confirm root **`README.md` Plugins** **Version** matches `package.json`; update the row description if behaviour changed materially.
 
 ### Versioning — once per branch
 
@@ -57,6 +57,41 @@ Bump a plugin’s `package.json` **`version` at most once per git branch** for t
    - **Unchanged vs merge base** and step 2 has functional changes → bump **once** from merge-base version per the table above.
    - **Already bumped on branch** → bump again **only** if cumulative changes now need a **higher** semver than the current branch version reflects (recompute from merge-base version + total branch changes; do not add another patch per agent run).
 5. Update the root **`README.md` Plugins** table **Version** cell to match `package.json` exactly.
+6. **Rebuild and commit the upload artifact** — see **Build artifact — commit `dist/index.html`** below (mandatory when step 4–5 apply).
+
+### Build artifact — commit `dist/index.html` (required)
+
+This repo **tracks** each plugin’s built bundle at **`<plugin>/dist/index.html`** only. Root **`.gitignore`** ignores other `dist/*` files (`ui.js`, license sidecars, etc.).
+
+**When to rebuild and commit `dist/index.html`:**
+
+| Trigger | Required action |
+|---------|-----------------|
+| **New plugin** (greenfield or copy-adapt) | Before marking the plugin done: install deps, run **`build`**, commit `<plugin>/dist/index.html` on the same branch |
+| **Functional change** under `<plugin>/` (`src/`, webpack, `package.json` deps, bundle-affecting config) | Rebuild; commit updated `dist/index.html` when the branch ships those changes |
+| **`package.json` `version` bump** (once per branch) | **Mandatory** — never bump version without a fresh `dist/index.html` built from the branch’s current source |
+
+**Commands (run from the plugin directory):**
+
+```bash
+cd <plugin-dir>
+# install dependencies, then run the build script (e.g. npm run build / yarn build)
+npm run build
+git add dist/index.html
+```
+
+**Rules:**
+
+- Build must exit **0** (webpack bundle-size warnings are OK; errors fail the task).
+- Commit **only** `dist/index.html` — not `dist/ui.js` or other build outputs.
+- **Greenfield at `0.1.0`:** still build and commit `dist/index.html` before merge, even though version stays at `0.1.0` for the whole first branch.
+- PRs that change plugin source but omit an updated `dist/index.html` are incomplete — rebuild before review.
+
+**Verify before finishing:**
+
+- [ ] **`build`** succeeded in `<plugin-dir>`
+- [ ] `<plugin>/dist/index.html` exists and reflects current source
+- [ ] `dist/index.html` is staged or committed alongside the source/version changes on the branch
 
 ### PR checklist (copy into description)
 
@@ -67,7 +102,7 @@ Bump a plugin’s `package.json` **`version` at most once per git branch** for t
 - [ ] **Webpack / CSS** meet Critical Webpack/CSS in [plugin-architecture.md](plugin-architecture.md).
 - [ ] **Entity search** bodies use `{ query: { combinator, rules } }` where applicable; errors surfaced with response body text.
 - [ ] **Dashboard page filters:** `mergePageFilters` receives the **full** blueprint from `params.blueprint.value` (not `{ identifier }` only); `readBlueprintParam` preserves all fields — [plugin-architecture.md](plugin-architecture.md) (**Dashboard page filters**).
-- [ ] **`npm run build`** succeeds; **`dist/index.html`** is the upload artifact.
+- [ ] **`build`** succeeds; **`dist/index.html`** is the upload artifact and is **committed** on the branch (see **Build artifact — commit `dist/index.html`**).
 - [ ] **Persistence:** Meaningful saved state uses the Port API where feasible; browser storage only when intentionally local-only (see [guidelines.md](guidelines.md)).
 - [ ] **Layout:** Responsive behaviour verified; root fills iframe space; no duplicate plugin title, description, or icon (see [scaffolding-and-implementation.md](scaffolding-and-implementation.md)).
 - [ ] **Portal links:** User-facing URLs use **`document.referrer`** origin with **`https://app.port.io`** fallback; entity pages use **`{origin}/{blueprint}Entity?identifier={entityId}`**; not `portApiBaseUrl` and not a hardcoded region unless documented.
@@ -80,6 +115,7 @@ Bump a plugin’s `package.json` **`version` at most once per git branch** for t
 - [ ] **Safe rendering:** No `innerHTML` / `dangerouslySetInnerHTML` for dynamic or user content.
 - [ ] **Charts:** Bar/line/area/pie/donut (and similar) use **Recharts** unless trivial; [webpack-port-upload-safety.md](webpack-port-upload-safety.md) applied when Recharts is present — [Charts](scaffolding-and-implementation.md#charts-and-data-visualization).
 - [ ] **Version bump:** Branch has at most **one** semver bump per plugin vs merge base; level matches **cumulative** functional changes (patch / minor / major); root **`README.md` Plugins** **Version** cell matches — not re-bumped on every agent run.
+- [ ] **Build artifact:** **`dist/index.html`** rebuilt and **committed** when the plugin is new or **`version`** / functional source changed — [Build artifact — commit `dist/index.html`](#build-artifact--commit-distindexhtml-required).
 - [ ] **Repo Plugins table:** Root `README.md` row includes **Version** matching `package.json` `version` when the plugin was added or version-bumped.
 
 ### 8. Per-plugin `README.md` standard (required)

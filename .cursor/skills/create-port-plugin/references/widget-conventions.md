@@ -31,7 +31,9 @@ Each widget lives in its own top-level directory:
 │   ├── package.json
 │   ├── upload-params.json
 │   ├── webpack.config.js
-│   └── tsconfig.json
+│   ├── tsconfig.json
+│   └── dist/
+│       └── index.html            # Built bundle — **committed** (other dist/* gitignored)
 └── your-new-widget/              # New plugin — same structure
 ```
 
@@ -83,6 +85,16 @@ If validation fails, rename the plugin folder and update README upload commands 
 | `src/App.css` | Widget styles | Adapt from template |
 | `src/types.ts` | TypeScript types including `PluginConfig` | Adapt: add fields matching params |
 | `src/hooks/usePostMessageData.ts` | postMessage listener | **Copy verbatim** from template |
+| `dist/index.html` | Production upload artifact (webpack output) | Run **`build`**, then **commit** — see [readme-and-audit.md](readme-and-audit.md) (**Build artifact — commit `dist/index.html`**) |
+
+## Build artifact in git
+
+Root **`.gitignore`** ignores `**/dist/*` except **`**/dist/index.html`**. Agents and contributors **must**:
+
+1. Install dependencies and run **`build`** in the plugin directory before finishing work.
+2. **Commit `dist/index.html`** when adding a **new plugin** or when the branch **bumps `package.json` `version`** for functional changes.
+
+Other `dist/` files (`ui.js`, license sidecars) stay local and gitignored.
 
 ## Tech Stack
 
@@ -111,7 +123,7 @@ Publishing a plugin **does not require** GitHub Actions or any other pipeline. M
 If you add a **build-and-upload** workflow (for example under `.github/workflows/`), a common pattern on merge to `main` is:
 
 1. Detect which plugin directories changed
-2. Run `npm ci && npm run build` in each changed directory
+2. Install dependencies and run **`build`** in each changed directory
 3. Upload `dist/index.html` with the canonical command (per-plugin values; see [readme-and-audit.md](readme-and-audit.md)):
 
    ```bash
