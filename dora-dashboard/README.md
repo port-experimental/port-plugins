@@ -2,6 +2,12 @@
 
 A DORA metrics dashboard widget for [Port](https://app.port.io) dashboards. Displays the four DORA metrics — Deployment Frequency, Lead Time for Change, Change Failure Rate, and Mean Time to Recovery — with trend cards and historical data from catalog entities.
 
+## Preview image
+
+<!-- Add a screenshot here once the widget is running in your Port environment.
+     Upload the image to a GitHub issue or PR, then replace this comment with:
+     <img alt="DORA Dashboard widget" src="https://github.com/user-attachments/assets/..." /> -->
+
 ## Features
 
 - Four DORA metric cards with current values and trend indicators
@@ -68,7 +74,7 @@ npm run build   # output: dist/index.html
 ```bash
 port-plugins upload \
   --file dist/index.html \
-  --identifier dora-dashboard \
+  --identifier dora-dashboard-port-plugin \
   --title "DORA Dashboard" \
   --params "$(cat upload-params.json)" \
   --upsert
@@ -98,8 +104,6 @@ dora-dashboard/
       useDoraDashboard.ts     # Data fetching and aggregation
       useEntities.ts          # Entity search with page-filter merge
       entitiesSearch.ts       # Generic entities/search hook
-    utils/
-      mergeWidgetQueryWithPageQuery.ts
     types.ts
     App.tsx
     index.tsx

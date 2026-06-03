@@ -39,7 +39,6 @@ export function EntityNode({ data }: NodeProps) {
       <Handle type="target" position={Position.Left} className="entity-node__handle" />
 
       <div className="entity-node__header">
-        {entity.icon && <span className="entity-node__icon">{entity.icon}</span>}
         <div className="entity-node__title-group">
           <div className="entity-node__title">{entity.title || entity.identifier}</div>
           <div className="entity-node__blueprint">{entity.blueprint ?? ''}</div>
