@@ -1,0 +1,852 @@
+/*
+ * DORA Metrics Dashboard
+ * Uses Port CSS variables (injected by applyThemeCss) with light-mode fallbacks.
+ * Dark mode is applied automatically when Port injects its dark-mode overrides.
+ */
+
+.dora-dashboard {
+  /* ── Token map ──────────────────────────────────────────────────── */
+  --dd-bg:          var(--background-primary,         #f7f9fa);
+  --dd-surface:     var(--background-dim,             #ffffff);
+  --dd-surface2:    var(--background-dim-transparent, #f3f6f7);
+  --dd-border:      var(--border-medium,              #e4e7e8);
+  --dd-text:        var(--text-high,                  #111111);
+  --dd-muted:       var(--text-medium,                #495762);
+  --dd-faint:       var(--text-low,                   #767e86);
+  --dd-accent:      #3860be;
+
+  /* Tier palette — Port-aligned */
+  --dd-elite:       #22c55e;
+  --dd-high:        #3860be;
+  --dd-medium:      #d97706;
+  --dd-low:         #dc2a2a;
+
+  /* Bucket colours (alias tier) */
+  --dd-daily:       var(--dd-elite);
+  --dd-weekly:      var(--dd-high);
+  --dd-monthly:     var(--dd-medium);
+  --dd-rare:        var(--dd-low);
+
+  /* ── Layout ─────────────────────────────────────────────────────── */
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px;
+  background: var(--dd-bg);
+  color: var(--dd-text);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 13px;
+  min-height: 100%;
+  box-sizing: border-box;
+}
+
+/* ── Dark mode ──────────────────────────────────────────────────────── */
+.dora-dashboard[data-theme="dark"] {
+  --dd-bg:      #0f1117;
+  --dd-surface: #13192b;
+  --dd-surface2: rgba(26, 35, 64, 0.6);
+  --dd-border:  #1e2a47;
+  --dd-text:    #e8edf5;
+  --dd-muted:   #6b87b8;
+  --dd-faint:   #4a5a78;
+  --dd-accent:  #3c73f3;
+  --dd-elite:   #4ade80;
+  --dd-high:    #3c73f3;
+  --dd-medium:  #fbbf24;
+  --dd-low:     #f87171;
+}
+
+/* ── Loading / Error state ──────────────────────────────────────────── */
+.dora-dashboard__state {
+  padding: 60px 20px;
+  text-align: center;
+  color: var(--dd-muted);
+  font-style: italic;
+}
+.dora-dashboard__state--error {
+  color: var(--dd-low);
+  font-style: normal;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   FILTER BAR
+═══════════════════════════════════════════════════════════════════ */
+.dora-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.dora-filter-bar__search {
+  flex: 1;
+  min-width: 160px;
+  max-width: 280px;
+  padding: 7px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--dd-border);
+  background: var(--dd-surface);
+  color: var(--dd-text);
+  font-size: 0.82rem;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.dora-filter-bar__search::placeholder {
+  color: var(--dd-faint);
+}
+
+.dora-filter-bar__search:focus {
+  border-color: var(--dd-accent);
+}
+
+.dora-filter-bar__tiers {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.dora-filter-bar__tier {
+  padding: 5px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--dd-border);
+  background: var(--dd-surface);
+  color: var(--dd-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+  font-family: inherit;
+}
+
+.dora-filter-bar__tier--Elite  { color: var(--dd-elite);  border-color: var(--dd-elite); }
+.dora-filter-bar__tier--High   { color: var(--dd-high);   border-color: var(--dd-high); }
+.dora-filter-bar__tier--Medium { color: var(--dd-medium); border-color: var(--dd-medium); }
+.dora-filter-bar__tier--Low    { color: var(--dd-low);    border-color: var(--dd-low); }
+
+.dora-filter-bar__tier--active                   { background: var(--dd-accent); border-color: var(--dd-accent); color: #fff; }
+.dora-filter-bar__tier--Elite.dora-filter-bar__tier--active  { background: var(--dd-elite);  border-color: var(--dd-elite);  color: #111; }
+.dora-filter-bar__tier--High.dora-filter-bar__tier--active   { background: var(--dd-high);   border-color: var(--dd-high);   color: #fff; }
+.dora-filter-bar__tier--Medium.dora-filter-bar__tier--active { background: var(--dd-medium); border-color: var(--dd-medium); color: #111; }
+.dora-filter-bar__tier--Low.dora-filter-bar__tier--active    { background: var(--dd-low);    border-color: var(--dd-low);    color: #fff; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   KPI CARDS ROW
+═══════════════════════════════════════════════════════════════════ */
+.dora-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+@media (max-width: 900px) {
+  .dora-kpi-row { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 560px) {
+  .dora-kpi-row { grid-template-columns: 1fr; }
+}
+
+.dora-kpi-card {
+  background: var(--dd-surface);
+  border: 1px solid var(--dd-border);
+  border-radius: 10px;
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* No colored ::before top bar — removed */
+
+.dora-kpi-card__label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--dd-muted);
+  margin-bottom: 2px;
+}
+
+.dora-kpi-card__value {
+  font-size: 2.8rem;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--dd-text);
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.dora-kpi-card__value--unit {
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: var(--dd-muted);
+}
+
+.dora-kpi-card__subtitle {
+  font-size: 0.75rem;
+  color: var(--dd-muted);
+  margin-top: 2px;
+  margin-bottom: 4px;
+}
+
+.dora-kpi-card__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.dora-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 9px;
+  border-radius: 20px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.dora-badge--Elite  { background: rgba(34, 197, 94, 0.12);  color: var(--dd-elite); }
+.dora-badge--High   { background: rgba(56, 96, 190, 0.12);  color: var(--dd-high); }
+.dora-badge--Medium { background: rgba(217, 119, 6, 0.12);  color: var(--dd-medium); }
+.dora-badge--Low    { background: rgba(220, 42, 42, 0.12);  color: var(--dd-low); }
+.dora-badge--info   { background: rgba(136, 146, 176, 0.12); color: var(--dd-muted); }
+
+.dora-kpi-card__unconfigured {
+  color: var(--dd-faint);
+  font-size: 0.82rem;
+  font-style: italic;
+  padding: 8px 0;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   SECTION HEADINGS
+═══════════════════════════════════════════════════════════════════ */
+.dora-section-title {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--dd-muted);
+  margin: 0 0 14px 0;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   CHART LEGEND — HORIZONTAL ROW
+═══════════════════════════════════════════════════════════════════ */
+.dora-legend-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.dora-legend-row__item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: default;
+}
+
+.dora-legend-row__swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.dora-legend-row__label {
+  font-size: 0.75rem;
+  color: var(--dd-muted);
+  white-space: nowrap;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   TWO-COLUMN LAYOUT
+═══════════════════════════════════════════════════════════════════ */
+.dora-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+@media (max-width: 780px) {
+  .dora-two-col { grid-template-columns: 1fr; }
+}
+
+.dora-panel {
+  background: var(--dd-surface);
+  border: 1px solid var(--dd-border);
+  border-radius: 10px;
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+}
+
+.dora-panel--unconfigured {
+  align-items: center;
+  justify-content: center;
+  min-height: 180px;
+  color: var(--dd-faint);
+  font-style: italic;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   BUCKET BAR CHART
+═══════════════════════════════════════════════════════════════════ */
+.dora-bucket-chart {
+  display: flex;
+  flex-direction: column;
+}
+
+.dora-bucket-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dora-bucket-row {
+  display: grid;
+  grid-template-columns: 82px 1fr 38px 38px;
+  align-items: center;
+  gap: 8px;
+}
+
+.dora-bucket-row__label {
+  font-size: 0.78rem;
+  color: var(--dd-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dora-bucket-row__track {
+  height: 10px;
+  background: var(--dd-border);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.dora-bucket-row__fill {
+  height: 100%;
+  border-radius: 5px;
+  min-width: 2px;
+  transition: width 0.4s ease;
+}
+
+.dora-bucket-row__count {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--dd-text);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.dora-bucket-row__pct {
+  font-size: 0.72rem;
+  color: var(--dd-muted);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.dora-bucket-chart__total {
+  margin-top: 14px;
+  font-size: 0.75rem;
+  color: var(--dd-muted);
+  text-align: right;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   TOP PERFORMERS LIST
+═══════════════════════════════════════════════════════════════════ */
+.dora-perf-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dora-perf-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dora-perf-row__name {
+  font-size: 0.78rem;
+  color: var(--dd-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 38%;
+  flex-shrink: 0;
+}
+
+.dora-perf-row__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dora-perf-row__bar-track {
+  flex: 1;
+  height: 6px;
+  background: var(--dd-surface2);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.dora-perf-row__bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+
+.dora-perf-row__count {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--dd-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  flex-shrink: 0;
+  width: 68px;
+  text-align: right;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   CFR BY PRODUCT ROWS
+═══════════════════════════════════════════════════════════════════ */
+.dora-cfr-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dora-cfr-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dora-cfr-row__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.dora-cfr-row__name {
+  font-size: 0.78rem;
+  color: var(--dd-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+}
+
+.dora-cfr-row__badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 8px;
+  border-radius: 10px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.dora-cfr-row__badge--Elite  { background: rgba(34, 197, 94, 0.12);  color: var(--dd-elite); }
+.dora-cfr-row__badge--High   { background: rgba(56, 96, 190, 0.12);  color: var(--dd-high); }
+.dora-cfr-row__badge--Medium { background: rgba(217, 119, 6, 0.12);  color: var(--dd-medium); }
+.dora-cfr-row__badge--Low    { background: rgba(220, 42, 42, 0.12);  color: var(--dd-low); }
+
+.dora-cfr-row__track {
+  height: 5px;
+  background: var(--dd-surface2);
+  border-radius: 3px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.dora-cfr-row__fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+
+.dora-cfr-row__fill--Elite  { background: var(--dd-elite); }
+.dora-cfr-row__fill--High   { background: var(--dd-high); }
+.dora-cfr-row__fill--Medium { background: var(--dd-medium); }
+.dora-cfr-row__fill--Low    { background: var(--dd-low); }
+
+/* ═══════════════════════════════════════════════════════════════════
+   MTTR ROWS
+═══════════════════════════════════════════════════════════════════ */
+.dora-mttr-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dora-mttr-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dora-mttr-row__name {
+  font-size: 0.78rem;
+  color: var(--dd-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 38%;
+  flex-shrink: 0;
+}
+
+.dora-mttr-row__bar-track {
+  flex: 1;
+  height: 8px;
+  background: var(--dd-surface2);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.dora-mttr-row__bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+.dora-mttr-row__bar-fill--Elite  { background: var(--dd-elite); }
+.dora-mttr-row__bar-fill--High   { background: var(--dd-high); }
+.dora-mttr-row__bar-fill--Medium { background: var(--dd-medium); }
+.dora-mttr-row__bar-fill--Low    { background: var(--dd-low); }
+
+.dora-mttr-row__val {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--dd-text);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  flex-shrink: 0;
+  width: 52px;
+  text-align: right;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   FULL-WIDTH PANELS
+═══════════════════════════════════════════════════════════════════ */
+.dora-full-panel {
+  background: var(--dd-surface);
+  border: 1px solid var(--dd-border);
+  border-radius: 10px;
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+}
+
+.dora-full-panel--unconfigured {
+  align-items: center;
+  justify-content: center;
+  min-height: 100px;
+  color: var(--dd-faint);
+  font-style: italic;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   LEAD TIME HORIZONTAL BAR CHART (with x-axis)
+═══════════════════════════════════════════════════════════════════ */
+.dora-lt-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.dora-lt-chart__rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+}
+
+.dora-lt-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 0;
+  position: relative;
+}
+
+.dora-lt-row__name {
+  font-size: 0.76rem;
+  color: var(--dd-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 140px;
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.dora-lt-row__bar-area {
+  flex: 1;
+  position: relative;
+  height: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.dora-lt-row__gridlines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  pointer-events: none;
+}
+
+.dora-lt-row__gridline {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--dd-border);
+}
+
+.dora-lt-row__bar {
+  height: 10px;
+  background: var(--dd-accent);
+  border-radius: 3px;
+  transition: width 0.4s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.dora-lt-row__val {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--dd-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  flex-shrink: 0;
+  width: 48px;
+}
+
+.dora-lt-xaxis {
+  display: flex;
+  margin-top: 4px;
+  padding-left: 150px; /* align with bar area */
+}
+
+.dora-lt-xaxis__inner {
+  flex: 1;
+  position: relative;
+  height: 18px;
+}
+
+.dora-lt-xaxis__tick {
+  position: absolute;
+  font-size: 0.65rem;
+  color: var(--dd-faint);
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   CFR VERTICAL BAR CHART (with y-axis and gridlines)
+═══════════════════════════════════════════════════════════════════ */
+.dora-cfr-vbar {
+  display: flex;
+  gap: 0;
+}
+
+.dora-cfr-vbar__yaxis {
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: space-between;
+  width: 36px;
+  flex-shrink: 0;
+  padding-bottom: 28px; /* space for x labels */
+}
+
+.dora-cfr-vbar__ylabel {
+  font-size: 0.62rem;
+  color: var(--dd-faint);
+  text-align: right;
+  padding-right: 6px;
+  white-space: nowrap;
+}
+
+.dora-cfr-vbar__chart-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.dora-cfr-vbar__plot {
+  position: relative;
+  height: 180px;
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  border-left: 1px solid var(--dd-border);
+  border-bottom: 1px solid var(--dd-border);
+  padding: 0 4px;
+  overflow-x: auto;
+}
+
+.dora-cfr-vbar__gridline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--dd-border);
+  pointer-events: none;
+}
+
+.dora-cfr-vbar__col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  min-width: 28px;
+  max-width: 52px;
+  flex: 1;
+  height: 100%;
+  justify-content: flex-end;
+  position: relative;
+  z-index: 1;
+}
+
+.dora-cfr-vbar__bar {
+  width: 100%;
+  border-radius: 3px 3px 0 0;
+  min-height: 3px;
+  transition: height 0.4s ease;
+}
+
+.dora-cfr-vbar__xlabels {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 6px 4px 0;
+  overflow-x: auto;
+}
+
+.dora-cfr-vbar__xlabel {
+  font-size: 0.6rem;
+  color: var(--dd-muted);
+  text-align: center;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  flex-shrink: 0;
+  min-width: 28px;
+  max-width: 52px;
+  flex: 1;
+  transform-origin: top center;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════════════════════════════ */
+.dora-footer {
+  text-align: center;
+  font-size: 0.72rem;
+  color: var(--dd-faint);
+  padding: 4px 0 10px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   HISTORICAL TRENDS — 2×2 GRID
+═══════════════════════════════════════════════════════════════════ */
+.dora-trends-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+@media (max-width: 780px) {
+  .dora-trends-grid { grid-template-columns: 1fr; }
+}
+
+.dora-trend-panel {
+  background: var(--dd-surface2);
+  border: 1px solid var(--dd-border);
+  border-radius: 10px;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dora-trend-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.dora-trend-panel__title {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--dd-muted);
+  margin: 0;
+}
+
+.dora-trend-panel__current {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 9px;
+  border-radius: 20px;
+  border: 1px solid currentColor;
+  font-size: 0.72rem;
+  font-weight: 700;
+  white-space: nowrap;
+  background: transparent;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   LINE CHART
+═══════════════════════════════════════════════════════════════════ */
+.dora-line-chart {
+  position: relative;
+  width: 100%;
+}
+
+.dora-line-tooltip {
+  position: absolute;
+  transform: translate(-50%, -130%);
+  background: var(--dd-surface2);
+  border: 1px solid var(--dd-border);
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 0.72rem;
+  color: var(--dd-text);
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 20;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+}
+
+.dora-line-tooltip__month {
+  color: var(--dd-muted);
+  font-size: 0.65rem;
+}
+
+.dora-line-tooltip__value {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}

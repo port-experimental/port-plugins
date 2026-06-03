@@ -1,0 +1,52 @@
+{
+  "blueprint1": {
+    "type": "blueprint",
+    "isRequired": true,
+    "label": "Blueprint 1"
+  },
+  "blueprint1_properties": {
+    "type": "string",
+    "isRequired": false,
+    "label": "Blueprint 1 columns (comma-separated property keys)"
+  },
+  "blueprint2": {
+    "type": "blueprint",
+    "isRequired": false,
+    "label": "Blueprint 2"
+  },
+  "blueprint2_properties": {
+    "type": "string",
+    "isRequired": false,
+    "label": "Blueprint 2 columns (comma-separated property keys)"
+  },
+  "blueprint3": {
+    "type": "blueprint",
+    "isRequired": false,
+    "label": "Blueprint 3"
+  },
+  "blueprint3_properties": {
+    "type": "string",
+    "isRequired": false,
+    "label": "Blueprint 3 columns (comma-separated property keys)"
+  },
+  "blueprint4": {
+    "type": "blueprint",
+    "isRequired": false,
+    "label": "Blueprint 4"
+  },
+  "blueprint4_properties": {
+    "type": "string",
+    "isRequired": false,
+    "label": "Blueprint 4 columns (comma-separated property keys)"
+  },
+  "blueprint5": {
+    "type": "blueprint",
+    "isRequired": false,
+    "label": "Blueprint 5"
+  },
+  "blueprint5_properties": {
+    "type": "string",
+    "isRequired": false,
+    "label": "Blueprint 5 columns (comma-separated property keys)"
+  }
+}
