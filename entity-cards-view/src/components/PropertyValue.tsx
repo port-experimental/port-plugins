@@ -1,5 +1,6 @@
 import { useI18n } from "../hooks/useI18n";
 import type { ArrayDisplayMode, BlueprintPropertyMeta, StatusTone } from "../types";
+import { TruncatedText } from "./TruncatedText";
 import {
   booleanStatusTone,
   coerceBoolean,
@@ -64,16 +65,17 @@ export function PropertyValue({
     const shown = items.slice(0, MAX_ARRAY_ITEMS_ON_CARD);
     const hidden = items.length - shown.length;
     const fullText = items.join(", ");
+    const display =
+      hidden > 0
+        ? `${shown.join(", ")} ${t("array.more", { count: String(hidden) })}`
+        : shown.join(", ");
 
     return (
-      <span className="prop-value prop-value--items" title={fullText}>
-        {shown.join(", ")}
-        {hidden > 0 && (
-          <span className="prop-value__more">
-            {t("array.more", { count: String(hidden) })}
-          </span>
-        )}
-      </span>
+      <TruncatedText
+        text={display}
+        tooltip={fullText}
+        className="prop-value prop-value--items"
+      />
     );
   }
 
@@ -84,9 +86,9 @@ export function PropertyValue({
   }
 
   const text = formatDefaultPropertyValue(value);
-  return (
-    <span className="prop-value" title={text}>
-      {text}
-    </span>
-  );
+  if (text === "—") {
+    return <span className="prop-value prop-value--empty">—</span>;
+  }
+
+  return <TruncatedText text={text} className="prop-value" />;
 }
