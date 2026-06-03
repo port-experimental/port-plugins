@@ -1,0 +1,27 @@
+{
+  "maxDepth": {
+    "type": "number",
+    "isRequired": false,
+    "label": "Max traversal depth (default: 3)"
+  },
+  "badge1Property": {
+    "type": "string",
+    "isRequired": false,
+    "label": "Entity badge 1 property key"
+  },
+  "badge2Property": {
+    "type": "string",
+    "isRequired": false,
+    "label": "Entity badge 2 property key"
+  },
+  "showUpstream": {
+    "type": "boolean",
+    "isRequired": false,
+    "label": "Show upstream relations (default: true)"
+  },
+  "showRuleResults": {
+    "type": "boolean",
+    "isRequired": false,
+    "label": "Show scorecard rule-result entities (default: false)"
+  }
+}

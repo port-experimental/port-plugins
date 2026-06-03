@@ -1,0 +1,52 @@
+{
+  "dfBlueprint": {
+    "type": "blueprint",
+    "isRequired": true,
+    "label": "Deployment Frequency blueprint"
+  },
+  "ltBlueprint": {
+    "type": "blueprint",
+    "isRequired": true,
+    "label": "Lead Time for Change blueprint"
+  },
+  "cfrBlueprint": {
+    "type": "blueprint",
+    "isRequired": true,
+    "label": "Change Failure Rate blueprint"
+  },
+  "mttrBlueprint": {
+    "type": "blueprint",
+    "isRequired": true,
+    "label": "Mean Time to Recovery blueprint"
+  },
+  "dfCountProp": {
+    "type": "string",
+    "isRequired": false,
+    "label": "Deploy count property (default: numberOfDeploys)"
+  },
+  "dfBucketProp": {
+    "type": "string",
+    "isRequired": false,
+    "label": "DF bucket property (default: deploymentFrequencyBucket)"
+  },
+  "ltProp": {
+    "type": "string",
+    "isRequired": false,
+    "label": "Lead time hours property (default: leadTimeForChangeHours)"
+  },
+  "cfrProp": {
+    "type": "string",
+    "isRequired": false,
+    "label": "Change failure rate property (default: changeFailureRate)"
+  },
+  "mttrProp": {
+    "type": "string",
+    "isRequired": false,
+    "label": "MTTR hours property (default: meanTimeToRecoveryHours)"
+  },
+  "periodProp": {
+    "type": "string",
+    "isRequired": false,
+    "label": "Period property (default: period)"
+  }
+}

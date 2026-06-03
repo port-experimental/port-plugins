@@ -1,0 +1,72 @@
+{
+  "blueprint1": {
+    "type": "blueprint",
+    "isRequired": true,
+    "label": "Service blueprint 1"
+  },
+  "blueprint2": {
+    "type": "blueprint",
+    "isRequired": false,
+    "label": "Service blueprint 2"
+  },
+  "blueprint3": {
+    "type": "blueprint",
+    "isRequired": false,
+    "label": "Service blueprint 3"
+  },
+  "blueprint4": {
+    "type": "blueprint",
+    "isRequired": false,
+    "label": "Service blueprint 4"
+  },
+  "blueprint5": {
+    "type": "blueprint",
+    "isRequired": false,
+    "label": "Service blueprint 5"
+  },
+  "teamBlueprint": {
+    "type": "string",
+    "isRequired": false,
+    "label": "Team blueprint identifier (default: _team)"
+  },
+  "teamServicesRelation": {
+    "type": "string",
+    "isRequired": false,
+    "label": "Team → services relation name"
+  },
+  "teamManagerRelation": {
+    "type": "string",
+    "isRequired": false,
+    "label": "Team → manager relation name (default: manager)"
+  },
+  "serviceTeamRelation": {
+    "type": "string",
+    "isRequired": false,
+    "label": "Service → team relation name"
+  },
+  "gradeA": {
+    "type": "number",
+    "isRequired": false,
+    "label": "Grade A threshold %"
+  },
+  "gradeB": {
+    "type": "number",
+    "isRequired": false,
+    "label": "Grade B threshold %"
+  },
+  "gradeC": {
+    "type": "number",
+    "isRequired": false,
+    "label": "Grade C threshold %"
+  },
+  "aggregateSimilar": {
+    "type": "boolean",
+    "isRequired": false,
+    "label": "Aggregate rules across similar scorecards"
+  },
+  "scorecardIds": {
+    "type": "string",
+    "isRequired": false,
+    "label": "Scorecard IDs to include (comma-separated, default: all)"
+  }
+}
