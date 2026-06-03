@@ -8,6 +8,10 @@ Look at the following [guide](https://docs.port.io/guides/all/manage-and-surface
 ![React](https://img.shields.io/badge/react-19-blue)
 ![TypeScript](https://img.shields.io/badge/typescript-5.7-blue)
 
+## Preview image
+
+<img alt="TechDocs widget" src="assets/preview.png" />
+
 ## Features
 
 - Sidebar navigation grouped by repository and folder path
