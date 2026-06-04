@@ -47,10 +47,9 @@ export const usePostMessageData = () => {
 
   const applyThemeCss = sdk.applyThemeCss;
 
+  // Always apply — Port injects theme on PLUGIN_DATA; skipping leaves invisible/low-contrast UI.
   useEffect(() => {
-    if (!DEV_MOCK) {
-      applyThemeCss();
-    }
+    applyThemeCss();
   }, [applyThemeCss]);
 
   const result = useMemo(() => {
