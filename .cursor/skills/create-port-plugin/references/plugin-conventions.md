@@ -20,8 +20,7 @@ const PLUGIN_IDENTIFIER_REGEX = /^(?!\.{1,2}$)[A-Za-z0-9@_.+:\\/=-]+$/;
 
 ```
 <plugins-repo>/
-├── README.md                 # Plugins table (link, Version, description)
-├── .cursor/skills/create-port-plugin/
+├── README.md                 # Plugins table (link, Version, description)  
 ├── existing-plugin/
 │   ├── src/
 │   ├── package.json

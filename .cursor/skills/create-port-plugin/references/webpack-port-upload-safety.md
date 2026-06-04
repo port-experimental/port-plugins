@@ -19,13 +19,12 @@ Do **not** add for minimal React widgets with **no** chart library and a success
 
 ### 1. Copy the lodash shim (only if using `NormalModuleReplacementPlugin` below)
 
+From this skill directory:
+
 ```bash
 mkdir -p <widget>/webpack
-cp .cursor/skills/create-port-plugin/assets/webpack/lodash-root-shim.js \
-   <widget>/webpack/lodash-root-shim.js
+cp assets/webpack/lodash-root-shim.js <widget>/webpack/lodash-root-shim.js
 ```
-
-(Use `.claude/skills/create-port-plugin/assets/...` in Claude Code.)
 
 ### 2. Patch `webpack.config.js`
 

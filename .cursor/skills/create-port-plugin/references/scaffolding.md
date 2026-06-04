@@ -14,7 +14,7 @@ See [plugin-conventions.md](plugin-conventions.md) for naming and identifier val
 
 ## 2. Copy templates verbatim
 
-From `.cursor/skills/create-port-plugin/assets/`:
+From `assets/` (this skill directory):
 
 | Source | Destination |
 |--------|-------------|

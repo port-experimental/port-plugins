@@ -173,7 +173,7 @@ Reference files **over 100 lines** must start with a **`## Table of contents`** 
 
 ## Assets
 
-From `.cursor/skills/create-port-plugin/assets/`:
+From `assets/` (this skill directory):
 
 | Template | Destination |
 |----------|-------------|
