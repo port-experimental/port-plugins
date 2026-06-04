@@ -5,9 +5,9 @@ import type { TechDocEntity } from "../../../types";
 import type { InternalDocTarget } from "../../../utils/internalDocLinks";
 import { MarkdownLink, type MarkdownNavigate } from "../markdownComponents";
 import MarkdownCodeBlock from "./MarkdownCodeBlock";
-import MarkdownPre from "./MarkdownPre";
+import MarkdownFencedCodeWrapper from "./MarkdownFencedCodeWrapper";
 import "./markdownPreview.css";
-import rehypeAnchorOnClick from "./rehypeAnchorOnClick";
+import rehypeSmoothScrollHashLinks from "./rehypeSmoothScrollHashLinks";
 
 const allowedElements = [
   "a",
@@ -114,7 +114,7 @@ export function TechDocsMarkdownPreview({
   const markdownComponents = useMemo(
     () => ({
       code: MarkdownCodeBlock,
-      pre: MarkdownPre,
+      pre: MarkdownFencedCodeWrapper,
       a: (anchorProps: ComponentProps<"a">) => (
         <MarkdownLink {...anchorProps} {...linkProps} />
       ),
@@ -135,7 +135,7 @@ export function TechDocsMarkdownPreview({
       className="wmde-markdown-var wmde-markdown doc-markdown-preview"
       source={value}
       skipHtml={false}
-      rehypePlugins={[rehypeAnchorOnClick]}
+      rehypePlugins={[rehypeSmoothScrollHashLinks]}
       allowedElements={allowedElements}
       components={markdownComponents}
       wrapperElement={{ "data-color-mode": dataColorMode }}

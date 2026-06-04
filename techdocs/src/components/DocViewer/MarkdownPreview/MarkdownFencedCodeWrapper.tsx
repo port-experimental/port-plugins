@@ -30,7 +30,8 @@ function isMermaidBlock(children: ReactNode): boolean {
   return Children.toArray(children).some(isMermaidChild);
 }
 
-export default function MarkdownPre({
+/** Outer wrapper for fenced code blocks: `<pre>` for code, `<div>` for Mermaid diagrams. */
+export default function MarkdownFencedCodeWrapper({
   children,
   className,
 }: HTMLAttributes<HTMLPreElement>) {

@@ -1,6 +1,6 @@
 import { visit } from "unist-util-visit";
 
-const onNode = (node: {
+const attachHashLinkScrollHandler = (node: {
   tagName?: string;
   properties?: { href?: string; onClick?: () => void };
 }) => {
@@ -21,8 +21,9 @@ const onNode = (node: {
   };
 };
 
-export default function rehypeAnchorOnClick() {
+/** Rehype plugin: same-page `#heading` links scroll smoothly inside the doc viewer. */
+export default function rehypeSmoothScrollHashLinks() {
   return (tree: Parameters<typeof visit>[0]) => {
-    visit(tree, "element", onNode);
+    visit(tree, "element", attachHashLinkScrollHandler);
   };
 }

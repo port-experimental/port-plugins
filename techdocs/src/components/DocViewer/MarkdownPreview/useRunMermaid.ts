@@ -1,6 +1,10 @@
 import mermaid from "mermaid";
 import { useEffect, useRef, useState } from "react";
 import { installTrustedTypesDefaultPolicy } from "../../../utils/trustedTypesPolicy";
+import {
+  preprocessBoxDrawing,
+  remapErrorLines,
+} from "./preprocessBoxDrawing";
 
 let initialized = false;
 let renderSerial = 0;
@@ -10,7 +14,6 @@ function ensureMermaidInit() {
   installTrustedTypesDefaultPolicy();
   mermaid.initialize({
     startOnLoad: false,
-    securityLevel: "loose",
     suppressErrorRendering: true,
     fontFamily: "system-ui, sans-serif",
   });
@@ -36,8 +39,21 @@ export function useRunMermaid(mermaidCode: string) {
     const renderId = `${instanceId.current}-${++renderSerial}`;
     ensureMermaidInit();
 
+    let mermaidInput = trimmed;
+    let lineMap = new Map<number, number>();
+    try {
+      const preprocessed = preprocessBoxDrawing(trimmed);
+      mermaidInput = preprocessed.text;
+      lineMap = preprocessed.lineMap;
+    } catch (error) {
+      if (cancelled) return;
+      setMermaidError(`Mermaid Chart ${String(error)}`);
+      setSvgCode(undefined);
+      return;
+    }
+
     mermaid
-      .render(renderId, trimmed)
+      .render(renderId, mermaidInput)
       .then((result) => {
         if (cancelled) return;
         setSvgCode(result.svg);
@@ -45,7 +61,10 @@ export function useRunMermaid(mermaidCode: string) {
       })
       .catch((error) => {
         if (cancelled) return;
-        setMermaidError(`Mermaid Chart ${String(error)}`);
+        const message = String(error);
+        const remapped =
+          lineMap.size > 0 ? remapErrorLines(message, lineMap) : message;
+        setMermaidError(`Mermaid Chart ${remapped}`);
         setSvgCode(undefined);
       });
 
