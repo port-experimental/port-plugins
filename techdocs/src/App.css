@@ -804,6 +804,11 @@ body {
   box-shadow: none;
 }
 
+.doc-content .doc-markdown-preview {
+  background: transparent;
+  box-shadow: none;
+}
+
 @media (min-width: 900px) {
   .doc-content {
     padding: 24px 28px 64px;
@@ -906,6 +911,65 @@ body {
   border: none;
   font-size: 14px;
   color: var(--doc-prose-heading);
+}
+
+.doc-content .doc-mermaid-block {
+  margin: 0 0 1.35em;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  overflow-x: auto;
+  text-align: center;
+}
+
+.doc-content .doc-mermaid-block .mermaid-diagram,
+.doc-content .doc-mermaid-block .mermaid-fallback {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.doc-content .doc-mermaid-block .copied {
+  display: none !important;
+}
+
+.doc-content .mermaid-diagram svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Mermaid paints a full-size backdrop rect as the first child of the SVG */
+.doc-content .mermaid-diagram svg > rect:first-child {
+  fill: transparent !important;
+}
+
+.doc-content .mermaid-fallback {
+  margin: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: left;
+  white-space: pre-wrap;
+}
+
+.doc-content .mermaid-error {
+  margin: 0 0 1.35em;
+}
+
+.doc-content .mermaid-error-title {
+  margin: 0 0 0.5em;
+  font-size: 14px;
+  color: var(--doc-prose-muted, #6b7280);
+}
+
+.doc-content .mermaid-error-detail {
+  margin: 0 0 0.75em;
+  font-size: 13px;
+  color: var(--doc-prose-muted, #6b7280);
+  word-break: break-word;
 }
 
 .doc-content table {

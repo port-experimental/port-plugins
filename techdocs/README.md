@@ -15,7 +15,7 @@ Look at the following [guide](https://docs.port.io/guides/all/manage-and-surface
 ## Features
 
 - Sidebar navigation grouped by repository and folder path
-- Full GitHub-Flavored Markdown rendering (tables, code blocks, etc.)
+- Markdown rendering aligned with Port’s `MarkdownPreview` (`@uiw/react-md-editor`, GFM, raw HTML, Mermaid, task lists)
 - **Internal markdown links** — relative links between ingested `.md` files (e.g. `[guide](docs/guide.md)`, `[root](../README.md)`) open in the sidebar viewer instead of leaving the widget
 - **External links** — `https://`, `mailto:`, and similar URLs open via Port’s link bridge (`@port-labs/plugins-sdk` ≥ 0.1.1)
 - Copy file URL (GitHub) from the **View source** control in the header
@@ -199,6 +199,7 @@ techdocs/
 │   │   ├── Sidebar.tsx              # Tree navigation sidebar
 │   │   ├── DocViewer/
 │   │   │   ├── DocView.tsx          # Markdown document viewer
+│   │   │   ├── MarkdownPreview/     # Port-aligned renderer (@uiw/react-md-editor)
 │   │   │   ├── markdownComponents.tsx  # Internal vs external link rendering
 │   │   │   ├── LoadingDocsView.tsx
 │   │   │   └── ErrorDocView.tsx

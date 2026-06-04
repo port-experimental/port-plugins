@@ -1,16 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import type { TechDocEntity } from "../../types";
 import { pickLastUpdatedRaw } from "../../utils/techDocProperties";
 import {
   buildDocPathIndex,
   type InternalDocTarget,
 } from "../../utils/internalDocLinks";
-import {
-  useMarkdownComponents,
-  type MarkdownNavigate,
-} from "./markdownComponents";
+import type { MarkdownNavigate } from "./markdownComponents";
+import { TechDocsMarkdownPreview } from "./MarkdownPreview/TechDocsMarkdownPreview";
 
 interface DocViewerProps {
   doc: TechDocEntity | null;
@@ -104,13 +100,6 @@ function DocViewerContent({
 
   const docPathIndex = useMemo(() => buildDocPathIndex(docs), [docs]);
 
-  const markdownComponents = useMarkdownComponents({
-    currentDoc: doc,
-    docPathIndex,
-    resolveLinkTarget,
-    onNavigate,
-  });
-
   useEffect(() => {
     const pending = pendingScrollRef.current;
     if (!pending || pending.docId !== doc.identifier) return;
@@ -196,12 +185,13 @@ function DocViewerContent({
             </header>
             <div className="doc-prose-region">
               <article className="doc-content">
-                <ReactMarkdown
-                  remarkPlugins={[remarkGfm]}
-                  components={markdownComponents}
-                >
-                  {content || "*No content available.*"}
-                </ReactMarkdown>
+                <TechDocsMarkdownPreview
+                  value={content || "*No content available.*"}
+                  currentDoc={doc}
+                  docPathIndex={docPathIndex}
+                  resolveLinkTarget={resolveLinkTarget}
+                  onNavigate={onNavigate}
+                />
               </article>
             </div>
           </div>

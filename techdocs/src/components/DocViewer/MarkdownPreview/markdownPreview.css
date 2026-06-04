@@ -1,0 +1,24 @@
+.doc-content .wmde-markdown,
+.doc-content .wmde-markdown-var {
+  --color-canvas-default: transparent;
+  --color-canvas-subtle: color-mix(in srgb, var(--card2) 88%, var(--text));
+  --color-fg-default: var(--doc-prose);
+  --color-fg-muted: var(--doc-prose-muted, #6b7280);
+  --color-border-default: var(--border);
+}
+
+.doc-content .wmde-markdown {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+}
+
+.doc-content .wmde-markdown .doc-mermaid-block {
+  background: transparent;
+  border: none;
+}
+
+.doc-content .wmde-markdown .doc-mermaid-block .copied {
+  display: none !important;
+}
