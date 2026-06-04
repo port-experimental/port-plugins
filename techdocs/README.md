@@ -3,7 +3,7 @@
 A [Port](https://app.getport.io) plugin that provides a documentation browser for your repositories. It fetches `techDoc` entities from your Port catalog and renders their markdown content in a two-pane layout with sidebar navigation grouped by repository and folder. 
 Look at the following [guide](https://docs.port.io/guides/all/manage-and-surface-technical-docs/) for more context. 
 
-![Version](https://img.shields.io/badge/version-0.2.0-blue)
+![Version](https://img.shields.io/badge/version-0.3.0-blue)
 ![Widget Type](https://img.shields.io/badge/type-dashboard%20widget-blue)
 ![React](https://img.shields.io/badge/react-19-blue)
 ![TypeScript](https://img.shields.io/badge/typescript-5.7-blue)
