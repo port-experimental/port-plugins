@@ -11,6 +11,12 @@ module.exports = (env, argv) => ({
   },
 
   module: {
+    parser: {
+      javascript: {
+        // Mermaid lazy-loads diagram implementations; eager mode keeps one Port upload file.
+        dynamicImportMode: "eager",
+      },
+    },
     rules: [
       {
         test: /\.tsx?$/,
@@ -53,6 +59,8 @@ module.exports = (env, argv) => ({
       }),
     ],
     usedExports: true,
+    // Port uploads a single inlined index.html; async chunks are not available at runtime.
+    splitChunks: false,
   },
 
   resolve: { extensions: [".tsx", ".ts", ".jsx", ".js"] },
@@ -61,6 +69,7 @@ module.exports = (env, argv) => ({
     filename: "[name].js",
     path: path.resolve(__dirname, "dist"),
     publicPath: "",
+    globalObject: "self",
   },
 
   plugins: [

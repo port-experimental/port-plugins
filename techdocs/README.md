@@ -3,7 +3,7 @@
 A [Port](https://app.getport.io) plugin that provides a documentation browser for your repositories. It fetches `techDoc` entities from your Port catalog and renders their markdown content in a two-pane layout with sidebar navigation grouped by repository and folder. 
 Look at the following [guide](https://docs.port.io/guides/all/manage-and-surface-technical-docs/) for more context. 
 
-![Version](https://img.shields.io/badge/version-0.2.0-blue)
+![Version](https://img.shields.io/badge/version-0.3.0-blue)
 ![Widget Type](https://img.shields.io/badge/type-dashboard%20widget-blue)
 ![React](https://img.shields.io/badge/react-19-blue)
 ![TypeScript](https://img.shields.io/badge/typescript-5.7-blue)
@@ -15,7 +15,7 @@ Look at the following [guide](https://docs.port.io/guides/all/manage-and-surface
 ## Features
 
 - Sidebar navigation grouped by repository and folder path
-- Full GitHub-Flavored Markdown rendering (tables, code blocks, etc.)
+- Markdown rendering aligned with Port’s `MarkdownPreview` (`@uiw/react-md-editor`, GFM, raw HTML, Mermaid, task lists)
 - **Internal markdown links** — relative links between ingested `.md` files (e.g. `[guide](docs/guide.md)`, `[root](../README.md)`) open in the sidebar viewer instead of leaving the widget
 - **External links** — `https://`, `mailto:`, and similar URLs open via Port’s link bridge (`@port-labs/plugins-sdk` ≥ 0.1.1)
 - Copy file URL (GitHub) from the **View source** control in the header
@@ -199,6 +199,7 @@ techdocs/
 │   │   ├── Sidebar.tsx              # Tree navigation sidebar
 │   │   ├── DocViewer/
 │   │   │   ├── DocView.tsx          # Markdown document viewer
+│   │   │   ├── MarkdownPreview/     # Port-aligned renderer (@uiw/react-md-editor)
 │   │   │   ├── markdownComponents.tsx  # Internal vs external link rendering
 │   │   │   ├── LoadingDocsView.tsx
 │   │   │   └── ErrorDocView.tsx

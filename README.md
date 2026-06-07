@@ -10,7 +10,7 @@ This repository contains plugins contributed by [Port.io](https://www.port.io).
 | [Entity Cards View](./entity-cards-view) | 0.1.1 | Display Blueprint entities as customizable cards with configurable properties |
 | [Scorecard Dashboard](./scorecard-dashboard) | 0.1.0 | Scorecard compliance dashboard grouped by team with grade thresholds and per-rule breakdown |
 | [Scorecard Goals](./scorecard-goals) | 0.1.0 | Per-scorecard compliance bars for a selected blueprint, with drill-down into failing entities and rules |
-| [TechDocs](./techdocs) | 0.2.0 | Documentation browser for ingested markdown; sidebar by repository and folder, in-widget relative links between docs, external URLs via Port link bridge |
+| [TechDocs](./techdocs) | 0.3.0 | Documentation browser for ingested markdown; sidebar by repository and folder, in-widget relative links between docs, external URLs via Port link bridge |
 | [Blueprint Table](./blueprint-table) | 0.1.0 | Multi-blueprint entity table with configurable columns; supports up to 5 blueprints with tab navigation |
 | [Dependency Tree](./dependency-tree) | 0.1.0 | Interactive dependency graph with BFS traversal; shows upstream/downstream relations with configurable depth and relation filtering |
 | [DORA Dashboard](./dora-dashboard) | 0.1.0 | DORA metrics dashboard (Deployment Frequency, Lead Time, Change Failure Rate, MTTR) with historical trends |

@@ -1,5 +1,4 @@
-import { useMemo, useState, type ComponentProps } from "react";
-import type { Components } from "react-markdown";
+import { useState, type ComponentProps } from "react";
 import type { TechDocEntity } from "../../types";
 import {
   isExternalHref,
@@ -22,7 +21,7 @@ type MarkdownLinkProps = AnchorProps & {
   onNavigate: MarkdownNavigate;
 };
 
-function MarkdownLink({
+export function MarkdownLink({
   href,
   children,
   className,
@@ -86,34 +85,3 @@ function MarkdownLink({
   );
 }
 
-interface UseMarkdownComponentsOptions {
-  currentDoc: TechDocEntity;
-  docPathIndex: Map<string, string>;
-  resolveLinkTarget: (
-    href: string | undefined,
-    currentDoc: TechDocEntity
-  ) => Promise<InternalDocTarget | null>;
-  onNavigate: MarkdownNavigate;
-}
-
-export function useMarkdownComponents({
-  currentDoc,
-  docPathIndex,
-  resolveLinkTarget,
-  onNavigate,
-}: UseMarkdownComponentsOptions): Components {
-  return useMemo(
-    () => ({
-      a: (linkProps: AnchorProps) => (
-        <MarkdownLink
-          {...linkProps}
-          currentDoc={currentDoc}
-          docPathIndex={docPathIndex}
-          resolveLinkTarget={resolveLinkTarget}
-          onNavigate={onNavigate}
-        />
-      ),
-    }),
-    [currentDoc, docPathIndex, resolveLinkTarget, onNavigate]
-  );
-}

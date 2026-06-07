@@ -2,6 +2,25 @@ import { TechDocEntity } from "../types";
 
 export const MOCK_DOCS: TechDocEntity[] = [
   {
+    identifier: "Node-hello-md",
+    title: "hello",
+    properties: {
+      content: `# hello
+
+\`\`\`mermaid
+graph TD
+    A[Start] --> B{Decision}
+    B -->|Yes| C[Do something]
+    B -->|No| D[Do something else]
+\`\`\`
+`,
+      filePath: "hello.md",
+      folderPath: "",
+      url: "https://github.com/example/Node/blob/main/hello.md",
+    },
+    relations: { repository: "Node" },
+  },
+  {
     identifier: "Node-README-md",
     title: "Node Docs",
     updatedAt: "2026-01-15T14:30:00.000Z",
