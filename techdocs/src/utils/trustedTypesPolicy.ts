@@ -6,7 +6,7 @@ export function installTrustedTypesDefaultPolicy(): void {
   const tt = globalThis.trustedTypes;
   if (!tt || tt.defaultPolicy) return;
 
-  const policyNames = ["default", "port-default", "trusted-types-default"];
+  const policyNames = ["default"];
   for (const name of policyNames) {
     try {
       tt.createPolicy(name, {
@@ -16,7 +16,7 @@ export function installTrustedTypesDefaultPolicy(): void {
       });
       if (tt.defaultPolicy) return;
     } catch {
-      // CSP may restrict policy names; try the next.
+      // CSP may restrict policy names
     }
   }
 }

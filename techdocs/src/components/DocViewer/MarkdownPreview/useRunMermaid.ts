@@ -1,3 +1,4 @@
+import zenuml from "@mermaid-js/mermaid-zenuml";
 import mermaid from "mermaid";
 import { useEffect, useRef, useState } from "react";
 import { installTrustedTypesDefaultPolicy } from "../../../utils/trustedTypesPolicy";
@@ -6,18 +7,22 @@ import {
   remapErrorLines,
 } from "./preprocessBoxDrawing";
 
-let initialized = false;
+let initPromise: Promise<void> | undefined;
 let renderSerial = 0;
 
-function ensureMermaidInit() {
-  if (initialized) return;
-  installTrustedTypesDefaultPolicy();
-  mermaid.initialize({
-    startOnLoad: false,
-    suppressErrorRendering: true,
-    fontFamily: "system-ui, sans-serif",
-  });
-  initialized = true;
+function ensureMermaidInit(): Promise<void> {
+  if (!initPromise) {
+    initPromise = (async () => {
+      installTrustedTypesDefaultPolicy();
+      await mermaid.registerExternalDiagrams([zenuml]);
+      mermaid.initialize({
+        startOnLoad: false,
+        suppressErrorRendering: true,
+        fontFamily: "system-ui, sans-serif",
+      });
+    })();
+  }
+  return initPromise;
 }
 
 export function useRunMermaid(mermaidCode: string) {
@@ -37,7 +42,6 @@ export function useRunMermaid(mermaidCode: string) {
 
     let cancelled = false;
     const renderId = `${instanceId.current}-${++renderSerial}`;
-    ensureMermaidInit();
 
     let mermaidInput = trimmed;
     let lineMap = new Map<number, number>();
@@ -52,10 +56,13 @@ export function useRunMermaid(mermaidCode: string) {
       return;
     }
 
-    mermaid
-      .render(renderId, mermaidInput)
-      .then((result) => {
+    ensureMermaidInit()
+      .then(() => {
         if (cancelled) return;
+        return mermaid.render(renderId, mermaidInput);
+      })
+      .then((result) => {
+        if (cancelled || !result) return;
         setSvgCode(result.svg);
         setMermaidError(undefined);
       })
