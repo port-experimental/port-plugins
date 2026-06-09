@@ -1,0 +1,337 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  font-size: 13px;
+  background: rgb(var(--background-primary, 13 17 23));
+  color: var(--text-high, #e6edf3);
+  height: 100dvh;
+  overflow: hidden;
+}
+
+/* ── Layout ──────────────────────────────────────────────── */
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border-medium, #30363d);
+  flex-shrink: 0;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.app-title {
+  font-size: 15px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: -.3px;
+}
+
+.app-subtitle {
+  font-size: 11px;
+  color: var(--text-low, #7d8590);
+  font-weight: 400;
+}
+
+.header-search {
+  background: var(--background-dim-transparent, #21262d);
+  border: 1px solid var(--border-medium, #30363d);
+  border-radius: 6px;
+  padding: 4px 10px;
+  color: var(--text-high, #e6edf3);
+  font-size: 12px;
+  width: 180px;
+  outline: none;
+}
+.header-search:focus { border-color: var(--color-primary, #58a6ff); }
+.header-search::placeholder { color: var(--text-low, #7d8590); }
+
+/* ── Main body ───────────────────────────────────────────── */
+.app-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;   /* critical: lets flex children shrink below content size */
+  overflow: hidden;
+}
+
+/* ── Radar panel ─────────────────────────────────────────── */
+.radar-panel {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* SVG wrapper: fills available space while keeping 1:1 aspect ratio */
+.radar-svg-wrap {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.radar-svg-wrap svg {
+  /* fill the smaller dimension so the circle never crops */
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+/* ── Legend collapse button ──────────────────────────────── */
+.legend-toggle {
+  position: absolute;
+  top: 50%;
+  left: -13px;
+  transform: translateY(-50%);
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: var(--background-dim-transparent, #21262d);
+  border: 1px solid var(--border-medium, #30363d);
+  color: var(--text-low, #7d8590);
+  font-size: 11px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 10;
+  transition: color .15s;
+}
+.legend-toggle:hover { color: var(--text-high, #e6edf3); }
+
+.legend-outer {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  transition: width .2s ease;
+}
+.legend-outer.collapsed { width: 0 !important; overflow: hidden; }
+
+/* ── Legend panel ────────────────────────────────────────── */
+.legend {
+  width: 260px;
+  flex-shrink: 0;
+  border-left: 1px solid var(--border-medium, #30363d);
+  overflow-y: auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Ring pills */
+.legend-rings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.ring-pill {
+  border: 1px solid var(--pill-color, #58a6ff);
+  color: var(--pill-color, #58a6ff);
+  background: transparent;
+  border-radius: 20px;
+  padding: 2px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s;
+}
+.ring-pill:hover, .ring-pill.active {
+  background: color-mix(in srgb, var(--pill-color, #58a6ff) 15%, transparent);
+}
+
+/* Quadrant sections */
+.legend-quadrants { display: flex; flex-direction: column; gap: 12px; }
+
+.legend-section {
+  transition: opacity .2s;
+  border-radius: 6px;
+  padding: 4px 0;
+}
+.legend-section.dimmed { opacity: 0.2; }
+
+.legend-section-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  margin-bottom: 6px;
+  padding: 2px 0;
+  cursor: default;
+}
+.legend-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.legend-count {
+  margin-left: auto;
+  background: var(--background-dim-transparent, #21262d);
+  border-radius: 20px;
+  padding: 1px 7px;
+  font-size: 10px;
+  color: var(--text-low, #7d8590);
+  font-weight: 400;
+}
+
+/* Legend items */
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 4px 4px 2px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background .1s, opacity .2s;
+  font-size: 12px;
+}
+.legend-item:hover { background: var(--background-dim-transparent, #21262d); }
+.legend-item.selected { background: rgba(88,166,255,.1); }
+.legend-item.dimmed { opacity: 0.2; pointer-events: none; }
+
+.legend-num {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 700;
+  color: white;
+  flex-shrink: 0;
+}
+.legend-name {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-high, #e6edf3);
+}
+.legend-ring {
+  font-size: 10px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.legend-moved {
+  font-size: 9px;
+  flex-shrink: 0;
+}
+.moved-in  { color: #4ade80; }
+.moved-out { color: #f87171; }
+
+.legend-link {
+  font-size: 10px;
+  color: var(--text-low, #7d8590);
+  text-decoration: none;
+  flex-shrink: 0;
+  padding: 1px 3px;
+  border-radius: 3px;
+}
+.legend-link:hover { color: var(--color-primary, #58a6ff); }
+
+/* ── Tooltip ─────────────────────────────────────────────── */
+.radar-tooltip {
+  position: fixed;
+  z-index: 9999;
+  background: var(--background-paper, var(--background-elevated, #1c2128));
+  color: var(--text-strong, #e6edf3);
+  border: 1px solid var(--border-medium, #30363d);
+  border-radius: 8px;
+  padding: 10px 12px;
+  max-width: 260px;
+  pointer-events: none;
+  box-shadow: 0 8px 24px rgba(0,0,0,.5);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.tt-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.tt-num {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: var(--color-primary, #58a6ff);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 700;
+  color: white;
+  flex-shrink: 0;
+}
+.tt-name { font-weight: 600; font-size: 13px; }
+.tt-badges { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 6px; }
+.tt-badge {
+  font-size: 10px;
+  font-weight: 600;
+  border: 1px solid;
+  border-radius: 20px;
+  padding: 1px 7px;
+}
+.tt-moved { background: rgba(88,166,255,.1); color: var(--color-primary, #58a6ff); border-color: var(--color-primary, #58a6ff); }
+.tt-desc {
+  font-size: 11px;
+  color: var(--text-medium, #adbac7);
+  line-height: 1.5;
+  margin-top: 4px;
+}
+
+/* ── Detail panel ────────────────────────────────────────── */
+.detail-panel {
+  width: 260px;
+  flex-shrink: 0;
+  border-left: 1px solid var(--border-medium, #30363d);
+  padding: 16px;
+  overflow-y: auto;
+}
+.detail-panel h3 { font-size: 14px; margin-bottom: 8px; }
+.detail-panel p  { font-size: 12px; color: var(--text-medium, #adbac7); line-height: 1.6; }
+.detail-close {
+  float: right;
+  background: none;
+  border: none;
+  color: var(--text-low, #7d8590);
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+}
+
+/* ── Loading / empty ─────────────────────────────────────── */
+.loading, .empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: 10px;
+  color: var(--text-low, #7d8590);
+  font-size: 13px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.spinner {
+  width: 22px; height: 22px;
+  border: 2px solid var(--border-medium, #30363d);
+  border-top-color: var(--color-primary, #58a6ff);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
