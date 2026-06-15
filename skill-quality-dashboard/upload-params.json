@@ -1,0 +1,61 @@
+{
+  "blueprint": {
+    "type": "blueprint",
+    "isRequired": true,
+    "label": "Blueprint"
+  },
+  "dim1_label": {
+    "type": "string",
+    "isRequired": false,
+    "label": "Dimension 1 label",
+    "default": "Structure"
+  },
+  "dim1_property": {
+    "type": "string",
+    "isRequired": false,
+    "label": "Dimension 1 score property",
+    "default": "spec_compliance_score"
+  },
+  "dim2_label": {
+    "type": "string",
+    "isRequired": false,
+    "label": "Dimension 2 label",
+    "default": "Findability"
+  },
+  "dim2_property": {
+    "type": "string",
+    "isRequired": false,
+    "label": "Dimension 2 score property",
+    "default": "discoverability_score"
+  },
+  "dim3_label": {
+    "type": "string",
+    "isRequired": false,
+    "label": "Dimension 3 label",
+    "default": "Clarity"
+  },
+  "dim3_property": {
+    "type": "string",
+    "isRequired": false,
+    "label": "Dimension 3 score property",
+    "default": "clarity_score"
+  },
+  "dim4_label": {
+    "type": "string",
+    "isRequired": false,
+    "label": "Dimension 4 label",
+    "default": "Maintenance"
+  },
+  "dim4_property": {
+    "type": "string",
+    "isRequired": false,
+    "label": "Dimension 4 score property",
+    "default": "maintainability_score"
+  },
+  "group_relation": {
+    "type": "string",
+    "isRequired": false,
+    "label": "Group relation identifier",
+    "default": ""
+  }
+}
