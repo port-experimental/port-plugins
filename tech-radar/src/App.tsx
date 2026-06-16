@@ -12,7 +12,7 @@ export function App() {
   const { portApiBaseUrl, portToken, params, applyThemeCss } = usePortPluginData();
   useEffect(() => { applyThemeCss?.(); }, [applyThemeCss]);
 
-  const blueprintId = (params?.blueprint?.value as string | undefined) || 'software';
+  const blueprintId = (params?.blueprint?.value.identifier as string | undefined) || 'software';
 
   const [blips,           setBlips]           = useState<Blip[]>([]);
   const [loading,         setLoading]         = useState(true);
