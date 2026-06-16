@@ -43,7 +43,7 @@ npm run build      # produces dist/index.html (single self-contained file)
 # Auth via the unified port CLI, then pipe token to port-plugins:
 PORT_TOKEN="$(port auth token --no-bearer)" port-plugins upload \
   --file dist/index.html \
-  --identifier tech-radar \
+  --identifier tech-radar-port-plugin \
   --title "Tech Radar" \
   --description "Visualize software entities by ring and quadrant" \
   --upsert
