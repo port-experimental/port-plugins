@@ -1,6 +1,6 @@
 {
   "name": "port-tech-radar",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "private": true,
   "description": "Tech radar plugin for Port — visualize software entities by ring and quadrant",
   "engines": {

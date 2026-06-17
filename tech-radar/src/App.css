@@ -116,14 +116,21 @@ body {
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
+  min-height: 0;   /* let the legend child scroll instead of overflowing */
   transition: width .2s ease;
 }
-.legend-outer.collapsed { width: 0 !important; overflow: hidden; }
+/* Keep width 0 when collapsed but DON'T clip — otherwise the reopen toggle
+   (absolutely positioned, sitting just left of the panel) gets hidden. */
+.legend-outer.collapsed { width: 0 !important; }
+/* When collapsed there is no panel border to hang off, so pull the toggle
+   fully into the radar area where it stays visible and clickable. */
+.legend-outer.collapsed .legend-toggle { left: -28px; }
 
 /* ── Legend panel ────────────────────────────────────────── */
 .legend {
   width: 260px;
-  flex-shrink: 0;
+  flex: 1;          /* fill the panel height so the list can scroll */
+  min-height: 0;    /* allow shrinking below content height */
   border-left: 1px solid var(--border-medium, #30363d);
   overflow-y: auto;
   padding: 12px;
@@ -131,6 +138,19 @@ body {
   flex-direction: column;
   gap: 14px;
 }
+/* Always-visible scrollbar so the full list is discoverable. A classic
+   (non-overlay) scrollbar renders whenever the content overflows; we avoid
+   `scrollbar-width` because it makes Chromium ignore these rules and fall
+   back to an auto-hiding overlay bar. Firefox shows its default bar. */
+.legend::-webkit-scrollbar { width: 10px; }
+.legend::-webkit-scrollbar-thumb {
+  background: var(--border-strong, #484f58);
+  border-radius: 5px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+.legend::-webkit-scrollbar-thumb:hover { background: var(--text-low, #7d8590); background-clip: content-box; }
+.legend::-webkit-scrollbar-track { background: transparent; }
 
 /* Ring pills */
 .legend-rings {

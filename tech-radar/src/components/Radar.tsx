@@ -32,11 +32,20 @@ function wedgePath(qi: number, innerR: number, outerR: number): string {
   ].join(' ');
 }
 
+// Small corner badge marking how the blip moved since the last radar.
+// Rendered offset to the top-right so it never covers the blip's number.
 function MovedIndicator({ moved }: { moved: number }) {
-  if (moved === 2) return <circle r={4} fill="white" opacity={0.9} />;
-  if (moved === 1)  return <polygon points="0,-5 4,3 -4,3" fill="white" opacity={0.9} />;
-  if (moved === -1) return <polygon points="0,5 4,-3 -4,-3" fill="white" opacity={0.9} />;
-  return null;
+  if (moved !== 2 && moved !== 1 && moved !== -1) return null;
+  const icon =
+    moved === 1  ? <polygon points="0,-2.6 2.4,1.4 -2.4,1.4" fill="#fff" /> :   // moved in  (up triangle)
+    moved === -1 ? <polygon points="0,2.6 2.4,-1.4 -2.4,-1.4" fill="#fff" /> :  // moved out (down triangle)
+                   <circle r={2.2} fill="#fff" />;                             // new
+  return (
+    <g transform="translate(10,-10)">
+      <circle r={5} fill="rgb(var(--background-primary,13 17 23))" stroke="rgba(255,255,255,0.45)" strokeWidth={1} />
+      {icon}
+    </g>
+  );
 }
 
 interface Props {
