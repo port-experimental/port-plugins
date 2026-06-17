@@ -158,6 +158,8 @@ Before `upload-params.json`:
 
 ## Reference index
 
+Reference files **over 100 lines** must start with a **`## Table of contents`** (after the title) listing all major sections — so partial reads still show full scope.
+
 | File | Read when |
 |------|-----------|
 | [reuse-workflow.md](references/reuse-workflow.md) | Deciding reuse vs adapt vs scaffold; catalog MCP steps |
