@@ -96,7 +96,18 @@ Before `upload-params.json`:
 
 - Version bump **once per branch** — [readme-and-audit.md](references/readme-and-audit.md) (**Versioning**)
 - README from `assets/template-README.md` — [readme-and-audit.md](references/readme-and-audit.md)
-- Root Plugins table row with **Version** from `package.json`
+- **Add a row to the root `README.md` Plugins table** for every newly created plugin (append at the end of the table):
+
+  ```markdown
+  | [<Title>](./<folder-name>) | <version from package.json> | <one-line description> |
+  ```
+
+  Example:
+  ```markdown
+  | [Blueprint Table](./blueprint-table) | 0.1.0 | Multi-blueprint entity table with configurable columns |
+  ```
+
+  The description must match the first sentence of the plugin's own README (keep them in sync).
 - Canonical upload command in README — no invented CLI flags
 
 ### 6. Final review
@@ -111,7 +122,7 @@ Before `upload-params.json`:
 3. Plugin identifier passes regex (Non-negotiables).
 4. README section order + upload command per [readme-and-audit.md](references/readme-and-audit.md).
 5. Non-negotiables + [guidelines.md](references/guidelines.md) anti-patterns.
-6. If functional changes on branch: **one** version bump; root Plugins **Version** matches.
+6. If functional changes on branch: **one** version bump; root Plugins **Version** matches. New plugins: row added to root `README.md` Plugins table with correct folder link, version, and description.
 
 ## Non-negotiables
 
@@ -127,7 +138,7 @@ Before `upload-params.json`:
 | Runtime vs params | Fetch catalog via API + `PLUGIN_DATA` — no duplicate params |
 | API host | `portApiBaseUrl` + token for `/v1/...` only |
 | Portal URLs | `getPortalOrigin()` from `document.referrer`; `{origin}/{blueprint}Entity?identifier={id}` |
-| Blueprint params | `type: "blueprint"`; read `.identifier`; max **5** |
+| Blueprint params | `type: "blueprint"`; Port wraps value — access via `params.<name>.value` (full obj) or `params.<name>.value.identifier` (for API); `.type` field is `unknown`; max **5** |
 | Relations | Schema-first MCP; catalog + README; no relation string params by default |
 | Local dev | Port **9000**; small mocks; document mock portal link limits in README |
 | Subject blueprint | `PLUGIN_DATA.entity.blueprint` on entity pages when design default suffices |
@@ -143,6 +154,7 @@ Before `upload-params.json`:
 | Persistence | Port entities unless explicitly local-only UI — [guidelines.md](references/guidelines.md) |
 | Upload CLI | `--file`, `--identifier`, `--title`, `--params`, `--description`, `--upsert` only |
 | Versioning | Once per branch; greenfield stays `0.1.0` — [readme-and-audit.md](references/readme-and-audit.md) |
+| Root README | New plugin: append row to root `README.md` Plugins table — `| [Title](./folder) | version | one-line description |` |
 
 ## Reference index
 
