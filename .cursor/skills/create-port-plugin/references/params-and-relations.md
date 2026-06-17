@@ -62,6 +62,31 @@ Do not put defaults or setup instructions in `label`.
 
 When admin picks a blueprint, use **`"type": "blueprint"`**. Port delivers an **object** — read `.identifier` for API paths; **preserve full object** for `mergePageFilters`.
 
+### Param shape (what Port delivers at runtime)
+
+Each param entry is a wrapper object with a `value` field and a `type` field:
+
+```
+params.<name>          →  { value: BlueprintObject, type: unknown }
+params.<name>.value    →  the full blueprint object, e.g. { identifier: "service", title: "Service", ... }
+params.<name>.type     →  typed as unknown (Record<string, unknown>) — do not rely on it
+```
+
+Access patterns:
+
+```typescript
+// Full blueprint object (for mergePageFilters):
+const blueprint = params.discussionBlueprint.value;
+
+// Blueprint identifier only (for API paths like GET /v1/blueprints/{id}):
+const blueprintId = params.discussionBlueprint.value.identifier;
+```
+
+> **Note:** `params.<name>.type` is `unknown` at runtime — treat it as `Record<string, unknown>`.  
+> For API calls you almost always only need `.value.identifier`, not the full object.
+
+### Typed helpers
+
 ```typescript
 import type { mergePageFilters } from "@port-labs/plugins-sdk";
 

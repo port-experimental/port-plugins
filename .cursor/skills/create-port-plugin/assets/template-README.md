@@ -10,7 +10,7 @@ PLUGIN_SUMMARY — custom plugin for [Port](https://app.port.io). PLUGIN_SURFACE
 
 ## Preview image
 
-<!-- Commit a screenshot or GIF under assets/ or docs/ after first run in Port. -->
+<!-- NEVER omit this section. If no screenshot exists yet, keep this placeholder as-is and commit it — add the real image after first run in Port (assets/ or docs/). -->
 
 <img alt="PLUGIN_TITLE plugin" src="assets/preview.png" />
 
