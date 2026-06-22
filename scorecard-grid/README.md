@@ -4,8 +4,7 @@ A colour-coded health grid widget for [Port](https://app.port.io) dashboards. Di
 
 ## Preview image
 
-<!-- Add a preview.png to assets/ and uncomment the line below -->
-<!-- <img alt="Scorecard Grid widget" src="assets/preview.png" /> -->
+<img alt="Scorecard Grid widget" src="assets/preview.png" />
 
 ## Features
 
