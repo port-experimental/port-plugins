@@ -12,12 +12,12 @@
   "counters": {
     "type": "array",
     "isRequired": true,
-    "label": "Array of counter badges. Each item: {\"emoji\":\"🪲\",\"label\":\"Bugs\",\"property\":\"open_bug_count\"}"
+    "label": "Counter badges (see README)"
   },
   "drillDown": {
     "type": "array",
     "isRequired": true,
-    "label": "Array of drill-down sections. Each item: {\"label\":\"Bugs\",\"blueprint\":\"jira_bug\",\"query\":{\"combinator\":\"and\",\"rules\":[...Port search rules...]},\"include\":[\"$title\",\"priority\"]}. query is optional — a relatedTo filter for the selected entity is always injected automatically."
+    "label": "Drill-down sections (see README)"
   },
   "pollIntervalSeconds": {
     "type": "number",
@@ -27,6 +27,6 @@
   "iconProperty": {
     "type": "string",
     "isRequired": false,
-    "label": "Property key whose value is used for icon lookup (e.g. \"language\" → Python icon). When unset, only the entity's configured Port icon is used. Falls back to initials when no icon matches."
+    "label": "Property key for icon lookup (e.g. language)"
   }
 }

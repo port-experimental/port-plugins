@@ -3,7 +3,7 @@ import * as si from "simple-icons";
 interface Props {
   portIcon: string | null;
   id?: string | null;
-  /** When set, tried first before portIcon for the simple-icons lookup. */
+  /** When set, tried first before portIcon and id for the simple-icons lookup. */
   iconValue?: string | null;
   size: number;
   tint?: string;

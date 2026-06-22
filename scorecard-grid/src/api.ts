@@ -175,7 +175,9 @@ export async function fetchDrillDownItems(
 
   const query = {
     combinator: "and",
-    rules: [relatedFilter, drillConfig.query],
+    rules: drillConfig.query
+      ? [relatedFilter, drillConfig.query]
+      : [relatedFilter],
   };
 
   const res = await fetch(

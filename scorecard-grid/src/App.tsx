@@ -15,7 +15,7 @@ export default function App() {
   const [errorCollapsed, setErrorCollapsed] = useState(false);
 
   // All hooks must be called unconditionally — early return happens after this block.
-  const { data, isLoading, error, dataUpdatedAt } = useQuery({
+  const { data, isPending, isLoading, error, dataUpdatedAt } = useQuery({
     queryKey: [
       "sg",
       portToken,
@@ -33,6 +33,7 @@ export default function App() {
   const entities = data?.entities ?? [];
   const levels: ScorecardLevel[] = data?.levels ?? [];
 
+  const isLoadingAny = isPending || isLoading;
   const errorMessage = error ? String(error) : null;
   useEffect(() => {
     if (errorMessage) setErrorCollapsed(false);
@@ -89,34 +90,13 @@ export default function App() {
 
   return (
     <div className="app">
-      {/* Nav */}
-      <nav className="nav">
-        <div className="nav__logo">⬡</div>
-        <span className="nav__title">Scorecard Grid</span>
-        <div className="nav__status">
-          {isLoading ? (
-            <div className="spinner" />
-          ) : (
-            <>
-              <div className="nav__dot" />
-              <span className="nav__sync-time">
-                {lastSynced ? `synced ${lastSynced.toLocaleTimeString()}` : "—"}
-              </span>
-            </>
-          )}
-          <span className="nav__poll-badge">
-            {config.pollIntervalSeconds}s poll
-          </span>
-        </div>
-      </nav>
-
       {/* Summary bar */}
       <div className="summary-bar">
         <div className="summary-bar__totals">
           {totals.map((t) => (
             <div key={t.label} className="total-stat">
               <span className="total-stat__val">
-                {isLoading ? "—" : t.total}
+                {isLoadingAny ? "—" : t.total}
               </span>
               <span className="total-stat__label">
                 {t.emoji} {t.label}
@@ -167,7 +147,7 @@ export default function App() {
       {/* Body */}
       <div className="body">
         <main className="main">
-          {isLoading && (
+          {isLoadingAny && (
             <div className="loading-state">
               <div className="spinner spinner--lg" />
               <p className="loading-state__text">
@@ -176,7 +156,7 @@ export default function App() {
             </div>
           )}
 
-          {!isLoading &&
+          {!isLoadingAny &&
             errorMessage &&
             (errorCollapsed ? (
               <button
@@ -203,11 +183,11 @@ export default function App() {
               </div>
             ))}
 
-          {!isLoading && !error && entities.length === 0 && (
+          {!isLoadingAny && !error && entities.length === 0 && (
             <p className="empty-state">No entities found</p>
           )}
 
-          {!isLoading &&
+          {!isLoadingAny &&
             !error &&
             levels
               .filter((lvl) => filter === "All" || filter === lvl.title)

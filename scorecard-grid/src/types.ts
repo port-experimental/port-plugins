@@ -31,7 +31,7 @@ export interface CounterConfig {
 export interface DrillDownConfig {
   label: string;
   blueprint: string;
-  query: {
+  query?: {
     combinator: "and" | "or";
     rules: Array<Record<string, unknown>>;
   };
@@ -64,6 +64,6 @@ export interface PluginConfig {
   pollIntervalSeconds: number;
   counters: CounterConfig[];
   drillDown: DrillDownConfig[];
-  /** Optional property key whose value is used as the icon lookup key instead of the entity's Port icon. */
+  /** Optional property key whose value is used as the icon lookup key instead of title/identifier. */
   iconProperty?: string;
 }
