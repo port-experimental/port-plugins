@@ -14,6 +14,9 @@ This repository contains plugins contributed by [Port.io](https://www.port.io).
 | [Blueprint Table](./blueprint-table) | 0.1.0 | Multi-blueprint entity table with configurable columns; supports up to 5 blueprints with tab navigation |
 | [Dependency Tree](./dependency-tree) | 0.1.0 | Interactive dependency graph with BFS traversal; shows upstream/downstream relations with configurable depth and relation filtering |
 | [DORA Dashboard](./dora-dashboard) | 0.1.0 | DORA metrics dashboard (Deployment Frequency, Lead Time, Change Failure Rate, MTTR) with historical trends |
+| [Survey Builder](./survey-builder) | 0.1.0 | Author engineering surveys (SPACE, AI Adoption, DORA, DX Core 4, or custom) visually and save them as Port survey entities |
+| [Survey Forms](./survey-forms) | 0.1.0 | Run engineering surveys inside Port; renders any authored survey and stores each submission as a scored response entity |
+| [Survey Analytics](./survey-analytics) | 0.1.0 | Read-only analytics for survey responses: scores, trends, team breakdown, multi-select, and a bundled DORA benchmark |
 
 ## AI-assisted development - Skills (Cursor & Claude)
 
