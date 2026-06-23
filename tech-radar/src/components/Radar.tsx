@@ -36,13 +36,14 @@ function wedgePath(qi: number, innerR: number, outerR: number): string {
 // Rendered offset to the top-right so it never covers the blip's number.
 function MovedIndicator({ moved }: { moved: number }) {
   if (moved !== 2 && moved !== 1 && moved !== -1) return null;
+  const fill = 'var(--text-high,#e6edf3)';
   const icon =
-    moved === 1  ? <polygon points="0,-2.6 2.4,1.4 -2.4,1.4" fill="#fff" /> :   // moved in  (up triangle)
-    moved === -1 ? <polygon points="0,2.6 2.4,-1.4 -2.4,-1.4" fill="#fff" /> :  // moved out (down triangle)
-                   <circle r={2.2} fill="#fff" />;                             // new
+    moved === 1  ? <polygon points="0,-2.6 2.4,1.4 -2.4,1.4" fill={fill} /> :   // moved in  (up triangle)
+    moved === -1 ? <polygon points="0,2.6 2.4,-1.4 -2.4,-1.4" fill={fill} /> :  // moved out (down triangle)
+                   <circle r={2.2} fill={fill} />;                             // new
   return (
     <g transform="translate(10,-10)">
-      <circle r={5} fill="rgb(var(--background-primary,13 17 23))" stroke="rgba(255,255,255,0.45)" strokeWidth={1} />
+      <circle r={5} fill="rgb(var(--background-primary,13 17 23))" stroke="var(--border-strong,rgba(255,255,255,0.45))" strokeWidth={1} />
       {icon}
     </g>
   );
@@ -187,8 +188,8 @@ export function Radar({ blips, activeRing, activeQuadrant, selectedBlip, onBlipH
                 <circle
                   r={13}
                   fill={color}
-                  opacity={isSelected ? 1 : 0.85}
-                  stroke={isSelected ? 'white' : 'none'}
+                  opacity={1}
+                  stroke={isSelected ? 'var(--text-high,#fff)' : 'none'}
                   strokeWidth={isSelected ? 2 : 0}
                 />
                 <text

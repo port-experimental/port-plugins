@@ -4,6 +4,14 @@ import type { Blip } from '../types';
 
 const MOVED_LABEL: Record<number, string> = { 2: '✦ New', 1: '▲ Moved in', 0: '', '-1': '▼ Moved out' };
 
+// Blend the category color toward the theme's text color so the label stays
+// readable in both modes: it darkens on a light tooltip, lightens on a dark one.
+const badgeStyle = (color: string): React.CSSProperties => ({
+  background: `color-mix(in srgb, ${color} 18%, transparent)`,
+  color: `color-mix(in srgb, ${color} 50%, var(--text-strong, #e6edf3))`,
+  borderColor: `color-mix(in srgb, ${color} 70%, transparent)`,
+});
+
 interface Props {
   blip: Blip;
   x: number;
@@ -21,10 +29,10 @@ export function Tooltip({ blip, x, y }: Props) {
         <span className="tt-name">{blip.name}</span>
       </div>
       <div className="tt-badges">
-        <span className="tt-badge" style={{ background: RING_COLORS[blip.ring] + '33', color: RING_COLORS[blip.ring], borderColor: RING_COLORS[blip.ring] }}>
+        <span className="tt-badge" style={badgeStyle(RING_COLORS[blip.ring])}>
           {blip.ring}
         </span>
-        <span className="tt-badge" style={{ background: QUAD_COLORS[blip.quadrant] + '22', color: QUAD_COLORS[blip.quadrant], borderColor: QUAD_COLORS[blip.quadrant] }}>
+        <span className="tt-badge" style={badgeStyle(QUAD_COLORS[blip.quadrant])}>
           {blip.quadrant}
         </span>
         {blip.moved !== 0 && (
