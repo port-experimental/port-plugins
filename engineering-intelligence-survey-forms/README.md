@@ -15,6 +15,16 @@ declarative definition (dimensions, questions, answer scales). Change the
 questions, dimensions, scale, or even the framework by editing the survey entity
 in Port - **no rebuild required**. See [Customizing the survey](#customizing-the-survey).
 
+## How these plugins connect
+
+Survey Intelligence is three plugins over one shared data model:
+
+- **Survey Builder** writes the `survey` entity (the definition) and a `surveyCampaign` when you share it.
+- **Survey Forms** reads the active campaigns and writes one `surveyResponse` per submission.
+- **Survey Analytics** reads `survey` and `surveyResponse` to render scores, trends, participation, and benchmarks.
+
+A survey authored in Survey Builder flows straight through Forms and Analytics with no extra wiring; each plugin reads the blueprint identifiers from its widget parameters.
+
 ## Preview image
 
 <!-- TODO: capture the respondent form in Port and commit it as assets/preview.png. -->
