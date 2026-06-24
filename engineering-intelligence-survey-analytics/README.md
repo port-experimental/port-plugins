@@ -6,6 +6,16 @@ Read-only analytics for engineering surveys run in [Port](https://app.port.io).
 Reads `survey` definitions and their `surveyResponse` entities and renders
 scores, trends, participation, and benchmark comparisons - no data is written.
 
+## How these plugins connect
+
+Survey Intelligence is three plugins over one shared data model:
+
+- **Survey Builder** writes the `survey` entity (the definition) and a `surveyCampaign` when you share it.
+- **Survey Forms** reads the active campaigns and writes one `surveyResponse` per submission.
+- **Survey Analytics** reads `survey` and `surveyResponse` to render scores, trends, participation, and benchmarks.
+
+A survey authored in Survey Builder flows straight through Forms and Analytics with no extra wiring; each plugin reads the blueprint identifiers from its widget parameters.
+
 ## Preview image
 
 <img alt="Survey Analytics plugin" src="assets/preview.png" />
