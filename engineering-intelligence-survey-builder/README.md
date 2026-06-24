@@ -94,7 +94,7 @@ couple of sample surveys and teams, so the full builder is exercisable offline.
 ```bash
 npx @port-labs/port-plugins-cli upload \
   --file dist/index.html \
-  --identifier survey-builder \
+  --identifier survey-builder-port-plugin \
   --title "Survey Builder" \
   --params "$(cat upload-params.json)" \
   --upsert \
