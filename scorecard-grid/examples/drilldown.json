@@ -1,0 +1,32 @@
+[
+  {
+    "label": "Bugs",
+    "blueprint": "jira_bug",
+    "query": {
+      "combinator": "and",
+      "rules": [
+        {
+          "property": "status",
+          "operator": "!=",
+          "value": "Done"
+        }
+      ]
+    },
+    "include": ["$title", "priority", "status"]
+  },
+  {
+    "label": "Vulnerabilities",
+    "blueprint": "security_vulnerability",
+    "query": {
+      "combinator": "and",
+      "rules": [
+        {
+          "property": "severity",
+          "operator": "in",
+          "value": ["High", "Critical"]
+        }
+      ]
+    },
+    "include": ["$title", "severity", "status"]
+  }
+]

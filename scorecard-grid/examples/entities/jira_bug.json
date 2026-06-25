@@ -1,0 +1,98 @@
+[
+  {
+    "identifier": "PAY-101",
+    "title": "Checkout timeout on slow networks",
+    "blueprint": "jira_bug",
+    "properties": {
+      "status": "In Progress",
+      "priority": "High"
+    },
+    "relations": {
+      "service": "payment-api"
+    }
+  },
+  {
+    "identifier": "PAY-102",
+    "title": "Refund webhook retries fail silently",
+    "blueprint": "jira_bug",
+    "properties": {
+      "status": "To Do",
+      "priority": "Critical"
+    },
+    "relations": {
+      "service": "payment-api"
+    }
+  },
+  {
+    "identifier": "PAY-103",
+    "title": "Duplicate charge on double-click",
+    "blueprint": "jira_bug",
+    "properties": {
+      "status": "To Do",
+      "priority": "Medium"
+    },
+    "relations": {
+      "service": "payment-api"
+    }
+  },
+  {
+    "identifier": "LEG-201",
+    "title": "Nightly job misses SLA window",
+    "blueprint": "jira_bug",
+    "properties": {
+      "status": "In Progress",
+      "priority": "High"
+    },
+    "relations": {
+      "service": "legacy-batch"
+    }
+  },
+  {
+    "identifier": "LEG-202",
+    "title": "CSV export truncates large files",
+    "blueprint": "jira_bug",
+    "properties": {
+      "status": "To Do",
+      "priority": "Medium"
+    },
+    "relations": {
+      "service": "legacy-batch"
+    }
+  },
+  {
+    "identifier": "LEG-203",
+    "title": "Memory leak in scheduler thread",
+    "blueprint": "jira_bug",
+    "properties": {
+      "status": "To Do",
+      "priority": "Critical"
+    },
+    "relations": {
+      "service": "legacy-batch"
+    }
+  },
+  {
+    "identifier": "LEG-204",
+    "title": "Stale lock after pod restart",
+    "blueprint": "jira_bug",
+    "properties": {
+      "status": "Done",
+      "priority": "Low"
+    },
+    "relations": {
+      "service": "legacy-batch"
+    }
+  },
+  {
+    "identifier": "LEG-205",
+    "title": "Alert noise from false-positive health check",
+    "blueprint": "jira_bug",
+    "properties": {
+      "status": "To Do",
+      "priority": "Low"
+    },
+    "relations": {
+      "service": "legacy-batch"
+    }
+  }
+]

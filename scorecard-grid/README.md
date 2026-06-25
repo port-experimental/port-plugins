@@ -34,6 +34,39 @@ The widget works with any blueprint that has a scorecard attached. No special bl
 | `drillDown` | array | yes | — | Drill-down sections. Each item: `{"label":"Bugs","blueprint":"jira_bug","query":{"combinator":"and","rules":[]},"include":["$title","priority"]}`. A `relatedTo` filter for the selected entity is always injected automatically. |
 | `pollIntervalSeconds` | number | no | 60 | How often to re-fetch data from Port (seconds) |
 
+## Examples
+
+The `examples/` folder contains a full sample setup: three blueprints, matching entities, a scorecard, and widget params.
+
+### Blueprints
+
+| File | Purpose |
+|------|---------|
+| [`examples/blueprints/service.json`](examples/blueprints/service.json) | Main blueprint — counter properties and relations to drill-down targets |
+| [`examples/blueprints/jira_bug.json`](examples/blueprints/jira_bug.json) | Bug blueprint used by the Bugs drill-down |
+| [`examples/blueprints/security_vulnerability.json`](examples/blueprints/security_vulnerability.json) | Vulnerability blueprint used by the Vulnerabilities drill-down |
+
+### Entities
+
+Sample catalog data that works with the scorecard and drill-down queries. Each bug/vulnerability points to its service via a `service` relation — that's the only link the drill-down needs.
+
+| File | Entities |
+|------|----------|
+| [`examples/entities/service.json`](examples/entities/service.json) | `payment-api`, `user-service`, `legacy-batch` — varying scorecard levels and counter values |
+| [`examples/entities/jira_bug.json`](examples/entities/jira_bug.json) | Bugs linked to `payment-api` and `legacy-batch` |
+| [`examples/entities/security_vulnerability.json`](examples/entities/security_vulnerability.json) | Vulnerabilities linked to `payment-api` and `legacy-batch` |
+
+### Widget configuration
+
+| File | Purpose |
+|------|---------|
+| [`examples/scorecard.json`](examples/scorecard.json) | Scorecard on the `service` blueprint — levels and rules the widget reads |
+| [`examples/counters.json`](examples/counters.json) | Widget `counters` param — maps emoji badges to blueprint properties |
+| [`examples/drilldown.json`](examples/drilldown.json) | Widget `drillDown` param — one section per counter, with optional extra query filters |
+| [`examples/widget-params.json`](examples/widget-params.json) | Full widget configuration you can paste into Port |
+
+`drillDown[n]` index matches `counters[n]` — the first drill-down section opens when you click the first counter stat card. The widget always injects a `relatedTo` filter for the selected entity, so drill-down targets only need a relation back to the main blueprint (e.g. `jira_bug` → `service`). Add extra rules in `query` only when you want to narrow results further (e.g. `status != Done` for open bugs only).
+
 ## Local development
 
 ```bash
@@ -95,6 +128,19 @@ scorecard-grid/
     constants.ts        # Port colour → hex map and hexToRgba helper
     types.ts            # PluginConfig, Entity, ScorecardLevel, etc.
   upload-params.json
+  examples/
+    blueprints/
+      service.json
+      jira_bug.json
+      security_vulnerability.json
+    entities/
+      service.json
+      jira_bug.json
+      security_vulnerability.json
+    scorecard.json
+    counters.json
+    drilldown.json
+    widget-params.json
   webpack.config.js
   tsconfig.json
 ```
@@ -105,6 +151,6 @@ scorecard-grid/
 |---------|-------|-----|
 | "Widget configuration is incomplete" | Required params not set | Ensure `blueprint`, `scorecardIdentifier`, `counters`, and `drillDown` are all configured |
 | All cubes show the same level | Scorecard has no rules or all entities pass/fail identically | Verify the scorecard has rules and entities have varying compliance |
-| Drill-down shows "No items found" | No related entities match the query | Check `drillDown[n].blueprint` and that the selected entity has relations to that blueprint |
+| Drill-down shows "No items found" | No related entities match the query | Check `drillDown[n].blueprint` and that related entities have a relation pointing to the selected service |
 | Port API error in error banner | Auth failure or wrong identifiers | Verify `blueprintIdentifier` and `scorecardIdentifier`; confirm the token has read access |
 | Counters always show 0 | Wrong property key in `counters[n].property` | Check the exact property identifier on your blueprint |

@@ -9,10 +9,6 @@ import type {
 import { PORT_COLOR_HEX } from "./constants";
 import { DEV_MOCK } from "./hooks/usePluginData";
 
-function authHeaders(token: string) {
-  return { Authorization: `Bearer ${token.replace(/^Bearer\s*/i, "")}` };
-}
-
 /** Derive the Port app base URL from the API base URL (api. → app., strip /v1). */
 export function appBaseUrl(apiUrl: string): string {
   if (DEV_MOCK) {
@@ -27,7 +23,7 @@ export async function fetchAll(
   token: string,
   config: PluginConfig
 ): Promise<{ rules: Rule[]; entities: Entity[]; levels: ScorecardLevel[] }> {
-  const h = authHeaders(token);
+  const h = { Authorization: `Bearer ${token}` };
   const { blueprintIdentifier: bp, scorecardIdentifier: sc } = config;
 
   const [scRes, listRes] = await Promise.all([
@@ -160,7 +156,10 @@ export async function fetchDrillDownItems(
   mainBlueprint: string,
   drillConfig: DrillDownConfig
 ): Promise<WorkItem[]> {
-  const h = { ...authHeaders(token), "Content-Type": "application/json" };
+  const h = {
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "application/json",
+  };
   const portBase = appBaseUrl(baseUrl);
 
   const relatedFilter = {

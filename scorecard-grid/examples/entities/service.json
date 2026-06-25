@@ -1,0 +1,69 @@
+[
+  {
+    "identifier": "payment-api",
+    "title": "Payment API",
+    "blueprint": "service",
+    "properties": {
+      "open_bug_count": 3,
+      "open_vulnerability_count": 1,
+      "language": "nodejs"
+    },
+    "relations": {
+      "team": "platform-team"
+    },
+    "scorecards": {
+      "production_readiness": {
+        "level": "Bronze",
+        "rules": [
+          { "identifier": "no_open_bugs", "status": "FAILURE" },
+          { "identifier": "low_vulnerabilities", "status": "SUCCESS" },
+          { "identifier": "has_owner", "status": "SUCCESS" }
+        ]
+      }
+    }
+  },
+  {
+    "identifier": "user-service",
+    "title": "User Service",
+    "blueprint": "service",
+    "properties": {
+      "open_bug_count": 0,
+      "open_vulnerability_count": 0,
+      "language": "python"
+    },
+    "relations": {
+      "team": "identity-team"
+    },
+    "scorecards": {
+      "production_readiness": {
+        "level": "Gold",
+        "rules": [
+          { "identifier": "no_open_bugs", "status": "SUCCESS" },
+          { "identifier": "low_vulnerabilities", "status": "SUCCESS" },
+          { "identifier": "has_owner", "status": "SUCCESS" }
+        ]
+      }
+    }
+  },
+  {
+    "identifier": "legacy-batch",
+    "title": "Legacy Batch",
+    "blueprint": "service",
+    "properties": {
+      "open_bug_count": 4,
+      "open_vulnerability_count": 3,
+      "language": "java"
+    },
+    "relations": {},
+    "scorecards": {
+      "production_readiness": {
+        "level": "Critical",
+        "rules": [
+          { "identifier": "no_open_bugs", "status": "FAILURE" },
+          { "identifier": "low_vulnerabilities", "status": "FAILURE" },
+          { "identifier": "has_owner", "status": "FAILURE" }
+        ]
+      }
+    }
+  }
+]

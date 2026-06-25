@@ -1,0 +1,32 @@
+{
+  "identifier": "service",
+  "title": "Service",
+  "description": "Main blueprint displayed in the widget grid.",
+  "icon": "Microservice",
+  "schema": {
+    "properties": {
+      "open_bug_count": {
+        "type": "number",
+        "title": "Open bugs"
+      },
+      "open_vulnerability_count": {
+        "type": "number",
+        "title": "Open vulnerabilities"
+      },
+      "language": {
+        "type": "string",
+        "title": "Primary language",
+        "description": "Optional — use as iconProperty in the widget for simple-icons lookup"
+      }
+    },
+    "required": []
+  },
+  "relations": {
+    "team": {
+      "title": "Team",
+      "target": "_team",
+      "required": false,
+      "many": false
+    }
+  }
+}

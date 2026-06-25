@@ -1,0 +1,40 @@
+{
+  "identifier": "jira_bug",
+  "title": "Jira bug",
+  "description": "Drill-down target for the Bugs counter.",
+  "icon": "Jira",
+  "schema": {
+    "properties": {
+      "status": {
+        "type": "string",
+        "title": "Status",
+        "enum": ["To Do", "In Progress", "Done"],
+        "enumColors": {
+          "To Do": "lightGray",
+          "In Progress": "yellow",
+          "Done": "green"
+        }
+      },
+      "priority": {
+        "type": "string",
+        "title": "Priority",
+        "enum": ["Low", "Medium", "High", "Critical"],
+        "enumColors": {
+          "Low": "lightGray",
+          "Medium": "blue",
+          "High": "orange",
+          "Critical": "red"
+        }
+      }
+    },
+    "required": ["status"]
+  },
+  "relations": {
+    "service": {
+      "title": "Service",
+      "target": "service",
+      "required": false,
+      "many": false
+    }
+  }
+}
