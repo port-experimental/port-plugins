@@ -91,7 +91,7 @@ npm run build   # output: dist/index.html
 ```bash
 port-plugins upload \
   --file dist/index.html \
-  --identifier scorecard-grid \
+  --identifier scorecard-grid-port-plugin \
   --title "Scorecard Grid" \
   --params "$(cat upload-params.json)" \
   --upsert
