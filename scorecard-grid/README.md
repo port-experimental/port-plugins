@@ -42,7 +42,7 @@ The `examples/` folder contains a full sample setup: three blueprints, matching 
 
 | File | Purpose |
 |------|---------|
-| [`examples/blueprints/service.json`](examples/blueprints/service.json) | Main blueprint — counter properties and relations to drill-down targets |
+| [`examples/blueprints/service.json`](examples/blueprints/service.json) | Main blueprint — aggregation properties for counters and relations to drill-down targets |
 | [`examples/blueprints/jira_bug.json`](examples/blueprints/jira_bug.json) | Bug blueprint used by the Bugs drill-down |
 | [`examples/blueprints/security_vulnerability.json`](examples/blueprints/security_vulnerability.json) | Vulnerability blueprint used by the Vulnerabilities drill-down |
 
@@ -52,7 +52,7 @@ Sample catalog data that works with the scorecard and drill-down queries. Each b
 
 | File | Entities |
 |------|----------|
-| [`examples/entities/service.json`](examples/entities/service.json) | `payment-api`, `user-service`, `legacy-batch` — varying scorecard levels and counter values |
+| [`examples/entities/service.json`](examples/entities/service.json) | `payment-api`, `user-service`, `legacy-batch` — varying scorecard levels (counter values come from aggregation properties) |
 | [`examples/entities/jira_bug.json`](examples/entities/jira_bug.json) | Bugs linked to `payment-api` and `legacy-batch` |
 | [`examples/entities/security_vulnerability.json`](examples/entities/security_vulnerability.json) | Vulnerabilities linked to `payment-api` and `legacy-batch` |
 
@@ -66,6 +66,8 @@ Sample catalog data that works with the scorecard and drill-down queries. Each b
 | [`examples/widget-params.json`](examples/widget-params.json) | Full widget configuration you can paste into Port |
 
 `drillDown[n]` index matches `counters[n]` — the first drill-down section opens when you click the first counter stat card. The widget always injects a `relatedTo` filter for the selected entity, so drill-down targets only need a relation back to the main blueprint (e.g. `jira_bug` → `service`). Add extra rules in `query` only when you want to narrow results further (e.g. `status != Done` for open bugs only).
+
+**Counters and drill-down are independent.** The widget reads counter values from whatever blueprint property you configure in `counters[n].property` (in the example, Port aggregation properties on `service`). Drill-down uses a separate query in `drillDown[n]`. Nothing keeps those in sync — it is your responsibility to define the aggregation (or manual property) and the drill-down query so they reflect the same underlying data. In the example, `open_bug_count` counts bugs where `status` is not `Done`, while the Bugs drill-down uses the same filter; `open_vulnerability_count` counts non-`Resolved` vulnerabilities, but the Vulnerabilities drill-down further filters by `severity` in `High` / `Critical`, so the sidebar list can be a subset of what the counter shows.
 
 ## Local development
 
@@ -105,7 +107,7 @@ See [@port-labs/port-plugins-cli](https://www.npmjs.com/package/@port-labs/port-
 2. Select **Scorecard Grid**
 3. Set `blueprint` to the blueprint you want to visualize
 4. Set `scorecardIdentifier` to the scorecard's identifier
-5. Define `counters` — one object per numeric property you want shown as a badge (e.g. `[{"emoji":"🪲","label":"Bugs","property":"open_bug_count"}]`)
+5. Define `counters` — one object per numeric property you want shown as a badge (e.g. `[{"emoji":"🪲","label":"Bugs","property":"open_bug_count"}]`). This can be a regular number property or an aggregation property on the blueprint.
 6. Define `drillDown` — one object per counter, pointing to a related blueprint whose entities you want to drill into
 7. Optionally set `pollIntervalSeconds` (default: 60)
 8. Save
@@ -153,4 +155,5 @@ scorecard-grid/
 | All cubes show the same level | Scorecard has no rules or all entities pass/fail identically | Verify the scorecard has rules and entities have varying compliance |
 | Drill-down shows "No items found" | No related entities match the query | Check `drillDown[n].blueprint` and that related entities have a relation pointing to the selected service |
 | Port API error in error banner | Auth failure or wrong identifiers | Verify `blueprintIdentifier` and `scorecardIdentifier`; confirm the token has read access |
-| Counters always show 0 | Wrong property key in `counters[n].property` | Check the exact property identifier on your blueprint |
+| Counters always show 0 | Wrong property key in `counters[n].property` | Check the exact property identifier on your blueprint; for aggregation properties, confirm `pathFilter` and `target` are set correctly |
+| Counter and drill-down disagree | Counter property and drill-down query use different filters | Align aggregation/query rules yourself — the widget does not link them |
