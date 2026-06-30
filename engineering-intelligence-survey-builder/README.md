@@ -102,15 +102,12 @@ couple of sample surveys and teams, so the full builder is exercisable offline.
 ## Upload to Port
 
 ```bash
-npx @port-labs/port-plugins-cli upload \
+port-plugins upload \
   --file dist/index.html \
   --identifier survey-builder-port-plugin \
   --title "Survey Builder" \
   --params "$(cat upload-params.json)" \
-  --upsert \
-  --client-id "$PORT_CLIENT_ID" \
-  --client-secret "$PORT_CLIENT_SECRET" \
-  --port-api-base-url https://api.port.io
+  --upsert 
 ```
 
 ## Adding a template
