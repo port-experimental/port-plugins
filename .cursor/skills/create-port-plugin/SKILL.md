@@ -90,6 +90,7 @@ Before `upload-params.json`:
 - Webpack `inject: "body"`; root `height: 100%`; `#plugin-root` flex column — [ui-and-styling.md](references/ui-and-styling.md)
 - Entity search: `{ query: { combinator, rules } }`
 - `applyThemeCss()` on every host path (including Port iframe)
+- **`@port-labs/plugins-sdk`** — compare declared + lockfile-resolved version to latest on npm (see [readme-and-audit.md](references/readme-and-audit.md) **SDK version**)
 - **Mandatory:** [production-readiness.md](references/production-readiness.md) — hooks order, query UI states, param/entity resolution
 
 ### 5. Document and ship
@@ -117,12 +118,13 @@ Before `upload-params.json`:
 
 ## Verify (before done)
 
-1. [production-readiness.md](references/production-readiness.md) — all §1–§9 (especially hooks before early returns, `isPending`, iframe layout).
+1. [production-readiness.md](references/production-readiness.md) — all §1–§10 (especially hooks before early returns, `isPending`, iframe layout, SDK version).
 2. `npm run dev` shows guard or functional UI (not empty white); `npm run build` → `dist/index.html`.
-3. Plugin identifier passes regex (Non-negotiables).
-4. README section order + upload command per [readme-and-audit.md](references/readme-and-audit.md).
-5. Non-negotiables + [guidelines.md](references/guidelines.md) anti-patterns.
-6. If functional changes on branch: **one** version bump; root Plugins **Version** matches. New plugins: row added to root `README.md` Plugins table with correct folder link, version, and description.
+3. **`@port-labs/plugins-sdk`** — run `npm view @port-labs/plugins-sdk version`; record declared (`package.json`), resolved (`package-lock.json`), and latest; flag when behind (audit/validation reports must include this row).
+4. Plugin identifier passes regex (Non-negotiables).
+5. README section order + upload command per [readme-and-audit.md](references/readme-and-audit.md).
+6. Non-negotiables + [guidelines.md](references/guidelines.md) anti-patterns.
+7. If functional changes on branch: **one** version bump; root Plugins **Version** matches. New plugins: row added to root `README.md` Plugins table with correct folder link, version, and description.
 
 ## Non-negotiables
 
@@ -133,6 +135,7 @@ Before `upload-params.json`:
 | Hooks | **All** hooks at top of `App` before any `return`; gate fetches with `enabled` — [production-readiness.md](references/production-readiness.md) §1 |
 | Port iframe | No blank main while loading; `isPending \|\| isLoading`; `#plugin-root` flex + `min-height` on shell — [production-readiness.md](references/production-readiness.md) §2–§3 |
 | Params / entity | `template-config.ts` + `template-resolveHostEntity.ts` for blueprint params and entity pages — [production-readiness.md](references/production-readiness.md) §5–§6 |
+| SDK version | On every audit/validation: `npm view @port-labs/plugins-sdk version` vs `package.json` + lockfile; report gap; bump + rebuild when behind — [readme-and-audit.md](references/readme-and-audit.md) (**SDK version**) |
 | Charts | Recharts unless trivial; webpack safety — [webpack-port-upload-safety.md](references/webpack-port-upload-safety.md) |
 | CSS | `:root` = surfaces/text/borders; decorations class-local; palette `-bg`/`-text` for pills |
 | Runtime vs params | Fetch catalog via API + `PLUGIN_DATA` — no duplicate params |
