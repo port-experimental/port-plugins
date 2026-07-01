@@ -27,9 +27,9 @@ A survey authored in Survey Builder flows straight through Forms and Analytics w
 
 ## Preview image
 
-<!-- TODO: capture the respondent form in Port and commit it as assets/preview.png. -->
+<img alt="Survey Forms respondent form: a SPACE survey rendered with likert questions grouped by dimension" src="assets/preview.png" />
 
-_Screenshot to be added._
+<img alt="Survey Forms dashboard picker: choose an active survey shared with your team" src="assets/preview-picker.png" width="60%" />
 
 ## Features
 
