@@ -1,0 +1,17 @@
+{
+  "surveyBlueprint": {
+    "type": "blueprint",
+    "isRequired": true,
+    "label": "Survey blueprint"
+  },
+  "respondentUrl": {
+    "type": "string",
+    "isRequired": false,
+    "label": "Respondent dashboard URL (for Share links)"
+  },
+  "analyticsUrl": {
+    "type": "string",
+    "isRequired": false,
+    "label": "Analytics dashboard URL (for View responses)"
+  }
+}
