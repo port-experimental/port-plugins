@@ -89,6 +89,7 @@ Entity and portal links built from mock identifiers do **not** work at `http://l
 ```bash
 npm install
 npm run build   # output: dist/index.html
+git add dist/index.html   # commit the upload artifact (tracked in repo)
 ```
 
 <!-- Add notes here when build needs extra steps (e.g. post-build patch script, Recharts webpack safety). -->
