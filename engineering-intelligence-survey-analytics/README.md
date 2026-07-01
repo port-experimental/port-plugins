@@ -48,7 +48,15 @@ A survey authored in Survey Builder flows straight through Forms and Analytics w
 | `surveyResponse` | One submission: `dimensionScores`, `overallScore`, raw `answers`, and owning team. |
 | Team (Port native) | Team names and sizes for participation. |
 
-## Plugin parameters
+### Relations
+
+| Relation | Source blueprint | Target blueprint | Required | Usage |
+|----------|------------------|------------------|----------|-------|
+| `survey` | `surveyResponse` | `survey` | yes | Responses are fetched per survey via a `relatedTo` search on this relation. |
+
+Owning team for a response comes from native Port ownership (`_user` team), not a relation.
+
+## Widget parameters
 
 | Param | Type | Required | Notes |
 |-------|------|----------|-------|
@@ -60,9 +68,20 @@ A survey authored in Survey Builder flows straight through Forms and Analytics w
 ```bash
 cd engineering-intelligence-survey-analytics
 npm install
-npm run dev     # local dev with mock data (outside Port's iframe)
+npm run dev     # http://localhost:9000
 npm run build   # output: dist/index.html
 ```
+
+Outside Port's iframe, `DEV_MOCK` (in `src/hooks/usePostMessageData.ts`) supplies
+a mock host and `src/dev/mockData.ts` provides sample surveys and responses, so
+the full dashboard renders offline. Edit `src/dev/mockData.ts` to change the
+fixtures. To test inside Port during development, use Port's **Local development**
+widget mode (loads `localhost:9000` in the real iframe with host context).
+
+**Deep link:** the Survey Builder "View responses" action hands off a survey id
+via `localStorage` key `__port_analytics_survey` (with a `?survey=` referrer
+fallback), read here on mount and via a `storage` event. URL-based deep links are
+not required and would not work cross-origin. The key is consumed once applied.
 
 ## Setup
 
@@ -81,6 +100,7 @@ port-plugins upload \
   --identifier survey-analytics-port-plugin \
   --title "Survey Analytics" \
   --params "$(cat upload-params.json)" \
+  --description "Developer survey analytics: results, trends, team breakdown, question ranking" \
   --upsert
 ```
 
@@ -96,6 +116,26 @@ See [@port-labs/port-plugins-cli](https://www.npmjs.com/package/@port-labs/port-
 ## Benchmark
 
 The DORA 2025 reference distribution ships with the plugin, so the **Benchmark** tab works out of the box for DORA surveys - no benchmark blueprint or seed step required. The tab appears only for surveys whose questions resolve to a bundled benchmark.
+
+## Project structure
+
+```
+engineering-intelligence-survey-analytics/
+  src/
+    api/            # portFetch, entities (survey + response search)
+    benchmarks/     # dora-2025.ts, registry.ts, compare.ts, types.ts (bundled reference data)
+    surveys/        # definition fallbacks + registry.ts
+    hooks/          # usePostMessageData, survey/response/team query hooks
+    components/     # SummaryStrip, DimensionBars, TrendLine, TeamHeatmap, QuestionRanking, ParticipationTable, ResponsesTable, BenchmarkView, FilterBar, states
+    utils/          # config, aggregations
+    dev/mockData.ts # local-dev fixtures (DEV_MOCK)
+    types.ts
+    App.tsx / App.css / index.tsx / index.html
+  assets/           # preview image(s)
+  upload-params.json
+  webpack.config.js
+  tsconfig.json
+```
 
 ## Troubleshooting
 
