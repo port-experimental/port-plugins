@@ -21,7 +21,7 @@ Use when **aligning an existing plugin** or **reviewing a newly scaffolded plugi
 
 ### When to use
 
-- Per-plugin **`README.md`** is missing, thin, or out of order versus **Per-plugin `README.md` standard (required)** below (preview image on GitHub user-attachments, parameters table before setup, canonical upload command, troubleshooting, and so on).
+- Per-plugin **`README.md`** is missing, thin, or out of order versus **Per-plugin `README.md` standard (required)** below (preview image, parameters table before setup, canonical upload command, troubleshooting, and so on).
 - **`upload-params.json`** drifted from **`src/types.ts`**, overuses `string` where **`type: "blueprint"`** fits, includes **relation-key string params** or other **runtime-fetchable catalog data** (blueprint lists, entity IDs, property inventories) that belong on the Port API, duplicates a fixed subject blueprint that **`PLUGIN_DATA.entity`** already provides, or ignores the five-blueprint-param cap (see [CLI metadata](https://www.npmjs.com/package/@port-labs/port-plugins-cli)).
 - **UX/UI** is weak (no loading/empty/error states, ignores theme, poor responsive layout) or code uses **`innerHTML`** / **`dangerouslySetInnerHTML`** for dynamic content.
 - **`@port-labs/plugins-sdk`** is outdated or the host bridge omits **`applyThemeCss()`**, **`usePortPluginData`**, or dashboard **`mergePageFilters`** when page filters should apply.
@@ -100,8 +100,7 @@ Do **not** commit other `dist/` files (source maps, chunks, etc.) — only `inde
 
 ### PR checklist (copy into description)
 
-- [ ] **`README.md`** matches the per-plugin README standard below (preview on user-attachments, params before setup, local dev, canonical upload command + CLI link, troubleshooting).
-- [ ] **Preview image** — `https://github.com/user-attachments/assets/{uuid}` with `width`, `height`, and descriptive `alt`; no local `assets/preview.png` / `docs/` screenshot paths.
+- [ ] **`README.md`** matches the per-plugin README standard below (preview asset, params before setup, local dev, canonical upload command + CLI link, troubleshooting).
 - [ ] **Upload command** uses only `--file`, `--identifier`, `--title`, `--params`, `--description`, `--upsert` (no invented flags).
 - [ ] **`upload-params.json`** ↔ **`types.ts`** aligned; **`blueprint`** types used where admins pick blueprints; ≤5 blueprint params.
 - [ ] **SDK version** — `npm view @port-labs/plugins-sdk version` compared to declared + lockfile-resolved versions; not behind latest without documented reason; **`applyThemeCss()`** called so host theme tokens apply in the iframe (see [plugins-sdk on npm](https://www.npmjs.com/package/@port-labs/plugins-sdk)).
@@ -126,24 +125,7 @@ Each **plugin directory must** include a `README.md` that follows **this section
 
 1. **`#` Title + summary** — Human title; one paragraph describing behaviour, a link to [Port](https://app.getport.io), and which catalog concepts apply (blueprints, relations, dashboard vs entity page).
 
-2. **Preview image** — At least **one** screenshot or short GIF of the widget running inside Port (dashboard and/or entity page, whichever the widget supports). Host on **GitHub user-attachments** only — do **not** commit `assets/preview.png`, `docs/`, or other local README image paths.
-
-   ```html
-   <img width="1170" height="735" alt="Short widget description" src="https://github.com/user-attachments/assets/{uuid}" />
-   ```
-
-   | Requirement | Detail |
-   |-------------|--------|
-   | `src` | `https://github.com/user-attachments/assets/{uuid}` — permanent, renders on github.com without repo checkout |
-   | `width` / `height` | Intrinsic pixel dimensions of the screenshot (macOS: `sips -g pixelWidth -g pixelHeight path.png`) |
-   | `alt` | Short, descriptive text — not generic `"image"` |
-
-   **Upload (pick one):**
-
-   1. **GitHub web UI** — drag the screenshot into a README/issue/PR comment editor; copy the generated `user-attachments` URL.
-   2. **`gh-image` CLI** (automatable) — `gh extension install drogers0/gh-image`, then `gh image path/to/screenshot.png --repo owner/repo` (prints markdown with URL).
-
-   Remove any local preview files from the plugin tree after the README uses the hosted URL.
+2. **Preview image** — At least **one** screenshot or short GIF of the widget running inside Port (dashboard and/or entity page, whichever the widget supports). Commit the asset under e.g. `docs/` or `assets/` and reference it with a relative path, **or** use a stable hosted URL. Always add **alt text** for accessibility.
 
 3. **Badges (optional)** — e.g. widget surface (dashboard / entity), React and TypeScript versions; link to [Plugins](https://docs.getport.io/customize-pages-dashboards-and-plugins/plugins) where helpful.
 

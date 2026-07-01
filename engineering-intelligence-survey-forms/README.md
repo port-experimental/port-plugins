@@ -27,9 +27,9 @@ A survey authored in Survey Builder flows straight through Forms and Analytics w
 
 ## Preview image
 
-<img width="812" height="651" alt="Survey Forms respondent form: a SPACE survey rendered with likert questions grouped by dimension" src="https://github.com/user-attachments/assets/32fa9968-d4a6-4e57-98b3-68d7cafc60f9" />
+<img alt="Survey Forms respondent form: a SPACE survey rendered with likert questions grouped by dimension" src="assets/preview.png" />
 
-<img width="814" height="336" alt="Survey Forms dashboard picker: choose an active survey shared with your team" src="https://github.com/user-attachments/assets/40438698-d4ac-40b9-b2b6-f7b334fec51e" />
+<img alt="Survey Forms dashboard picker: choose an active survey shared with your team" src="assets/preview-picker.png" width="60%" />
 
 ## Features
 

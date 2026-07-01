@@ -124,8 +124,7 @@ Before `upload-params.json`:
 4. Plugin identifier passes regex (Non-negotiables).
 5. README section order + upload command per [readme-and-audit.md](references/readme-and-audit.md).
 6. Non-negotiables + [guidelines.md](references/guidelines.md) anti-patterns.
-7. README preview uses GitHub `user-attachments` URL (`width`, `height`, descriptive `alt`) — no local screenshot paths.
-8. If functional changes on branch: **one** version bump; root Plugins **Version** matches; **`dist/index.html` rebuilt and committed**. New plugins: row added to root `README.md` Plugins table with correct folder link, version, and description; initial **`dist/index.html` committed**.
+7. If functional changes on branch: **one** version bump; root Plugins **Version** matches; **`dist/index.html` rebuilt and committed**. New plugins: row added to root `README.md` Plugins table with correct folder link, version, and description; initial **`dist/index.html` committed**.
 
 ## Non-negotiables
 
@@ -149,7 +148,6 @@ Before `upload-params.json`:
 | Param schema | Every param: `type`, `isRequired`, `label` |
 | Param labels | Short in JSON; detail in README **Plugin parameters** |
 | README | Prerequisites tables before params — [readme-and-audit.md](references/readme-and-audit.md) |
-| Preview image | GitHub `user-attachments` URL with `width`/`height`/`alt` — no local `assets/preview.png` — [readme-and-audit.md](references/readme-and-audit.md) (**Preview image**) |
 | Search | Nested `query`; not top-level `combinator`/`rules` |
 | Page filters | `mergePageFilters` with **full** blueprint object — [plugin-architecture.md](references/plugin-architecture.md) |
 | Errors | Include full response body text |

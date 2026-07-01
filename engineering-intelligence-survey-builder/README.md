@@ -21,7 +21,7 @@ A survey authored in Survey Builder flows straight through Forms and Analytics w
 
 ## Preview image
 
-<img width="1312" height="815" alt="Survey Builder plugin" src="https://github.com/user-attachments/assets/4d03864b-2d22-4d10-877a-3ed4657877f1" />
+<img alt="Survey Builder plugin" src="assets/preview.png" />
 
 ## What it does
 
@@ -165,6 +165,7 @@ engineering-intelligence-survey-builder/
     utils/          # config, portalUrl, share, surveyGrouping, draft, resolveHostEntity
     types.ts / scoring.ts
     App.tsx / App.css / index.tsx / index.html
+  assets/preview.png
   upload-params.json
   webpack.config.js
   tsconfig.json

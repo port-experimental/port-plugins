@@ -10,9 +10,9 @@ PLUGIN_SUMMARY — custom plugin for [Port](https://app.port.io). PLUGIN_SURFACE
 
 ## Preview image
 
-<!-- NEVER omit this section. Screenshot must be hosted on GitHub user-attachments — see readme-and-audit.md (Preview image). -->
+<!-- NEVER omit this section. If no screenshot exists yet, keep this placeholder as-is and commit it — add the real image after first run in Port (assets/ or docs/). -->
 
-<img width="PLUGIN_PREVIEW_WIDTH" height="PLUGIN_PREVIEW_HEIGHT" alt="PLUGIN_TITLE plugin" src="https://github.com/user-attachments/assets/PLUGIN_PREVIEW_UUID" />
+<img alt="PLUGIN_TITLE plugin" src="assets/preview.png" />
 
 ## Features
 
