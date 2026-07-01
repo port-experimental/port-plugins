@@ -84,7 +84,7 @@ npm run build  # dist/index.html
 
 Checklist: `inject: "body"` in webpack; `height: 100%` + `#plugin-root` flex — [ui-and-styling.md](ui-and-styling.md); `applyThemeCss()` always — [production-readiness.md](production-readiness.md).
 
-**Before marking done:** complete [production-readiness.md](production-readiness.md) §1–§9.
+**Before marking done:** complete [production-readiness.md](production-readiness.md) §1–§10 (including `npm view @port-labs/plugins-sdk version` vs lockfile).
 
 ## 6. Document and ship
 

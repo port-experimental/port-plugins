@@ -5,7 +5,9 @@
 - [README, audit, and ship](#readme-audit-and-ship)
 - [Audit workflow](#audit-workflow)
   - [When to use](#when-to-use)
-  - [Steps](#steps)
+  - [Workflow](#workflow)
+  - [SDK version (mandatory on every audit)](#sdk-version-mandatory-on-every-audit)
+  - [Validation report](#validation-report)
 - [Versioning — once per branch](#versioning-once-per-branch)
 - [PR checklist](#pr-checklist)
 - [Per-plugin README standard](#per-plugin-readme-standard)
@@ -29,17 +31,54 @@ Use when **aligning an existing plugin** or **reviewing a newly scaffolded plugi
 ### Workflow
 
 1. **Read** — `README.md`, `upload-params.json`, `package.json` (`engines`, dependencies), `src/types.ts`, host hook (`usePostMessageData` / `usePortPluginData`), main UI entry, any API modules, `webpack.config.js`, root CSS.
-2. **Gap analysis** — Compare against the README standard below, params guidance in [scaffolding-and-implementation.md](scaffolding-and-implementation.md) (**Define parameters**), and [plugin-architecture.md](plugin-architecture.md) / [widget-conventions.md](widget-conventions.md).
-3. **Prioritize** — Correctness first (Port API request shapes, token usage, theme), then operator docs (README, param table), then polish (badges, screenshots, structure tree).
-4. **Patch** — Keep diffs focused: bump SDK with hook changes; keep `PluginConfig` and `upload-params.json` in lockstep; rewrite README sections rather than deleting useful catalog/integration detail. **Bump `package.json` `version`** for every functional change (patch / minor / major per semver); update the repo root **Plugins** table **Version** column to match.
-5. **Verify** — `npm ci` / `npm install`, `npm run build`, smoke in **Local development** mode and/or in Port; confirm root **`README.md` Plugins** **Version** matches `package.json`; update the row description if behaviour changed materially.
+2. **SDK version** — mandatory on every audit; see [SDK version (mandatory on every audit)](#sdk-version-mandatory-on-every-audit) below.
+3. **Gap analysis** — Compare against the README standard below, params guidance in [scaffolding-and-implementation.md](scaffolding-and-implementation.md) (**Define parameters**), and [plugin-architecture.md](plugin-architecture.md) / [widget-conventions.md](widget-conventions.md).
+4. **Prioritize** — Correctness first (Port API request shapes, token usage, theme, SDK currency), then operator docs (README, param table), then polish (badges, screenshots, structure tree).
+5. **Patch** — Keep diffs focused: bump SDK with hook changes; keep `PluginConfig` and `upload-params.json` in lockstep; rewrite README sections rather than deleting useful catalog/integration detail. **Bump `package.json` `version`** for every functional change (patch / minor / major per semver); update the repo root **Plugins** table **Version** column to match.
+6. **Verify** — `npm ci` / `npm install`, `npm run build`, smoke in **Local development** mode and/or in Port; confirm root **`README.md` Plugins** **Version** matches `package.json`; update the row description if behaviour changed materially.
+
+### SDK version (mandatory on every audit)
+
+**Do not skip this step** when running an audit or writing a `VALIDATION-REPORT.md`.
+
+1. **Latest on npm** (authoritative):
+
+   ```bash
+   npm view @port-labs/plugins-sdk version
+   ```
+
+2. **Declared** in the plugin's `package.json` (`dependencies["@port-labs/plugins-sdk"]`).
+
+3. **Resolved** in `package-lock.json` (`node_modules/@port-labs/plugins-sdk` → `version`). If there is no lockfile, run `npm install` first or note "unresolved".
+
+4. **Compare** — pass only when resolved ≥ latest (or declared range explicitly targets latest and lockfile will resolve there after `npm install`). Flag **behind** when resolved < latest.
+
+5. **Report** — validation reports and audit summaries must include a table row:
+
+   | Declared | Resolved (lockfile) | Latest (npm) | Status |
+   |----------|---------------------|--------------|--------|
+   | `^0.1.0` | `0.1.1` | `0.3.0` | Behind — bump recommended |
+
+6. **Fix** — set `"@port-labs/plugins-sdk": "^<latest>"` in `package.json`, run `npm install`, `npm run build`, and smoke-test host bridge (`applyThemeCss`, `usePortPluginData` / `mergePageFilters` if used). Read [plugins-sdk on npm](https://www.npmjs.com/package/@port-labs/plugins-sdk) for breaking changes between versions.
+
+### Validation report
+
+When the user asks to **validate** or **audit** a plugin, write `<plugin>/VALIDATION-REPORT.md` (or present the same sections in chat) using this outline:
+
+1. **Build & runtime (passed)** — table of checks that passed.
+2. **Dependencies** — **required** SDK version table (see above); note any other stale Port packages (`@port-labs/port-plugins-cli` in README only — dev tool, not bundled).
+3. **Production readiness gaps** — hooks, layout, query states, etc.
+4. **README / audit gaps** — docs, preview image, param drift.
+5. **Intentional / acceptable choices**
+6. **Not verified in this run** — Port iframe smoke test, live org, etc.
+7. **Recommended fix priority**
 
 ### PR checklist (copy into description)
 
 - [ ] **`README.md`** matches the per-plugin README standard below (preview asset, params before setup, local dev, canonical upload command + CLI link, troubleshooting).
 - [ ] **Upload command** uses only `--file`, `--identifier`, `--title`, `--params`, `--description`, `--upsert` (no invented flags).
 - [ ] **`upload-params.json`** ↔ **`types.ts`** aligned; **`blueprint`** types used where admins pick blueprints; ≤5 blueprint params.
-- [ ] **SDK** current enough for your needs (see [plugins-sdk on npm](https://www.npmjs.com/package/@port-labs/plugins-sdk)); **`applyThemeCss()`** called so host theme tokens apply in the iframe.
+- [ ] **SDK version** — `npm view @port-labs/plugins-sdk version` compared to declared + lockfile-resolved versions; not behind latest without documented reason; **`applyThemeCss()`** called so host theme tokens apply in the iframe (see [plugins-sdk on npm](https://www.npmjs.com/package/@port-labs/plugins-sdk)).
 - [ ] **Webpack / CSS** meet Critical Webpack/CSS in [plugin-architecture.md](plugin-architecture.md).
 - [ ] **Entity search** bodies use `{ query: { combinator, rules } }` where applicable; errors surfaced with response body text.
 - [ ] **`npm run build`** succeeds; **`dist/index.html`** is the upload artifact.
