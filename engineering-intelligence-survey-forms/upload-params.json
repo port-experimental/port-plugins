@@ -1,0 +1,12 @@
+{
+  "responseBlueprint": {
+    "type": "blueprint",
+    "isRequired": true,
+    "label": "Response blueprint"
+  },
+  "surveyBlueprint": {
+    "type": "blueprint",
+    "isRequired": false,
+    "label": "Survey blueprint"
+  }
+}
