@@ -92,6 +92,7 @@ Checklist: `inject: "body"` in webpack; `height: 100%` + `#plugin-root` flex —
 | Task | Reference |
 |------|-----------|
 | Per-plugin README | [readme-and-audit.md](readme-and-audit.md) + `assets/template-README.md` |
+| Preview screenshot | Upload to GitHub user-attachments (`gh image` or web UI); embed URL in README — [readme-and-audit.md](readme-and-audit.md) (**Preview image**) |
 | Version bump (once per branch) | [readme-and-audit.md](readme-and-audit.md) (**Versioning**) — rebuild and commit `dist/index.html` |
 | Build artifact | `npm run build` then commit `dist/index.html` (greenfield + every version bump) |
 | Root Plugins table row | Include **Version** from `package.json` |

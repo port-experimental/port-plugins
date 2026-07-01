@@ -220,6 +220,12 @@ See [ui-and-styling.md](ui-and-styling.md) (**Surface vs decoration colors**).
 }
 ```
 
+### ❌ Don't: Commit local README preview images
+
+**Bad:** `<img src="assets/preview.png" />` or `docs/screenshot.png` checked into the plugin folder.
+
+**Good:** Upload the screenshot to GitHub user-attachments (`gh image path.png --repo owner/repo` or drag-drop in the GitHub web editor); embed `https://github.com/user-attachments/assets/{uuid}` with `width`, `height`, and descriptive `alt` — [readme-and-audit.md](readme-and-audit.md) (**Preview image**).
+
 ### ❌ Don't: Create Duplicate Blueprints
 
 **Bad:**
