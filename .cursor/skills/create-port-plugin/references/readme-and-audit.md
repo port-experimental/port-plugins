@@ -100,7 +100,8 @@ Do **not** commit other `dist/` files (source maps, chunks, etc.) — only `inde
 
 ### PR checklist (copy into description)
 
-- [ ] **`README.md`** matches the per-plugin README standard below (preview asset, params before setup, local dev, canonical upload command + CLI link, troubleshooting).
+- [ ] **Preview image** — `assets/preview.png` committed; README `<img>` uses full `https://github.com/{owner}/{repo}/blob/{branch}/{plugin-dir}/assets/preview.png` with `width`, `height`, descriptive `alt`.
+- [ ] **`README.md`** matches the per-plugin README standard below (full GitHub blob preview URL, params before setup, local dev, canonical upload command + CLI link, troubleshooting).
 - [ ] **Upload command** uses only `--file`, `--identifier`, `--title`, `--params`, `--description`, `--upsert` (no invented flags).
 - [ ] **`upload-params.json`** ↔ **`types.ts`** aligned; **`blueprint`** types used where admins pick blueprints; ≤5 blueprint params.
 - [ ] **SDK version** — `npm view @port-labs/plugins-sdk version` compared to declared + lockfile-resolved versions; not behind latest without documented reason; **`applyThemeCss()`** called so host theme tokens apply in the iframe (see [plugins-sdk on npm](https://www.npmjs.com/package/@port-labs/plugins-sdk)).
@@ -125,7 +126,21 @@ Each **plugin directory must** include a `README.md` that follows **this section
 
 1. **`#` Title + summary** — Human title; one paragraph describing behaviour, a link to [Port](https://app.getport.io), and which catalog concepts apply (blueprints, relations, dashboard vs entity page).
 
-2. **Preview image** — At least **one** screenshot or short GIF of the widget running inside Port (dashboard and/or entity page, whichever the widget supports). Commit the asset under e.g. `docs/` or `assets/` and reference it with a relative path, **or** use a stable hosted URL. Always add **alt text** for accessibility.
+2. **Preview image** — At least **one** screenshot or short GIF of the widget running inside Port (dashboard and/or entity page, whichever the widget supports). **Commit** the file under `assets/preview.png` (additional screenshots: `assets/preview-*.png`) and reference it with a **full GitHub blob URL** — not a relative path, not `user-attachments`, not `raw.githubusercontent.com`.
+
+   ```html
+   <img width="2000" height="503" alt="Blueprint Table widget" src="https://github.com/port-experimental/port-plugins/blob/main/blueprint-table/assets/preview.png" />
+   ```
+
+   | Requirement | Detail |
+   |-------------|--------|
+   | `src` | `https://github.com/{owner}/{repo}/blob/{branch}/{plugin-dir}/assets/preview.png` |
+   | `{branch}` | Repo default branch (`main`) after merge; use the **feature branch** name until the image is on `main` |
+   | `width` / `height` | Intrinsic pixel dimensions (`sips -g pixelWidth -g pixelHeight assets/preview.png` on macOS) |
+   | `alt` | Short, descriptive widget name / caption |
+   | File | `assets/preview.png` committed in the same PR as the README update |
+
+   When the screenshot changes, update **both** the committed PNG and the README `width` / `height` if dimensions changed.
 
 3. **Badges (optional)** — e.g. widget surface (dashboard / entity), React and TypeScript versions; link to [Plugins](https://docs.getport.io/customize-pages-dashboards-and-plugins/plugins) where helpful.
 

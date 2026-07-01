@@ -220,6 +220,12 @@ See [ui-and-styling.md](ui-and-styling.md) (**Surface vs decoration colors**).
 }
 ```
 
+### ❌ Don't: Use relative paths or user-attachments for README preview images
+
+**Bad:** `<img src="assets/preview.png" />` or `https://github.com/user-attachments/assets/{uuid}`.
+
+**Good:** Commit `assets/preview.png` and use the full GitHub blob URL: `https://github.com/port-experimental/port-plugins/blob/{branch}/{plugin-dir}/assets/preview.png` with `width`, `height`, and descriptive `alt` — [readme-and-audit.md](readme-and-audit.md) (**Preview image**).
+
 ### ❌ Don't: Create Duplicate Blueprints
 
 **Bad:**
