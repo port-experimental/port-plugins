@@ -140,12 +140,3 @@ export type ScoreResult = {
   /** Mean of dimension scores, 0..100. */
   overallScore: number | null;
 };
-
-/** A surveyResponse entity as read back from Port for the results view. */
-export type SurveyResponseRecord = {
-  identifier: string;
-  respondent?: string;
-  submittedAt?: string;
-  dimensionScores?: Record<string, number>;
-  overallScore?: number;
-};

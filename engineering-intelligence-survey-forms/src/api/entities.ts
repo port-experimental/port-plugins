@@ -1,11 +1,6 @@
 import { DEV_MOCK } from "../hooks/usePostMessageData";
-import { MOCK_RESPONSES, MOCK_SURVEYS } from "../dev/mockData";
-import type {
-  Answers,
-  Entity,
-  ScoreResult,
-  SurveyResponseRecord,
-} from "../types";
+import { MOCK_SURVEYS } from "../dev/mockData";
+import type { Answers, Entity, ScoreResult } from "../types";
 import { delay, portFetch, type PortCtx } from "./portFetch";
 
 /** Relation on the response blueprint that points back to its survey. */
@@ -34,39 +29,6 @@ export async function searchActiveSurveys(
     }
   );
   return data.entities ?? [];
-}
-
-/** All responses related to a given survey, for the results view. */
-export async function searchResponses(
-  ctx: PortCtx,
-  args: { responseBlueprint: string; surveyBlueprint: string; surveyId: string }
-): Promise<SurveyResponseRecord[]> {
-  if (DEV_MOCK) {
-    await delay();
-    return MOCK_RESPONSES;
-  }
-  const data = await portFetch<{ entities: Entity[] }>(
-    ctx,
-    `/v1/blueprints/${encodeURIComponent(
-      args.responseBlueprint
-    )}/entities/search`,
-    {
-      method: "POST",
-      body: JSON.stringify({
-        query: {
-          combinator: "and",
-          rules: [
-            {
-              operator: "relatedTo",
-              blueprint: args.surveyBlueprint,
-              value: args.surveyId,
-            },
-          ],
-        },
-      }),
-    }
-  );
-  return (data.entities ?? []).map(toResponseRecord);
 }
 
 /** Persist one submission as a surveyResponse entity. */
@@ -116,21 +78,6 @@ export async function createResponse(
     { method: "POST", body: JSON.stringify(body) }
   );
   return data.entity;
-}
-
-function toResponseRecord(e: Entity): SurveyResponseRecord {
-  const p = e.properties ?? {};
-  return {
-    identifier: e.identifier,
-    respondent: typeof p.respondent === "string" ? p.respondent : undefined,
-    submittedAt: typeof p.submittedAt === "string" ? p.submittedAt : undefined,
-    dimensionScores:
-      p.dimensionScores && typeof p.dimensionScores === "object"
-        ? (p.dimensionScores as Record<string, number>)
-        : undefined,
-    overallScore:
-      typeof p.overallScore === "number" ? p.overallScore : undefined,
-  };
 }
 
 function slug(s: string): string {

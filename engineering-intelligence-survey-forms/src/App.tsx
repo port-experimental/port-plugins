@@ -28,6 +28,7 @@ export function App() {
   const { params, entity, user, portToken, portApiBaseUrl } =
     usePostMessageData();
   const config = configFromParams(params);
+  const surveyBlueprintId = config?.surveyBlueprint?.identifier ?? null;
 
   const ctx =
     portToken && portApiBaseUrl
@@ -44,8 +45,12 @@ export function App() {
   const hostSurvey = useMemo(() => {
     const h = resolveHostSubject(entity);
     if (!h || !entity) return null;
+    // When a survey blueprint is configured, only treat the host as a survey if
+    // its blueprint matches - otherwise the widget was placed on an unrelated
+    // entity page and must not render a form from that entity's properties.
+    if (surveyBlueprintId && h.blueprint !== surveyBlueprintId) return null;
     return surveyContextFromEntity({ ...entity, blueprint: h.blueprint });
-  }, [entity]);
+  }, [entity, surveyBlueprintId]);
   const isEntityPage = !!hostSurvey;
 
   // Which survey the respondent has picked from the dashboard list.
@@ -111,13 +116,14 @@ export function App() {
 
   // ── Dashboard: no survey chosen yet ─────────────────────────────────────
   if (!activeSurvey) {
-    // Wait for surveys + campaigns + teams so we don't flash the picker before
-    // filtering (a missing team query is disabled, so it never blocks).
+    // Wait for surveys, and - unless we're going to show everything anyway -
+    // for the campaign + team data that filtering depends on, so the picker
+    // never flashes unfiltered before filtering settles. In degrade mode
+    // (no email, or a campaign/team lookup failed) there's nothing to wait for,
+    // which also avoids blocking on teamsQuery when it's disabled (no email).
     const discovering =
       surveysQuery.isPending ||
-      surveysQuery.isLoading ||
-      campaignsQuery.isLoading ||
-      teamsQuery.isLoading;
+      (!degradeOpen && (campaignsQuery.isPending || teamsQuery.isPending));
     const hasActive = (surveysQuery.data ?? []).length > 0;
 
     return (

@@ -33,14 +33,15 @@ _Screenshot to be added._
 
 ## Features
 
-- **Definition-driven forms** - likert, single-/multi-choice, boolean, and
+- **Definition-driven forms** - likert, single-/multi-choice, boolean, eNPS, and
   open-text questions rendered dynamically from the survey definition.
 - **Built-in templates** - SPACE, DORA, DX Core 4, and AI Adoption, plus any
   custom framework authored in Survey Builder, with reverse-coded items.
 - **Automatic scoring** - per-dimension scores (0-100) and an overall score are
   computed on submit and saved on the response entity.
-- **Aggregated results view** - anonymous per-dimension score meters, response
-  count, and overall score, read back from the catalog.
+- **Audience-gated dashboard picker** - on a dashboard, only active surveys
+  shared with your team (via a `surveyCampaign`) are listed; a deadline badge is
+  shown when the campaign has one.
 - **Two surfaces** - entity page (host = the survey) or dashboard (survey picker).
 - Loading, empty, error, and setup states; light/dark theme via the Port SDK.
 
@@ -56,8 +57,8 @@ _Screenshot to be added._
 
 ### Blueprints & properties
 
-This plugin persists submissions as entities, so it needs two blueprints. They
-are created automatically by the catalog setup below; the schemas are:
+This plugin persists submissions and reads campaigns for audience gating, so it
+uses three blueprints. The schemas are:
 
 **`survey`** - a configurable survey instance
 
@@ -77,16 +78,34 @@ are created automatically by the catalog setup below; the schemas are:
 | `answers` | object | Raw answers keyed by question id. |
 | `dimensionScores` | object | Per-dimension normalized score (0-100). |
 | `overallScore` | number | Mean of dimension scores (0-100). |
+| `enps` | number | Per-respondent eNPS contribution (+100 / 0 / -100), when the survey has an `nps` question. |
 | `submittedAt` | string (date-time) | |
+
+**`surveyCampaign`** - a share of a survey to an audience (read on dashboards)
+
+Authored by Survey Builder. This plugin reads it (blueprint id is a code
+constant, not a param) to decide which active surveys to show on a dashboard.
+
+| Property | Type | Notes |
+|----------|------|-------|
+| `audience` | enum (`all`, `teams`) | `all` shows the survey to everyone; `teams` restricts to the `teams` relation. |
+| `status` | enum (`active`, `closed`) | Only `active` campaigns gate visibility. |
+| `deadline` | date-time | Optional; rendered as a deadline badge on the form header. |
 
 ### Relations
 
 | Relation | Source blueprint | Target blueprint | Required | Usage |
 |----------|------------------|------------------|----------|-------|
-| `survey` | `surveyResponse` | `survey` | yes | Links each response to its survey. The plugin reads/writes this relation as a code constant (`RESPONSE_TO_SURVEY_RELATION`) - it is **not** a plugin parameter. |
+| `survey` | `surveyResponse` | `survey` | yes | Links each response to its survey. Read/written as a code constant (`RESPONSE_TO_SURVEY_RELATION`) - **not** a plugin parameter. |
+| `survey` | `surveyCampaign` | `survey` | yes | Which survey a campaign shares (used to match campaigns to surveys). |
+| `teams` | `surveyCampaign` | `_team` | no | Target teams when `audience = teams`. |
 
-`survey` also has an optional `service` relation (`survey` → `service`) so a
-survey can be scoped to a service; the plugin does not require it.
+**Dashboard visibility rule:** on a dashboard, an `active` survey is shown only
+when it has an `active` `surveyCampaign` shared with `all` teams or with one of
+the current user's teams. An active survey with **no** campaign is hidden. If the
+user's email or the campaign/team lookup is unavailable, the picker **degrades
+open** (shows everything) rather than appear empty. The **entity-page** surface
+is not gated - a direct entity link always opens the form.
 
 ## Plugin parameters
 
@@ -125,13 +144,14 @@ A definition looks like:
       "text": "I am satisfied with my work as a developer on this team." },
     { "id": "sat_exhausted", "dimension": "satisfaction", "type": "likert", "reverse": true,
       "text": "I often feel emotionally or physically exhausted by my work." },
+    { "id": "enps", "type": "nps", "text": "How likely are you to recommend this team as a place to work?" },
     { "id": "biggest_improvement", "type": "text", "text": "What would most improve your effectiveness?" }
   ]
 }
 ```
 
 Supported question `type`s: `likert`, `single_choice`, `multi_choice`, `boolean`,
-`text`. Likert/boolean/scored single-choice questions with a `dimension`
+`nps`, `text`. Likert/boolean/scored single-choice questions with a `dimension`
 contribute to that dimension's score; `reverse: true` inverts the scale (e.g.
 "I feel exhausted"). To add a **new framework** as a built-in default, drop a
 definition file next to `src/surveys/space.ts` and register it in
@@ -158,12 +178,8 @@ npm run dev   # http://localhost:9000
 
 Outside Port's iframe, `DEV_MOCK` (in `src/hooks/usePostMessageData.ts`) supplies
 a mock host: it simulates landing on the `space-sample` survey entity page with
-both blueprint params set, and `src/dev/mockData.ts` provides a few mock
-responses for the Results view. Submissions are mocked locally (no write).
-
-The "open in Port" link in the header is built from `document.referrer`, so it
-does **not** resolve at `localhost:9000` - validate it via Port's **Local
-development** iframe or after deploy.
+both blueprint params set. Submissions are mocked locally (no write). Edit
+`src/dev/mockData.ts` to change the sample survey.
 
 ## Setup
 
@@ -205,7 +221,7 @@ for CLI install and credential setup.
 2. Select **Survey Forms**.
 3. Set **Response blueprint** = `surveyResponse`. Leave **Survey blueprint** empty.
 4. Save → fill in the survey → **Submit response** → a `surveyResponse` entity is
-   created, related to the survey, and the **Results** tab updates.
+   created, related to the survey. Analyze responses in **Survey Analytics**.
 
 **On a dashboard:**
 
@@ -219,12 +235,13 @@ for CLI install and credential setup.
 engineering-intelligence-survey-forms/
   src/
     surveys/        # space.ts (SPACE template) + registry.ts (resolve/fallback)
-    scoring.ts      # normalization, reverse-coding, dimension/overall scoring
-    api/            # portFetch.ts, entities.ts (search/create)
-    hooks/          # usePostMessageData, useActiveSurveys, useSurveyResponses, useSubmitResponse
-    components/     # SurveyForm, QuestionField, ResultsPanel, SurveyPicker, states
-    utils/          # config, resolveHostEntity, surveyContext, portalUrl
+    scoring.ts      # normalization, reverse-coding, dimension/overall/eNPS scoring
+    api/            # portFetch.ts, entities.ts (search/create), campaigns.ts (audience read)
+    hooks/          # usePostMessageData, useActiveSurveys, useCampaigns, useUserTeams, useSubmitResponse
+    components/     # SurveyForm, QuestionField, SurveyPicker, states
+    utils/          # config, resolveHostEntity, surveyContext, audience
     types.ts        # SurveyDefinition, Question, PluginConfig, …
+    dev/mockData.ts # local-dev fixtures (DEV_MOCK)
     App.tsx / App.css / index.tsx / index.html
   upload-params.json
   webpack.config.js
@@ -239,6 +256,5 @@ engineering-intelligence-survey-forms/
 | "Configure the Response blueprint…" | `responseBlueprint` param not set | Set the required **Response blueprint** param. |
 | "Place this widget on a survey entity page…" | Dashboard placement without **Survey blueprint** | Set the **Survey blueprint** param, or place the widget on a `survey` entity. |
 | Form shows the SPACE default unexpectedly | Survey entity has no inline `definition` | Expected fallback - set the `definition` property to override. |
+| Dashboard picker is empty though active surveys exist | Surveys not shared with your team, or no campaign | Share the survey to your team (or all teams) from Survey Builder; an active survey with no campaign is hidden on dashboards. |
 | 422 on submit/search | Malformed search body or relation value | Search bodies nest `{ query: { combinator, rules } }`; the `survey` relation value is the survey identifier. Error text includes the Port response body. |
-| Results empty | No responses yet, or wrong `survey` relation | Submit one response; confirm responses relate to the survey. |
-| "open in Port" link doesn't work locally | No `document.referrer` at `localhost:9000` | Expected - validate in Port's Local development iframe or after deploy. |
