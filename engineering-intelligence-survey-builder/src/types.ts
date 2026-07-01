@@ -158,9 +158,8 @@ export const CADENCES = ["one-off", "monthly", "quarterly"] as const;
 // Sharing - a survey is *published* (status → active, runner-eligible) and then
 // *shared* to an audience as a point-in-time campaign. The campaign, not the
 // survey, owns the audience + reminder schedule, so one survey can be run many
-// times (matching `cadence`). The widget only collects this config and triggers
-// the `share_survey` self-service action; the action's backend creates the
-// surveyCampaign entity and schedules nudges.
+// times (matching `cadence`). The widget collects this config and upserts the
+// surveyCampaign entity directly (see api/campaigns.ts `launchCampaign`).
 // ───────────────────────────────────────────────────────────────────────────
 
 /** How often to nudge people who haven't responded yet. */

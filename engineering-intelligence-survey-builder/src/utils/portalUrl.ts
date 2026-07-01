@@ -65,6 +65,21 @@ export function buildRespondentDashboardUrl(
 }
 
 /**
+ * URL of a workflow's configuration page in the embedding Port portal settings.
+ * The org comes from the token (reliable cross-origin), the origin from the
+ * referrer. Returns null when the org can't be resolved, so callers can hide the
+ * link rather than point it at the wrong org.
+ */
+export function buildWorkflowConfigUrl(
+  workflowId: string,
+  token?: string | null
+): string | null {
+  const { origin, org: orgFromRef } = portalBase();
+  const org = orgFromToken(token) ?? orgFromRef;
+  return org ? `${origin}/${org}/settings/workflows/${workflowId}` : null;
+}
+
+/**
  * Deep link to a survey's results in the survey-analytics dashboard, with the
  * survey id in the query so analytics can pre-select it. `override` (the
  * analyticsUrl param) wins over the portal-derived default.

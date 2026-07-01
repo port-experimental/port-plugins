@@ -3,14 +3,6 @@ import { MOCK_CAMPAIGNS } from "../dev/mockData";
 import { delay, portFetch, type PortCtx } from "./portFetch";
 import type { Entity, ShareConfig } from "../types";
 
-/**
- * Workflow that fans a survey out to an audience and schedules reminder nudges.
- * The widget triggers this self-service workflow on the `survey` blueprint.
- * It creates the `surveyCampaign` entity and sets `nextNudgeAt`; the
- * `survey_nudge` timer automation then reschedules and tracks reminders.
- */
-export const SHARE_WORKFLOW = "share-survey";
-
 /** Workflow that manually nudges non-respondents for an active campaign. */
 export const NUDGE_WORKFLOW = "survey-nudge-now";
 

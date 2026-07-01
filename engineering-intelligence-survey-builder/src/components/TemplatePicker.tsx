@@ -1,8 +1,19 @@
 import { useEffect, useRef, useState } from "react";
+import { openAiChat } from "@port-labs/plugins-sdk";
 import { TEMPLATES } from "../surveys/registry";
 import { groupByFramework, partition } from "../utils/surveyGrouping";
 import { copyText } from "../utils/share";
+import { DEV_MOCK } from "../hooks/usePostMessageData";
 import type { SurveyDefinition, SurveyRow } from "../types";
+
+/** Small sparkle mark for the "Build with AI" affordances (replaces an emoji). */
+function SparkleIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M12 2l2.2 6.2a3 3 0 0 0 1.6 1.6L22 12l-6.2 2.2a3 3 0 0 0-1.6 1.6L12 22l-2.2-6.2a3 3 0 0 0-1.6-1.6L2 12l6.2-2.2a3 3 0 0 0 1.6-1.6z" />
+    </svg>
+  );
+}
 
 /**
  * Starter prompts to paste into Port AI for drafting a survey from a goal.
@@ -130,13 +141,14 @@ export function TemplatePicker({ onPick, onCancel, surveys, onClone }: Props) {
   const [aiShowAll, setAiShowAll] = useState(false);
   // The prompt whose full text is currently previewed (by label), or null.
   const [previewLabel, setPreviewLabel] = useState<string | null>(null);
-  // The AI prompt whose text was just copied, for transient "Copied!" feedback.
-  const [copiedPrompt, setCopiedPrompt] = useState<string | null>(null);
-  const copyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // The prompt whose action just fired, with the transient label to show
+  // ("Opened in Port AI" or, in standalone dev, "Copied!").
+  const [ackPrompt, setAckPrompt] = useState<{ text: string; label: string } | null>(null);
+  const ackTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const promptsRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => () => {
-    if (copyTimer.current) clearTimeout(copyTimer.current);
+    if (ackTimer.current) clearTimeout(ackTimer.current);
   }, []);
 
   // The prompts panel renders at the bottom; scroll it into view when opened.
@@ -144,11 +156,23 @@ export function TemplatePicker({ onPick, onCancel, surveys, onClone }: Props) {
     if (aiOpen) promptsRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }, [aiOpen]);
 
-  const handleCopyPrompt = async (prompt: string) => {
-    const ok = await copyText(prompt);
-    setCopiedPrompt(ok ? prompt : null);
-    if (copyTimer.current) clearTimeout(copyTimer.current);
-    if (ok) copyTimer.current = setTimeout(() => setCopiedPrompt(null), 2000);
+  const ackFor = (text: string, label: string) => {
+    setAckPrompt({ text, label });
+    if (ackTimer.current) clearTimeout(ackTimer.current);
+    ackTimer.current = setTimeout(() => setAckPrompt(null), 2000);
+  };
+
+  // Open the Port AI side chat with the prompt pre-filled (build mode - these
+  // prompts ask Port AI to design a survey). Standalone dev has no Port host to
+  // receive the message, so fall back to copying the prompt to the clipboard.
+  const handleUsePrompt = async (prompt: string) => {
+    if (DEV_MOCK) {
+      const ok = await copyText(prompt);
+      if (ok) ackFor(prompt, "Copied!");
+      return;
+    }
+    openAiChat(prompt, { chatMode: "build" });
+    ackFor(prompt, "Opened in Port AI");
   };
 
   const cloneCard = (s: SurveyRow) => (
@@ -194,7 +218,9 @@ export function TemplatePicker({ onPick, onCancel, surveys, onClone }: Props) {
             aria-expanded={aiOpen}
             onClick={() => setAiOpen((v) => !v)}
           >
-            <span className="tpl-card__label">✨ Build with AI</span>
+            <span className="tpl-card__label ai-label">
+              <SparkleIcon /> Build with AI
+            </span>
             <span className="tpl-card__blurb">
               Draft a survey using Port AI.
             </span>
@@ -221,9 +247,11 @@ export function TemplatePicker({ onPick, onCancel, surveys, onClone }: Props) {
 
         {aiOpen && (
           <section className="ai-prompts" ref={promptsRef}>
-            <span className="ai-prompts__title">✨ Build with AI</span>
+            <span className="ai-prompts__title ai-label">
+              <SparkleIcon /> Build with AI
+            </span>
             <p className="muted ai-prompts__hint">
-              Each prompt asks Port AI to analyze your environment first, ask clarifying questions, then design a targeted survey and recommend which teams to send it to. Customize it to your needs.
+              Pick a prompt to open Port AI with it pre-filled. Each one asks Port AI to analyze your environment first, ask clarifying questions, then design a targeted survey and recommend which teams to send it to - edit it before or after sending.
             </p>
             <ul className="ai-prompts__list">
               {(aiShowAll ? AI_PROMPTS : AI_PROMPTS.slice(0, AI_PROMPTS_PREVIEW)).map(
@@ -244,10 +272,14 @@ export function TemplatePicker({ onPick, onCancel, surveys, onClone }: Props) {
                         </button>
                         <button
                           type="button"
-                          className="btn btn--ghost btn--sm ai-prompts__copy"
-                          onClick={() => void handleCopyPrompt(p.text)}
+                          className="btn btn--primary btn--sm ai-prompts__use"
+                          onClick={() => void handleUsePrompt(p.text)}
                         >
-                          {copiedPrompt === p.text ? "Copied!" : "Copy"}
+                          {ackPrompt?.text === p.text
+                            ? ackPrompt.label
+                            : DEV_MOCK
+                            ? "Copy"
+                            : "Open in Port AI"}
                         </button>
                       </div>
                     </div>

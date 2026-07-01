@@ -5,9 +5,10 @@ import { useCampaign } from "../hooks/useCampaign";
 import { useLaunchCampaign } from "../hooks/useLaunchCampaign";
 import { useUnshareCampaign } from "../hooks/useUnshareCampaign";
 import { buildSurveyShareText } from "../utils/share";
+import { buildWorkflowConfigUrl } from "../utils/portalUrl";
 import { SendReminderModal } from "./SendReminderModal";
 import type { PortCtx } from "../api/portFetch";
-import type { Campaign } from "../api/campaigns";
+import { NUDGE_WORKFLOW, type Campaign } from "../api/campaigns";
 import { type ShareConfig } from "../types";
 
 /** The minimal survey shape the drawer needs (id + invite-text fields). */
@@ -42,7 +43,7 @@ function shortDate(iso: string | null): string | null {
  *     the real audience and deadline (or "Not shared yet" when none exists).
  *  2. **Copy invite** - a ready-to-paste message + dashboard link.
  *  3. **Audience editor** - pre-filled from the current campaign; launching
- *     (re)creates the campaign via the `share_survey` action.
+ *     (re)creates the campaign by upserting the `surveyCampaign` entity.
  */
 export function ShareDrawer({ ctx, survey, dashboardUrl, onClose }: Props) {
   const teamsQuery = useTeams(ctx);
@@ -50,14 +51,12 @@ export function ShareDrawer({ ctx, survey, dashboardUrl, onClose }: Props) {
   const launch = useLaunchCampaign(ctx);
   const unshare = useUnshareCampaign(ctx);
 
-  const reminderConfigUrl = useMemo(() => {
-    try {
-      const base = new URL(dashboardUrl).origin;
-      return `${base}/org_sTqtYJRkdFA380xp/settings/workflows/survey-nudge-now`;
-    } catch {
-      return null;
-    }
-  }, [dashboardUrl]);
+  // The reminder-workflow config link lives in the embedding portal's settings.
+  // Derive the org from the token (reliable cross-origin) rather than pinning it.
+  const reminderConfigUrl = useMemo(
+    () => buildWorkflowConfigUrl(NUDGE_WORKFLOW, ctx.token),
+    [ctx.token]
+  );
 
   const campaign = campaignQuery.data ?? null;
   const isReshare = !!campaign;

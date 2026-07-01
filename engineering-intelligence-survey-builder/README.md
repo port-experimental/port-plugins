@@ -68,10 +68,19 @@ authored here overrides any built-in template automatically.
 
 ## Prerequisites
 
-- Port account with permission to add custom plugins and read/write the `survey` blueprint.
+- Port account with permission to add custom plugins and read/write the blueprints below.
 - Node.js **≥ 20**.
 - [`@port-labs/port-plugins-cli`](https://www.npmjs.com/package/@port-labs/port-plugins-cli) to upload.
-- The `survey` blueprint must exist (see [How it fits the data model](#how-it-fits-the-data-model)); Survey Forms and Survey Analytics share it.
+- **Build with AI** needs `@port-labs/plugins-sdk` **≥ 0.2.0** on the plugin (this plugin targets `^0.3.0`) and on the Port host, so `openAiChat` can open the side chat.
+
+### Blueprints, relations & workflows
+
+| Requirement | Details |
+| --- | --- |
+| `survey` blueprint | Holds survey definitions (see [How it fits the data model](#how-it-fits-the-data-model)); shared with Survey Forms and Survey Analytics. Read + written. |
+| `surveyCampaign` blueprint | Upserted directly when you share a survey (id `<survey>-campaign`; deleted on unshare). Properties: `audience` (`all`/`teams`), `status`, `deadline`, `reminderCadence`. Relations: `survey` → `survey` (1:1), `teams` → `_team` (many). |
+| `_team` (native) | Read to resolve team names for the sharing audience. |
+| `survey-nudge-now` workflow | Triggered by the **Send reminder** button (`POST /v1/workflows/survey-nudge-now/runs`). Required only if you use reminders. |
 
 ## Parameters
 
@@ -99,6 +108,16 @@ npm run build    # → dist/index.html (single inlined file)
 In dev (outside Port's iframe) the widget mocks the dashboard surface with a
 couple of sample surveys and teams, so the full builder is exercisable offline.
 
+Two host-only behaviors don't work at `localhost:9000` and must be checked in
+Port's **Local development** iframe or after deploy:
+
+- **Build with AI** opens the Port AI side chat via `openAiChat`; standalone dev
+  has no host chat, so the starter prompt is copied to the clipboard instead.
+- Share invites, the reminder-workflow config link, and the Survey Analytics
+  "View responses" deep link (handed off via `localStorage` key
+  `__port_analytics_survey`) are built from `document.referrer` + the token org,
+  neither of which is present standalone.
+
 ## Upload to Port
 
 ```bash
@@ -107,11 +126,58 @@ port-plugins upload \
   --identifier survey-builder-port-plugin \
   --title "Survey Builder" \
   --params "$(cat upload-params.json)" \
-  --upsert 
+  --description "Author engineering surveys visually and save them as Port survey entities" \
+  --upsert
 ```
+
+See [`@port-labs/port-plugins-cli`](https://www.npmjs.com/package/@port-labs/port-plugins-cli)
+for CLI install and credential setup (tokens vs client credentials, region).
+
+## Add in Port
+
+**On a dashboard (manage all surveys):**
+
+1. **Add widget** → **Custom widget** → **Survey Builder**.
+2. Set **Survey blueprint** = `survey`. Leave the URL params empty unless you need to override the derived links.
+3. Save → list / create / edit / share surveys.
+
+**On a survey entity page:**
+
+1. Open a `survey` entity → **Add widget** → **Custom widget** → **Survey Builder**.
+2. Set **Survey blueprint** = `survey`.
+3. Save → the widget opens that survey in the editor directly.
 
 ## Adding a template
 
 Drop a `SurveyDefinition` file in `src/surveys/` and register it in
 `src/surveys/registry.ts` (`TEMPLATES`). It then appears as a starting point in
 the "New survey" picker - no other changes needed.
+
+## Project structure
+
+```
+engineering-intelligence-survey-builder/
+  src/
+    surveys/        # built-in templates (space/ai-adoption/dora/dx-core-4) + registry.ts
+    api/            # portFetch, entities (survey CRUD), campaigns (share/nudge/unshare), teams
+    hooks/          # usePostMessageData, useSurveys, useCampaign(s), useLaunchCampaign, useNudgeNow, useTeams, useUnshareCampaign
+    components/     # SurveyListScreen, BuilderScreen, editors, TemplatePicker, ShareDrawer, SendReminderModal, preview/, states
+    utils/          # config, portalUrl, share, surveyGrouping, draft, resolveHostEntity
+    types.ts / scoring.ts
+    App.tsx / App.css / index.tsx / index.html
+  assets/preview.png
+  upload-params.json
+  webpack.config.js
+  tsconfig.json
+```
+
+## Troubleshooting
+
+| Symptom | Cause | Fix |
+| --- | --- | --- |
+| Blank white iframe | React hooks called after an early `return` | All hooks run before any return - keep it that way. |
+| "Configure the Survey blueprint..." | `surveyBlueprint` param not set | Set the required **Survey blueprint** param, or place the widget on a `survey` entity page. |
+| Build with AI copies instead of opening chat | Running standalone, or Port host / SDK below 0.2.0 | Expected at `localhost:9000`; in Port ensure the host supports `openAiChat` (SDK ≥ 0.2.0). |
+| Share does nothing / campaign not created | `surveyCampaign` blueprint or its relations missing | Create the `surveyCampaign` blueprint with `survey` and `teams` relations (see Prerequisites). Errors include the Port response body. |
+| Reminder button disabled or errors | Survey not shared, or `survey-nudge-now` workflow missing | Share the survey first; create the `survey-nudge-now` workflow. |
+| 422 on save/search | Malformed request body | Entity search nests `{ query: { combinator, rules } }`; error text includes the Port response body. |
