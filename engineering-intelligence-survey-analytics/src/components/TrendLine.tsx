@@ -298,7 +298,7 @@ export function TrendLine({ trend, dimensions, framework, teamLabel }: Props) {
             </div>
             <div className="trend-pop__rows">
               <div className={`trend-pop__row${hover.key === "overall" ? " trend-pop__row--focus" : ""}`}>
-                <span className="trend-pop__dot" style={{ background: "var(--text)" }} />
+                <span className="trend-pop__dot" style={{ background: "currentColor" }} />
                 <span className="trend-pop__name">Overall</span>
                 <span className="trend-pop__val">{hovered.overall ?? "-"}</span>
               </div>
@@ -330,7 +330,7 @@ export function TrendLine({ trend, dimensions, framework, teamLabel }: Props) {
         <div className="trend-dims">
           {overallVals.length > 0 && (
             <TrendStat
-              color="var(--text)"
+              color="currentColor"
               name="Overall"
               value={overallVals[overallVals.length - 1]}
               delta={

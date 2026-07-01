@@ -881,18 +881,18 @@ body {
   font-size: 10px;
 }
 .trend-line {
-  stroke: var(--text);
+  stroke: currentColor;
   stroke-width: 2.5;
   stroke-linejoin: round;
   stroke-linecap: round;
 }
 .trend-dot {
-  fill: var(--text);
+  fill: currentColor;
   stroke: var(--card);
   stroke-width: 2;
 }
 .trend-value {
-  fill: var(--text);
+  fill: currentColor;
   font-size: 11px;
   font-weight: 700;
   text-anchor: middle;

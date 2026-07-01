@@ -9,6 +9,17 @@ import type {
 import { SPACE_SURVEY } from "./space";
 import { AI_ADOPTION_SURVEY } from "./ai-adoption";
 
+const AUTO_COLORS = [
+  "#6366f1",
+  "#10b981",
+  "#f59e0b",
+  "#3b82f6",
+  "#ec4899",
+  "#8b5cf6",
+  "#06b6d4",
+  "#f97316",
+];
+
 export const TEMPLATES: Record<string, SurveyDefinition> = {
   space: SPACE_SURVEY,
   "ai-adoption": AI_ADOPTION_SURVEY,
@@ -55,6 +66,10 @@ export function normalizeDefinition(raw: unknown): SurveyDefinition | null {
     dimensions = flat.dimensions;
   }
 
+  const coloredDimensions = dimensions.map((d, i) =>
+    d.color ? d : { ...d, color: AUTO_COLORS[i % AUTO_COLORS.length] }
+  );
+
   return {
     id: typeof obj.id === "string" ? obj.id : "custom",
     title: typeof obj.title === "string" ? obj.title : "Survey",
@@ -64,7 +79,7 @@ export function normalizeDefinition(raw: unknown): SurveyDefinition | null {
     version: typeof obj.version === "string" ? obj.version : undefined,
     anonymous: typeof obj.anonymous === "boolean" ? obj.anonymous : undefined,
     scale: (obj.scale as SurveyDefinition["scale"]) ?? undefined,
-    dimensions,
+    dimensions: coloredDimensions,
     questions,
   };
 }
