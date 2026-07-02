@@ -1,6 +1,6 @@
 {
   "name": "port-survey-builder-plugin",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "Author engineering surveys visually (SPACE, AI Adoption, DORA, DX Core 4, or custom) and save them as Port survey entities. Port custom widget.",
   "engines": {

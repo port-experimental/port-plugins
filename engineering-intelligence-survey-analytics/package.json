@@ -1,6 +1,6 @@
 {
   "name": "port-survey-analytics-plugin",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "Engineering survey analytics dashboard: results, trends, team breakdown, question ranking, and benchmarks. Port custom widget.",
   "engines": {
