@@ -4,7 +4,7 @@ A DORA metrics dashboard widget for [Port](https://app.port.io) dashboards. Disp
 
 ## Preview image
 
-<img alt="DORA Dashboard widget" src="assets/preview.png" />
+<img width="2000" height="1070" alt="DORA Dashboard widget" src="https://github.com/port-experimental/port-plugins/blob/library-prep/dora-dashboard/assets/preview.png" />
 
 ## Features
 

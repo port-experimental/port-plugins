@@ -10,7 +10,7 @@ Look at the following [guide](https://docs.port.io/guides/all/manage-and-surface
 
 ## Preview image
 
-<img alt="TechDocs widget" src="assets/preview.png" />
+<img width="1024" height="503" alt="TechDocs widget" src="https://github.com/port-experimental/port-plugins/blob/library-prep/techdocs/assets/preview.png" />
 
 ## Features
 

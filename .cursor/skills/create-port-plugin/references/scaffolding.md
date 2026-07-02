@@ -80,6 +80,7 @@ cd <plugin-name>
 npm install
 npm run dev    # http://localhost:9000
 npm run build  # dist/index.html
+git add dist/index.html   # commit the upload artifact (not other dist/ files)
 ```
 
 Checklist: `inject: "body"` in webpack; `height: 100%` + `#plugin-root` flex — [ui-and-styling.md](ui-and-styling.md); `applyThemeCss()` always — [production-readiness.md](production-readiness.md).
@@ -91,7 +92,9 @@ Checklist: `inject: "body"` in webpack; `height: 100%` + `#plugin-root` flex —
 | Task | Reference |
 |------|-----------|
 | Per-plugin README | [readme-and-audit.md](readme-and-audit.md) + `assets/template-README.md` |
-| Version bump (once per branch) | [readme-and-audit.md](readme-and-audit.md) (**Versioning**) |
+| Preview screenshot | Commit `assets/preview.png`; full GitHub blob URL in README — [readme-and-audit.md](readme-and-audit.md) (**Preview image**) |
+| Version bump (once per branch) | [readme-and-audit.md](readme-and-audit.md) (**Versioning**) — rebuild and commit `dist/index.html` |
+| Build artifact | `npm run build` then commit `dist/index.html` (greenfield + every version bump) |
 | Root Plugins table row | Include **Version** from `package.json` |
 | Upload | Canonical `port-plugins upload` in [readme-and-audit.md](readme-and-audit.md) |
 | Anti-patterns | [guidelines.md](guidelines.md) before finishing |

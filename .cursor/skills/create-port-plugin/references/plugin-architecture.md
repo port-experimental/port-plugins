@@ -144,7 +144,7 @@ Without SDK: inject `theme.css` from `PLUGIN_DATA` yourself.
 
 ## Build requirements
 
-- Output: **single self-contained `dist/index.html`**
+- Output: **single self-contained `dist/index.html`** — **commit** to git after build (new plugin or version bump); root `.gitignore` tracks only this file under `dist/`
 - `InlineChunkHtmlPlugin` in webpack template
 - No external CDN requests in built file
 

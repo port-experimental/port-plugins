@@ -144,6 +144,7 @@ Use `.shell--message` + `.muted` with **explicit** text color fallbacks for guar
 ```bash
 npm run dev   # http://localhost:9000 — must show UI (not blank)
 npm run build
+git add dist/index.html   # when version bumped or plugin is new
 ```
 
 | Check | Pass criteria |
