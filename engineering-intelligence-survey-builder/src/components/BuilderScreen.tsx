@@ -165,7 +165,7 @@ export function BuilderScreen({
           {/* Authoring only saves a draft; going live (Publish) is a card action. */}
           <button
             type="button"
-            className="btn btn--primary"
+            className="btn btn--cta"
             onClick={onSave}
             disabled={!canSave}
             title={issues.length ? "Resolve the issues below to save" : undefined}

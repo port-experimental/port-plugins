@@ -108,7 +108,7 @@ export function SurveyForm({
           <span className="muted">
             {answeredCount}/{total} answered · {respondentLabel}
           </span>
-          <button type="submit" className="btn btn--primary" disabled={submitting}>
+          <button type="submit" className="btn btn--cta" disabled={submitting}>
             {submitting ? "Submitting…" : "Submit response"}
           </button>
         </div>

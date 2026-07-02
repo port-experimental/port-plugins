@@ -106,13 +106,14 @@ body {
   cursor: default;
 }
 .btn--primary {
-  background: var(--primary);
-  color: var(--primary-text);
-  border-color: var(--primary);
+  background: color-mix(in srgb, var(--text) 85%, var(--bg));
+  color: var(--bg);
+  border-color: transparent;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.14);
 }
 .btn--primary:hover:not(:disabled) {
-  filter: brightness(1.12);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 34%, transparent);
+  background: var(--text);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.22);
 }
 .btn--ghost {
   background: transparent;
@@ -565,7 +566,7 @@ body {
 
 .q-row__rank {
   font-size: 0.78rem;
-  color: var(--text-faint);
+  color: var(--muted);
   min-width: 20px;
   text-align: right;
 }
@@ -623,8 +624,7 @@ body {
 }
 .q-row__reverse {
   font-size: 0.7rem;
-  color: var(--text-faint);
-  opacity: 0.7;
+  color: var(--muted);
   letter-spacing: 0.01em;
 }
 
@@ -780,7 +780,7 @@ body {
 /* ── KPI sub-line ── */
 .kpi__sub {
   font-size: 0.72rem;
-  color: var(--text-faint);
+  color: var(--muted);
   margin-top: 1px;
 }
 
@@ -877,7 +877,7 @@ body {
   stroke-width: 1;
 }
 .trend-axis {
-  fill: var(--text-faint);
+  fill: var(--muted);
   font-size: 10px;
 }
 .trend-line {
@@ -1047,9 +1047,9 @@ body {
   color: var(--text);
 }
 .trend-range__btn--active {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: var(--primary-text);
+  background: color-mix(in srgb, var(--text) 85%, var(--bg));
+  border-color: transparent;
+  color: var(--bg);
 }
 
 /* ── Participation ── */
@@ -1149,7 +1149,7 @@ body {
 }
 .q-dist__choice-label {
   font-size: 0.65rem;
-  color: var(--text-faint);
+  color: var(--muted);
   text-align: center;
   overflow: hidden;
   white-space: nowrap;
@@ -1394,7 +1394,7 @@ a.bm-source:hover {
   align-items: center;
   padding-left: 8px;
   font-size: 0.72rem;
-  color: var(--text-faint);
+  color: var(--muted);
   background: var(--card2);
 }
 .bm-bar__seg {

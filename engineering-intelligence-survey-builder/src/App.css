@@ -138,8 +138,9 @@ body {
 .topbar__meta {
   display: block;
   margin-top: 3px;
-  color: var(--muted);
+  color: var(--text);
   font-size: 0.85rem;
+  opacity: 0.65;
 }
 
 .badge {
@@ -583,8 +584,9 @@ body {
   overflow: hidden;
 }
 .survey-card__meta {
-  color: var(--text-faint);
+  color: var(--text);
   font-size: 0.8rem;
+  opacity: 0.55;
 }
 .survey-card__actions {
   display: flex;
@@ -1164,7 +1166,7 @@ body {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: var(--text-faint);
+  color: var(--muted);
 }
 .clone-group__toggle {
   display: flex;
@@ -1185,13 +1187,13 @@ body {
   display: inline-block;
   width: 0.9em;
   font-size: 0.7rem;
-  color: var(--text-faint);
+  color: var(--muted);
 }
 .clone-group__count {
   margin-left: auto;
   font-size: 0.72rem;
   font-weight: 600;
-  color: var(--text-faint);
+  color: var(--muted);
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 999px;
@@ -1228,7 +1230,7 @@ body {
   line-height: 1.45;
 }
 .tpl-card__meta {
-  color: var(--text-faint);
+  color: var(--muted);
   font-size: 0.76rem;
   margin-top: 2px;
 }
@@ -1319,12 +1321,12 @@ body {
   outline-offset: 2px;
 }
 .scale__btn--on {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: var(--primary-text);
+  background: color-mix(in srgb, var(--text) 85%, var(--bg));
+  border-color: transparent;
+  color: var(--bg);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
 }
-.scale__labels { display: flex; justify-content: space-between; color: var(--text-faint); font-size: 0.78rem; }
+.scale__labels { display: flex; justify-content: space-between; color: var(--muted); font-size: 0.78rem; }
 
 .choices { display: flex; flex-direction: column; gap: 6px; }
 .choices--inline { flex-direction: row; gap: 8px; }
@@ -1338,7 +1340,7 @@ body {
   font: inherit;
   cursor: pointer;
 }
-.chip--on { background: var(--primary); border-color: var(--primary); color: var(--primary-text); font-weight: 600; }
+.chip--on { background: color-mix(in srgb, var(--text) 85%, var(--bg)); border-color: transparent; color: var(--bg); font-weight: 600; }
 
 /* "⋯" overflow menu on a card. Opens upward because .survey-card is
    overflow:hidden - a downward popover would be clipped. */

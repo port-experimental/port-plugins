@@ -1,6 +1,6 @@
 {
   "name": "port-developer-survey-plugin",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "Run engineering surveys (SPACE, DORA, DX Core 4, AI Adoption, or custom) inside Port. Port custom widget.",
   "engines": {

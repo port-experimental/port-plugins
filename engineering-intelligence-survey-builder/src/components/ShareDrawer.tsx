@@ -298,7 +298,7 @@ export function ShareDrawer({ ctx, survey, dashboardUrl, onClose }: Props) {
           </button>
           <button
             type="button"
-            className="btn btn--primary"
+            className="btn btn--cta"
             onClick={handleLaunch}
             disabled={!canLaunch}
             title={

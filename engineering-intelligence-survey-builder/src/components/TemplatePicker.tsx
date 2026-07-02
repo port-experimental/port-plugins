@@ -272,7 +272,7 @@ export function TemplatePicker({ onPick, onCancel, surveys, onClone }: Props) {
                         </button>
                         <button
                           type="button"
-                          className="btn btn--primary btn--sm ai-prompts__use"
+                          className="btn btn--cta btn--sm ai-prompts__use"
                           onClick={() => void handleUsePrompt(p.text)}
                         >
                           {ackPrompt?.text === p.text
