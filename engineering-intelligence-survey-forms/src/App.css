@@ -191,13 +191,15 @@ body {
   cursor: default;
 }
 .btn--primary {
-  background: var(--primary);
-  color: var(--primary-text);
-  border-color: var(--primary);
+  background: color-mix(in srgb, var(--text) 85%, var(--bg));
+  color: var(--bg);
+  border-color: transparent;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.14);
 }
 .btn--primary:hover:not(:disabled) {
-  filter: brightness(1.12);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 34%, transparent);
+  background: var(--text);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.22);
+  transform: translateY(-1px);
 }
 .btn--ghost {
   background: transparent;
@@ -348,16 +350,16 @@ body {
   transform: translateY(1px);
 }
 .scale__btn--on {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: var(--primary-text);
+  background: color-mix(in srgb, var(--text) 85%, var(--bg));
+  border-color: transparent;
+  color: var(--bg);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
 }
 
 .scale__labels {
   display: flex;
   justify-content: space-between;
-  color: var(--text-faint);
+  color: var(--muted);
   font-size: 0.78rem;
 }
 
@@ -389,9 +391,9 @@ body {
   cursor: pointer;
 }
 .chip--on {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: var(--primary-text);
+  background: color-mix(in srgb, var(--text) 85%, var(--bg));
+  border-color: transparent;
+  color: var(--bg);
   font-weight: 600;
 }
 
@@ -557,8 +559,9 @@ body {
   gap: 2px;
 }
 .survey-card__meta {
-  color: var(--text-faint);
+  color: var(--text);
   font-size: 0.8rem;
+  opacity: 0.55;
 }
 .survey-card__cta {
   color: var(--text);

@@ -82,7 +82,7 @@ export function QuestionsEditor({
             </option>
           ))}
         </select>
-        <button type="button" className="btn btn--primary" onClick={add}>
+        <button type="button" className="btn btn--cta" onClick={add}>
           + Add question
         </button>
       </div>

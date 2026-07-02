@@ -93,7 +93,7 @@ export function SendReminderModal({ ctx, survey, dashboardUrl, initialMessage, a
           </button>
           <button
             type="button"
-            className="btn btn--primary"
+            className="btn btn--cta"
             onClick={handleSend}
             disabled={nudge.isPending || nudge.isSuccess}
           >
