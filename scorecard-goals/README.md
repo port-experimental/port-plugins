@@ -6,7 +6,7 @@ Compliance is computed from entity search results: for each entity, every rule o
 
 ## Preview image
 
-<img width="2426" height="1186" alt="Scorecard Goals widget" src="https://github.com/port-experimental/port-plugins/blob/library-prep/scorecard-goals/assets/preview.png" />
+<img width="2426" height="1186" alt="Scorecard Goals widget" src="https://github.com/port-experimental/port-plugins/blob/main/scorecard-goals/assets/preview.png" />
 
 
 ## Features

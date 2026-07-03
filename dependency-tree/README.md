@@ -4,7 +4,7 @@ An interactive dependency graph widget for [Port](https://app.port.io) entity pa
 
 ## Preview image
 
-<img width="1068" height="866" alt="Dependency Tree widget" src="https://github.com/port-experimental/port-plugins/blob/library-prep/dependency-tree/assets/preview.png" />
+<img width="1068" height="866" alt="Dependency Tree widget" src="https://github.com/port-experimental/port-plugins/blob/main/dependency-tree/assets/preview.png" />
 
 ## Features
 

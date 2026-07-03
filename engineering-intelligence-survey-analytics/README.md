@@ -18,7 +18,7 @@ A survey authored in Survey Builder flows straight through Forms and Analytics w
 
 ## Preview image
 
-<img width="1474" height="741" alt="Survey Analytics plugin" src="https://github.com/port-experimental/port-plugins/blob/library-prep/engineering-intelligence-survey-analytics/assets/preview.png" />
+<img width="1474" height="741" alt="Survey Analytics plugin" src="https://github.com/port-experimental/port-plugins/blob/main/engineering-intelligence-survey-analytics/assets/preview.png" />
 
 ## Features
 

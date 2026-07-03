@@ -6,7 +6,7 @@ Designed for **dashboard** pages (not entity-scoped).
 
 ## Preview image
 
-<img width="1266" height="1212" alt="Entity Calendar widget" src="https://github.com/port-experimental/port-plugins/blob/library-prep/entity-calendar/assets/preview.png" />
+<img width="1266" height="1212" alt="Entity Calendar widget" src="https://github.com/port-experimental/port-plugins/blob/main/entity-calendar/assets/preview.png" />
 
 ## Badges
 
