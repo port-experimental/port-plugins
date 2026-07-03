@@ -5,7 +5,7 @@ A [Port](https://app.getport.io) custom widget for **dashboard** pages. Pick a b
 Dashboard **page filters** are merged into entity search when present.
 
 ## Preview image
-<img width="2340" height="1470" alt="Entity Cards View widget" src="https://github.com/port-experimental/port-plugins/blob/library-prep/entity-cards-view/assets/preview.png" />
+<img width="2340" height="1470" alt="Entity Cards View widget" src="https://github.com/port-experimental/port-plugins/blob/main/entity-cards-view/assets/preview.png" />
 
 ## Features
 

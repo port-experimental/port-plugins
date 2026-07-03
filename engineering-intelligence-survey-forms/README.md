@@ -27,9 +27,9 @@ A survey authored in Survey Builder flows straight through Forms and Analytics w
 
 ## Preview image
 
-<img width="812" height="651" alt="Survey Forms respondent form: a SPACE survey rendered with likert questions grouped by dimension" src="https://github.com/port-experimental/port-plugins/blob/library-prep/engineering-intelligence-survey-forms/assets/preview.png" />
+<img width="812" height="651" alt="Survey Forms respondent form: a SPACE survey rendered with likert questions grouped by dimension" src="https://github.com/port-experimental/port-plugins/blob/main/engineering-intelligence-survey-forms/assets/preview.png" />
 
-<img width="814" height="336" alt="Survey Forms dashboard picker: choose an active survey shared with your team" src="https://github.com/port-experimental/port-plugins/blob/library-prep/engineering-intelligence-survey-forms/assets/preview-picker.png" />
+<img width="814" height="336" alt="Survey Forms dashboard picker: choose an active survey shared with your team" src="https://github.com/port-experimental/port-plugins/blob/main/engineering-intelligence-survey-forms/assets/preview-picker.png" />
 
 ## Features
 
