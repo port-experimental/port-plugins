@@ -31,7 +31,7 @@ export function ratio(num: number, den: number): number | null {
 
 /** "2026-07-05" → "Jul 5". */
 export function fmtDayShort(iso: string): string {
-  const d = new Date(`${iso}T00:00:00`);
+  const d = new Date(`${iso}T00:00:00Z`);
   if (Number.isNaN(d.getTime())) return iso;
   return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }

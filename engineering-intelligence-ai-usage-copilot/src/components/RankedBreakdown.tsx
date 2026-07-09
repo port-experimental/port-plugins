@@ -35,10 +35,7 @@ export function RankedBreakdown({ rows, metric, compareRows, topN = 8 }: Props) 
             <div className="breakdown__track">
               <span
                 className="breakdown__fill"
-                style={{
-                  width: `${(r[metric] / max) * 100}%`,
-                  background: PALETTE.violet,
-                }}
+                style={{ width: `${(r[metric] / max) * 100}%` }}
               />
             </div>
             <span className="breakdown__val">{fmtCompact(r[metric])}</span>

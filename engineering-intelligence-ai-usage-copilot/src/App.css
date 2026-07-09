@@ -780,6 +780,7 @@ body {
   height: 100%;
   border-radius: 999px;
   transition: width 0.3s ease;
+  background: #8b5cf6;
 }
 .breakdown__val {
   flex: 0 0 56px;

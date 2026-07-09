@@ -71,6 +71,24 @@ function formatPeriod(period: string | undefined): string {
   }
 }
 
+// ── Icons ─────────────────────────────────────────────────────────────────────
+
+function SparkleIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden="true"
+      xmlns="http://www.w3.org/2000/svg"
+      width="1em"
+      height="1em"
+      viewBox="0 0 16 16"
+      fill="currentColor"
+      className={className}
+    >
+      <path d="M8 0c-.3 3.4-2.4 5.6-8 8 5.6 2.4 7.7 4.6 8 8 .3-3.4 2.4-5.6 8-8-5.6-2.4-7.7-4.6-8-8z" />
+    </svg>
+  );
+}
+
 // ── Act on finding ───────────────────────────────────────────────────────────
 
 function buildActPrompt(f: InsightFinding): string {
@@ -88,6 +106,9 @@ function buildActPrompt(f: InsightFinding): string {
 
 function ActButton({ finding }: { finding: InsightFinding }) {
   const [ack, setAck] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => () => { if (timerRef.current) clearTimeout(timerRef.current); }, []);
 
   const handleClick = () => {
     const prompt = buildActPrompt(finding);
@@ -97,7 +118,8 @@ function ActButton({ finding }: { finding: InsightFinding }) {
       openAiChat(prompt, { chatMode: "build" });
     }
     setAck(true);
-    setTimeout(() => setAck(false), 2000);
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => setAck(false), 2000);
   };
 
   return (
@@ -107,7 +129,7 @@ function ActButton({ finding }: { finding: InsightFinding }) {
       onClick={handleClick}
       title="Open this recommendation in Port AI to build a remediation"
     >
-      {ack ? "✓ Opened" : <><span className="btn-act__icon">✦</span> Build with AI</>}
+      {ack ? "✓ Opened" : <><SparkleIcon className="btn-act__icon" /> Build with AI</>}
     </button>
   );
 }
@@ -224,7 +246,7 @@ function FindingsTable({ findings }: { findings: InsightFinding[] }) {
         </thead>
         <tbody>
           {sorted.map((f, i) => (
-            <tr key={i}>
+            <tr key={f.insight?.slice(0, 40) ?? String(i)}>
               <td className="ft-col-insight">{f.insight}</td>
               <td className="ft-col-chip">
                 {f.category ? <span className="badge badge--category">{f.category}</span> : <span className="muted">—</span>}
@@ -268,7 +290,7 @@ function GeneratingBanner({ onRefresh }: { onRefresh: () => void }) {
 function InsightsEmptyState({ onGenerate }: { onGenerate?: () => void }) {
   return (
     <div className="state state--empty insights__empty">
-      <div className="insights__empty-icon">✦</div>
+      <div className="insights__empty-icon"><SparkleIcon /></div>
       <div className="state__title">No insights generated yet</div>
       <p className="muted">
         Trigger the insights workflow to generate an AI-powered summary of your Copilot adoption.
@@ -469,20 +491,24 @@ export function InsightsTab({
     void insightsQuery.refetch();
   };
 
+  const portalOrigin = (() => {
+    try { return new URL(document.referrer).origin; } catch { return "https://app.getport.io"; }
+  })();
+
   const workflowUrl = workflowId
     ? orgId
-      ? `https://app.getport.io/${orgId}/settings/workflows/${encodeURIComponent(workflowId)}`
-      : `https://app.getport.io/settings/workflows/${encodeURIComponent(workflowId)}`
-    : "https://app.getport.io/settings/workflows";
+      ? `${portalOrigin}/${orgId}/settings/workflows/${encodeURIComponent(workflowId)}`
+      : `${portalOrigin}/settings/workflows/${encodeURIComponent(workflowId)}`
+    : `${portalOrigin}/settings/workflows`;
 
   const runUrl = latestRun?.identifier && orgId
-    ? `https://app.getport.io/${orgId}/organization/workflow-run?runId=${latestRun.identifier}`
+    ? `${portalOrigin}/${orgId}/organization/workflow-run?runId=${latestRun.identifier}`
     : null;
 
   if (!blueprintId) {
     return (
       <div className="state state--empty insights__setup">
-        <div className="insights__empty-icon">✦</div>
+        <div className="insights__empty-icon"><SparkleIcon /></div>
         <div className="state__title">Insights not configured</div>
         <p className="muted">
           Set the <strong>Copilot Insights Blueprint</strong> widget parameter to enable
@@ -500,7 +526,7 @@ export function InsightsTab({
 
       {/* Header */}
       <div className={`insights__header${showPanel ? " insights__header--open" : ""}`}>
-        <span className="insights__icon">✦</span>
+        <span className="insights__icon"><SparkleIcon /></span>
         <span className="insights__heading">Copilot Insights</span>
         <a
           href={workflowUrl}
@@ -525,7 +551,7 @@ export function InsightsTab({
             type="button"
             className="btn btn--primary btn--sm"
             onClick={() => setShowPanel((v) => !v)}
-            disabled={generating || isActiveRun || insightsQuery.isLoading}
+            disabled={generating || isActiveRun || insightsQuery.isPending || insightsQuery.isFetching}
           >
             {generating || isActiveRun
               ? <><span className="btn-spinner" aria-hidden="true" /> Generating…</>

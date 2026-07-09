@@ -33,6 +33,7 @@ export function GroupedBars({
   const [hoverIdx, setHoverIdx] = useState<number | null>(null);
   if (data.length === 0) return null;
   const hasCompare = !!compareData && compareData.length > 0;
+  const cmpByDate = hasCompare ? new Map(compareData!.map((d) => [d.date, d])) : null;
 
   const cmpVals = hasCompare
     ? compareData!.flatMap((d) => series.map((s) => Number(d[s.key] ?? 0)))
@@ -104,9 +105,8 @@ export function GroupedBars({
                 {series.map((s, si) => {
                   const slotX = gx + si * (barW + barGap);
                   const v = Number(d[s.key] ?? 0);
-                  const cv = hasCompare
-                    ? Number(compareData![i]?.[s.key] ?? 0)
-                    : null;
+                  const cmpPoint = cmpByDate?.get(d.date);
+                  const cv = cmpPoint != null ? Number(cmpPoint[s.key] ?? 0) : null;
                   return (
                     <g key={s.key}>
                       {cv != null && (
@@ -161,9 +161,7 @@ export function GroupedBars({
             <div className="chart__pop-title">{data[hoverIdx].label}</div>
             {series.map((s) => {
               const cur = Number(data[hoverIdx][s.key] ?? 0);
-              const prevRaw = hasCompare
-                ? compareData![hoverIdx]?.[s.key]
-                : undefined;
+              const prevRaw = cmpByDate?.get(data[hoverIdx].date)?.[s.key];
               const prev = prevRaw != null ? Number(prevRaw) : null;
               const diff = prev != null ? cur - prev : null;
               return (
