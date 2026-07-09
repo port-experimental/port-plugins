@@ -1,25 +1,19 @@
 # Github Copilot AI Adoption and Usage
 
-AI adoption & usage dashboard for GitHub Copilot — custom plugin for [Port](https://app.port.io). Runs on dashboard pages and merges page filters into entity search.
+Custom [Port](https://app.port.io) plugin that turns raw GitHub Copilot organization metrics into an interactive engineering intelligence dashboard. Tracks active users, acceptance rates, lines of code, PR activity, and (optionally) generates AI insight reports about your Copilot usage.
 
 ## Preview image
 
-<!-- Replace assets/preview.png with a screenshot of this widget before publishing. -->
-
-<img width="1800" height="748" alt="Github Copilot AI Adoption and Usage plugin" src="https://github.com/port-experimental/port-plugins/blob/main/engineering-intelligence-ai-usage-copilot/assets/ei-usage-github-copilot.png" />
+<img width="1800" height="748" alt="Github Copilot AI Adoption and Usage plugin" src="https://github.com/port-experimental/port-plugins/blob/main/engineering-intelligence-ai-usage-copilot/assets/preview.png" />
 
 ## Features
 
-- KPI header strip — active users, adoption rate, acceptance rate, lines accepted, suggestions, and Copilot PRs, with trend vs. the previous equal period
-- **Adoption & Engagement** tab — active users (DAU/WAU/MAU), active users by surface, stickiness, and AI adoption-phase distribution
-- **Usage & Acceptance** tab — suggestions vs. acceptances, acceptance-rate trend, lines suggested vs. accepted, and a usage breakdown by IDE / feature / language / model
-- Shared filter bar:
-  - **Date range** — a calendar picker with a preset rail (last 7 / 14 / 30 / 60 / 90 days, this month, last month) plus a two-month range calendar for custom windows
-  - **Granularity** — day / week / month rollup
-  - **Active users aggregation** — how active-user & stickiness metrics are summarized: Latest (default), Avg, Median, or Peak. Flow metrics (suggestions, lines, PRs) are always summed
-  - **Compare** — overlay the previous equal period
-  - Breakdown dimension + rank-by metric (Usage tab)
-- **Remembers your view** — the last-used filters (range, granularity, aggregation, compare, breakdown) persist across reloads via `localStorage`. Day-count presets stay rolling (re-derived relative to today); custom ranges restore their exact window
+- KPI header strip with active users, adoption rate, acceptance rate, lines accepted, suggestions, and Copilot PRs
+- **Adoption & Engagement** tab with active users (DAU/WAU/MAU) and active users by surface
+- **Usage & Acceptance** tab with suggestions vs. acceptances, acceptance-rate trend, lines suggested vs. accepted, Copilot PR activity, and a usage breakdown by IDE / feature / language / model
+- **AI Insights** tab (optional) with AI-generated analysis of Copilot usage data and a Generate button that triggers a Port workflow to produce new insight reports
+- Per-chart **granularity** (day / week / month) and **aggregation mode** (Latest / Avg / Median / Peak) controls for stock metrics such as active users
+- **Save view**: an explicit Save button appears when your current filters differ from the saved defaults; Reset returns to the last saved state
 - Respects dashboard page filters
 - Light/dark theme support via Port SDK
 
@@ -27,32 +21,29 @@ AI adoption & usage dashboard for GitHub Copilot — custom plugin for [Port](ht
 
 ### Access
 
-- Port account with permission to add custom plugins and read the metrics blueprint
-- Node.js **≥ 20** (see `package.json` `engines`)
+- Port account with permission to add custom plugins and read the Copilot org usage blueprint
+- Node.js **>= 20** (see `package.json` `engines`)
 - [port-plugins-cli](https://www.npmjs.com/package/@port-labs/port-plugins-cli) for upload
 
-### Blueprints & properties
+### Blueprints and properties
 
-The widget reads one blueprint holding **one entity per organization per day** of GitHub Copilot organization usage metrics. An ingestion pipeline (e.g. a scheduled job calling the GitHub Copilot metrics API) must populate it.
+Port's native [GitHub Copilot integration](https://docs.port.io/context-lake/ingestion/ingest-data-into-port/native-integrations/ai-usage-metrics/github-copilot/github-copilot) creates the `githubCopilotOrganizationUsage` blueprint and populates it with one entity per organization per day. That blueprint identifier is what you pass as `copilotOrgUsageBlueprint` when configuring the widget.
 
-| Requirement | Details |
-|-------------|---------|
-| Blueprint | The org usage-metrics blueprint (e.g. `githubCopilotOrganizationUsage`) — pass it as `metricsBlueprint` |
-| Date property | `record_date` by default (ISO date-time). Override with `dayProp` if your schema differs |
+The plugin reads the `record_date` property (ISO date-time string) to identify which day each entity belongs to.
 
 Property keys read from each entity's `properties` (snake_case, matching the GitHub Copilot metrics payload):
 
 | Group | Keys |
 |-------|------|
-| Active users | `daily_active_users`, `weekly_active_users`, `monthly_active_users`, `daily_active_cli_users`, `daily_active_copilot_cloud_agent_users`, `daily_active_copilot_code_review_users` (+ weekly/monthly variants) |
-| Activity & LOC | `code_generation_activity_count`, `code_acceptance_activity_count`, `user_initiated_interaction_count`, `loc_suggested_to_add_sum`, `loc_added_sum` |
-| Breakdowns | `totals_by_ide`, `totals_by_feature`, `totals_by_language_feature`, `totals_by_model_feature` (arrays) |
+| Active users | `daily_active_users`, `weekly_active_users`, `monthly_active_users`, `monthly_active_chat_users`, `monthly_active_agent_users`, `daily_active_cli_users`, `daily_active_copilot_cloud_agent_users`, `weekly_active_copilot_cloud_agent_users`, `monthly_active_copilot_cloud_agent_users`, `daily_active_copilot_code_review_users`, `weekly_active_copilot_code_review_users`, `monthly_active_copilot_code_review_users`, `daily_passive_copilot_code_review_users`, `weekly_passive_copilot_code_review_users`, `monthly_passive_copilot_code_review_users` |
+| Activity and LOC | `code_generation_activity_count`, `code_acceptance_activity_count`, `user_initiated_interaction_count`, `loc_suggested_to_add_sum`, `loc_added_sum`, `loc_suggested_to_delete_sum`, `loc_deleted_sum` |
+| Breakdowns | `totals_by_ide`, `totals_by_feature`, `totals_by_language_feature`, `totals_by_language_model`, `totals_by_model_feature`, `totals_by_cli` (arrays) |
 | Cohorts | `totals_by_ai_adoption_phase` (array) |
 | PRs | `pull_requests` (object) |
 
 Unrecognized or missing keys are treated as zero, so the widget degrades gracefully if your schema is a subset.
 
-### Blueprints & properties — AI Insights tab (optional)
+### Blueprints and properties — AI Insights tab (optional)
 
 The **AI Insights** tab is enabled when `copilotInsightsBlueprint` is set. It reads one entity per generated insight report from a dedicated blueprint.
 
@@ -85,36 +76,36 @@ The expected `raw_response` JSON shape:
 }
 ```
 
-Legacy properties (`summary`, `key_findings`, `recommendations`, `risk_signals`, `confidence_note` as top-level entity properties) are also read as a fallback when `raw_response` is absent.
+### Workflow (AI Insights tab, optional)
 
-### Self-service actions (SSA) — AI Insights tab (optional)
-
-The **Generate** button in the AI Insights tab is enabled when `copilotInsightsAction` is set to a Port self-service action (or workflow) identifier.
+The **Generate** button in the AI Insights tab is enabled when `copilotInsightsAction` is set to a Port workflow identifier.
 
 | Field | Value |
 |---|---|
-| Identifier | `generate_github_copilot_insights` |
+| Recommended identifier | `generate_github_copilot_insights` |
 | Trigger | The widget calls `/v1/actions/<id>/runs` with the properties below |
 
-The widget sends these inputs to the action on every **Generate** click:
+The widget sends these inputs to the workflow on every **Generate** click:
 
 | Input key | Type | Description |
 |---|---|---|
 | `period_from` | string | Start of the requested period (ISO date, e.g. `2026-06-01`) |
 | `period_to` | string | End of the requested period (ISO date, e.g. `2026-07-01`) |
-| `metrics_blueprint` | string | Identifier of the `metricsBlueprint` (omitted if not configured) |
+| `metrics_blueprint` | string | Identifier of the `copilotOrgUsageBlueprint` (omitted if not configured) |
 | `org_filter` | string | GitHub org to scope the analysis to (omitted when generating for all orgs) |
 
 The action is responsible for querying Copilot usage metrics, calling an AI model, and writing the result as a new entity to the `copilotInsightsBlueprint`. After triggering, the widget polls for new entities and displays them automatically.
 
 ## Plugin parameters
 
-| Key | Type | Required | Default | Description |
-|-----|------|----------|---------|-------------|
-| `metricsBlueprint` | blueprint | yes | `githubCopilotOrganizationUsage` | Blueprint holding the daily organization usage-metrics entities |
-| `licensedSeats` | number | no | — | Licensed Copilot seats. When set, enables the **Adoption rate** KPI (MAU ÷ seats) |
-| `copilotInsightsBlueprint` | blueprint | no | `copilot_insights` | Blueprint holding AI-generated Copilot insight entities. Required to enable the **AI Insights** tab |
-| `copilotInsightsAction` | string | no | `generate_github_copilot_insights` | Port self-service action identifier that generates new insights. Required to enable the **Generate** button in the AI Insights tab |
+These are the fields exposed in the Port widget configuration UI (from `upload-params.json`):
+
+| Key | Label in UI | Type | Required | Description |
+|-----|-------------|------|----------|-------------|
+| `copilotOrgUsageBlueprint` | GitHub Copilot Org Usage blueprint | blueprint | yes | The `githubCopilotOrganizationUsage` blueprint, holding one entity per organization per day of GitHub Copilot usage metrics |
+| `licensedSeats` | Licensed seats | number | no | Licensed Copilot seats. When set, enables the **Adoption rate** KPI (MAU divided by seats) |
+| `copilotInsightsBlueprint` | Github Copilot Insights blueprint | blueprint | no | Blueprint holding AI-generated Copilot insight entities. Required to enable the **AI Insights** tab |
+| `copilotInsightsAction` | Github Copilot Insights workflow identifier | string | no | Port workflow identifier for generating new insights. Recommended value: `generate_github_copilot_insights`. Required to enable the **Generate** button in the AI Insights tab |
 
 ## Local development
 
@@ -152,11 +143,18 @@ See [@port-labs/port-plugins-cli](https://www.npmjs.com/package/@port-labs/port-
 
 ### Add in Port
 
-1. Open a dashboard page → **Edit** → **Add widget** → **Custom widget**
+1. Open a dashboard page, click **Edit**, then **Add widget**, and select **Custom widget**
 2. Select **Github Copilot AI Adoption and Usage**
-3. Set `metricsBlueprint` to your org usage-metrics blueprint
-4. Optionally set `licensedSeats` (to enable adoption rate) and `dayProp`
-5. Save
+3. Fill in the fields:
+
+| Field | Input | Description |
+|-------|-------|-------------|
+| **GitHub Copilot Org Usage blueprint** (required) | `githubCopilotOrganizationUsage` | Blueprint holding the daily organization usage-metrics entities |
+| **Licensed seats** | Number | Licensed Copilot seats. Enables the **Adoption rate** KPI (MAU divided by seats) |
+| **Github Copilot Insights workflow identifier** | `generate_github_copilot_insights` | Required to enable the **Generate** button in the AI Insights tab |
+| **Github Copilot Insights blueprint** | `github_copilot_insights` | Required to enable the **AI Insights** tab |
+
+4. Save
 
 ## Project structure
 
@@ -167,9 +165,11 @@ engineering-intelligence-ai-usage-copilot/
       charts/
         LineChart.tsx        # Multi-series SVG line/area chart
         GroupedBars.tsx      # Grouped column chart
-      FilterBar.tsx          # Date picker, granularity, aggregation, compare, breakdown, metric
+      FilterBar.tsx          # Date range picker, org filter, and view save/reset controls
       DateRangePicker.tsx    # Popover: preset rail + two-month range calendar
+      InlineSelect.tsx       # Per-chart granularity and aggregation selectors
       KpiStrip.tsx           # Header KPI cards with deltas
+      InsightsTab.tsx        # AI Insights tab with insight list and generate button
       RankedBreakdown.tsx    # Ranked bars + table (by IDE/feature/language/model)
       PhaseDistribution.tsx  # AI adoption-phase cohorts
       Section.tsx            # Card wrapper
@@ -179,7 +179,7 @@ engineering-intelligence-ai-usage-copilot/
       useMetrics.ts          # Entity search over a date range + page filters
     api/
       portFetch.ts
-      metrics.ts             # Entity → DailyMetric mapper + fetch
+      metrics.ts             # Entity to DailyMetric mapper + fetch
     utils/
       aggregations.ts        # KPIs, trends, breakdown, stock reducers (avg/median/max)
       constants.ts           # Chart series + palette
@@ -195,13 +195,12 @@ engineering-intelligence-ai-usage-copilot/
   tsconfig.json
 ```
 
-## Notes & limitations
+## Notes and limitations
 
-- Data is **org-level, per-day**, so the primary filter is the date range; Port team page-filters do not segment org-aggregate rows. Multi-org / per-team views are a future scope item.
-- Stock metrics (active users, adoption rate, stickiness) default to the **latest** in-range daily snapshot; the **Active users** aggregation control switches them to Avg / Median / Peak across the range. Flow metrics (suggestions, acceptances, LOC, PRs) are always summed and ignore this control.
-- Filter state is remembered per browser via `localStorage` (key `port_ai_adoption_view_v1`); it is not shared across users. Named / shareable saved views are a future scope item.
+- Data is **org-level, per-day**. When multiple GitHub organizations report data to the same blueprint, the org filter (shown automatically in the filter bar) lets you scope charts to a single org. Port team page-filters do not segment org-aggregate rows.
+- Stock metrics (active users, adoption rate) default to the **Latest** in-range daily snapshot; per-chart aggregation controls switch them to Avg / Median / Peak across the range. Flow metrics (suggestions, acceptances, LOC, PRs) are always summed and are not affected by this control.
 - Adoption-rate KPI requires `licensedSeats`; GitHub's usage metrics do not carry a seat count.
-- GitHub does not always populate every field for every org (e.g. `daily_active_cli_users`, `totals_by_cli` can arrive `null`). The plugin treats missing values as 0 / empty, so those widgets degrade gracefully.
+- GitHub does not always populate every field for every org (for example, `daily_active_cli_users` and `totals_by_cli` can arrive as `null`). The plugin treats missing values as 0 or empty, so those charts degrade gracefully.
 
 ## Troubleshooting
 
@@ -209,6 +208,7 @@ engineering-intelligence-ai-usage-copilot/
 |---------|-------|-----|
 | "No usage data in range" | Blueprint empty for that window, or wrong `dayProp` | Verify ingestion; confirm the date property key and that records fall in the selected range |
 | Adoption rate shows "–" | `licensedSeats` not set | Add the `licensedSeats` param |
-| Setup prompt / waiting for Port context | Opened outside Port or missing token | Embed via Port **Local development** or deploy |
-| Port API error | Auth, wrong blueprint, or malformed search body | Error includes the response body; confirm the blueprint identifier and nested `{ query: { combinator, rules } }` |
-| KPIs show no trend arrows | No data in the previous equal period | Expected until at least two comparable periods exist |
+| AI Insights tab not visible | `copilotInsightsBlueprint` not configured | Set `copilotInsightsBlueprint` to your insights blueprint identifier |
+| Generate button not visible | `copilotInsightsAction` not configured | Set `copilotInsightsAction` to your workflow identifier |
+| Org filter not shown | Only one organization in the data | The org filter appears only when two or more distinct organization IDs are present |
+| All KPI values show 0 despite data existing | Property keys in the blueprint don't match what the plugin expects | Check that your integration mapping includes the full `organization-usage-metrics` resource block from the setup guide |
