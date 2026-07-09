@@ -1,0 +1,17 @@
+{
+  "$schema": "https://cursor.com/schemas/cursor-plugin/plugin.json",
+  "name": "port-plugins",
+  "displayName": "Port Plugins",
+  "description": "AI skill for building and extending Port.io custom plugins and widgets as self-contained React/TypeScript iframe widgets.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Port Labs",
+    "email": "support@port.io"
+  },
+  "homepage": "https://github.com/port-labs/port-plugins",
+  "repository": "https://github.com/port-labs/port-plugins",
+  "license": "Apache-2.0",
+  "keywords": ["port", "port-io", "plugins", "widgets", "react", "typescript"],
+  "logo": "https://avatars.githubusercontent.com/u/88274480",
+  "skills": ".cursor/skills/"
+}

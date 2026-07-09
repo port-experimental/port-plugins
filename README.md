@@ -20,7 +20,21 @@ This repository contains plugins contributed by [Port.io](https://www.port.io).
 
 ## AI-assisted development - Skills (Cursor & Claude)
 
-This repo ships the same **create-port-plugin** skill for [Cursor](./.cursor/skills/create-port-plugin/) and [Claude Code](./.claude/skills/create-port-plugin/):
+This repo ships the **create-port-plugin** skill as an installable plugin for both Cursor and Claude Code.
+
+### One-line install
+
+```bash
+# Cursor
+cursor plugin install port-labs/port-plugins
+
+# Claude Code
+claude plugin install port-labs/port-plugins
+```
+
+Both commands install the `create-port-plugin` skill into your editor from the manifests at [`.cursor-plugin/plugin.json`](./.cursor-plugin/plugin.json) and [`.claude-plugin/plugin.json`](./.claude-plugin/plugin.json).
+
+If you prefer to work directly from the source files, the skill paths are:
 
 | Tool | Skill path |
 |------|------------|
