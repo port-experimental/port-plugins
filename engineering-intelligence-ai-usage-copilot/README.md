@@ -93,7 +93,7 @@ The **Generate** button in the AI Insights tab is enabled when `copilotInsightsA
 
 | Field | Value |
 |---|---|
-| Identifier | Any — passed as the `copilotInsightsAction` param |
+| Identifier | `generate_github_copilot_insights` |
 | Trigger | The widget calls `/v1/actions/<id>/runs` with the properties below |
 
 The widget sends these inputs to the action on every **Generate** click:
@@ -115,7 +115,7 @@ The action is responsible for querying Copilot usage metrics, calling an AI mode
 | `licensedSeats` | number | no | — | Licensed Copilot seats. When set, enables the **Adoption rate** KPI (MAU ÷ seats) |
 | `dayProp` | string | no | `record_date` | Property key holding each record's ISO date/date-time |
 | `copilotInsightsBlueprint` | blueprint | no | — | Blueprint holding AI-generated Copilot insight entities. Required to enable the **AI Insights** tab |
-| `copilotInsightsAction` | string | no | — | Port self-service action identifier that generates new insights. Required to enable the **Generate** button in the AI Insights tab |
+| `copilotInsightsAction` | string | no | `generate_github_copilot_insights` | Port self-service action identifier that generates new insights. Required to enable the **Generate** button in the AI Insights tab |
 
 ## Local development
 
