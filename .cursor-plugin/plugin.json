@@ -5,8 +5,7 @@
   "description": "AI skill for building and extending Port.io custom plugins and widgets as self-contained React/TypeScript iframe widgets.",
   "version": "1.0.0",
   "author": {
-    "name": "Port Labs",
-    "email": "support@port.io"
+    "name": "Port Labs"
   },
   "homepage": "https://github.com/port-labs/port-plugins",
   "repository": "https://github.com/port-labs/port-plugins",
