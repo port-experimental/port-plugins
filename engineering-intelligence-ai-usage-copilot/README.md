@@ -1,4 +1,4 @@
-# Github Copilot AI Adoption and Usage
+# Github AI Adoption and Usage
 
 AI adoption & usage dashboard for GitHub Copilot — custom plugin for [Port](https://app.port.io). Runs on dashboard pages and merges page filters into entity search.
 
@@ -6,7 +6,7 @@ AI adoption & usage dashboard for GitHub Copilot — custom plugin for [Port](ht
 
 <!-- Replace assets/preview.png with a screenshot of this widget before publishing. -->
 
-<img width="1800" height="748" alt="Github Copilot AI Adoption and Usage plugin" src="https://github.com/port-experimental/port-plugins/blob/main/engineering-intelligence-ai-usage-copilot/assets/ei-usage-github-copilot.png" />
+<img width="1800" height="748" alt="Github AI Adoption and Usage plugin" src="https://github.com/port-experimental/port-plugins/blob/main/engineering-intelligence-ai-usage-copilot/assets/ei-usage-github-copilot.png" />
 
 ## Features
 
@@ -142,8 +142,8 @@ git add dist/index.html   # commit the upload artifact (tracked in repo)
 ```bash
 port-plugins upload \
   --file dist/index.html \
-  --identifier ai-usage-github-copilot \
-  --title "Github Copilot AI Adoption and Usage" \
+  --identifier ai-usage-githib-copilot \
+  --title "Github AI Adoption and Usage" \
   --params "$(cat upload-params.json)" \
   --description "AI adoption & usage dashboard for GitHub Copilot" \
   --upsert
@@ -154,7 +154,7 @@ See [@port-labs/port-plugins-cli](https://www.npmjs.com/package/@port-labs/port-
 ### Add in Port
 
 1. Open a dashboard page → **Edit** → **Add widget** → **Custom widget**
-2. Select **Github Copilot AI Adoption and Usage**
+2. Select **Github AI Adoption and Usage**
 3. Set `metricsBlueprint` to your org usage-metrics blueprint
 4. Optionally set `licensedSeats` (to enable adoption rate) and `dayProp`
 5. Save
