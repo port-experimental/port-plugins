@@ -17,11 +17,11 @@
   "copilotInsightsBlueprint": {
     "type": "blueprint",
     "isRequired": false,
-    "label": "Copilot Insights blueprint"
+    "label": "Github Copilot Insights blueprint"
   },
   "copilotInsightsAction": {
     "type": "string",
     "isRequired": false,
-    "label": "Copilot Insights workflow identifier"
+    "label": "Github Copilot Insights workflow identifier"
   }
 }
