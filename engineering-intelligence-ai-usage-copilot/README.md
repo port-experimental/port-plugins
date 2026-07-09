@@ -111,10 +111,9 @@ The action is responsible for querying Copilot usage metrics, calling an AI mode
 
 | Key | Type | Required | Default | Description |
 |-----|------|----------|---------|-------------|
-| `metricsBlueprint` | blueprint | yes | — | Blueprint holding the daily organization usage-metrics entities |
+| `metricsBlueprint` | blueprint | yes | `githubCopilotOrganizationUsage` | Blueprint holding the daily organization usage-metrics entities |
 | `licensedSeats` | number | no | — | Licensed Copilot seats. When set, enables the **Adoption rate** KPI (MAU ÷ seats) |
-| `dayProp` | string | no | `record_date` | Property key holding each record's ISO date/date-time |
-| `copilotInsightsBlueprint` | blueprint | no | — | Blueprint holding AI-generated Copilot insight entities. Required to enable the **AI Insights** tab |
+| `copilotInsightsBlueprint` | blueprint | no | `copilot_insights` | Blueprint holding AI-generated Copilot insight entities. Required to enable the **AI Insights** tab |
 | `copilotInsightsAction` | string | no | `generate_github_copilot_insights` | Port self-service action identifier that generates new insights. Required to enable the **Generate** button in the AI Insights tab |
 
 ## Local development
