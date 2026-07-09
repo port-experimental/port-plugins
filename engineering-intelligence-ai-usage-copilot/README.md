@@ -6,7 +6,7 @@ AI adoption & usage dashboard for GitHub Copilot — custom plugin for [Port](ht
 
 <!-- Replace assets/preview.png with a screenshot of this widget before publishing. -->
 
-<img width="2000" height="1070" alt="Github Copilot AI Adoption and Usage plugin" src="https://github.com/port-experimental/port-plugins/blob/main/engineering-intelligence-ai-usage-copilot/assets/preview.png" />
+<img width="1800" height="748" alt="Github Copilot AI Adoption and Usage plugin" src="https://github.com/port-experimental/port-plugins/blob/main/engineering-intelligence-ai-usage-copilot/assets/ei-usage-github-copilot.png" />
 
 ## Features
 
