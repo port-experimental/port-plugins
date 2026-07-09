@@ -216,23 +216,6 @@ export function surfaceSeries(
   }));
 }
 
-/** Stickiness (DAU ÷ MAU) over time, as a percentage 0..100. */
-export function stickinessSeries(
-  metrics: DailyMetric[],
-  g: Granularity,
-  agg: AggregationMode = "latest"
-): SeriesPoint[] {
-  return bucketize(metrics, g).map((b) => {
-    const dau = reduceStock(b.items, (m) => m.dailyActiveUsers, agg);
-    const mau = reduceStock(b.items, (m) => m.monthlyActiveUsers, agg);
-    return {
-      label: b.label,
-      date: b.date,
-      stickiness: mau > 0 ? Math.round((dau / mau) * 100) : 0,
-    };
-  });
-}
-
 /** Suggestions vs acceptances over time (flow → summed in bucket). */
 export function suggestionsSeries(
   metrics: DailyMetric[],

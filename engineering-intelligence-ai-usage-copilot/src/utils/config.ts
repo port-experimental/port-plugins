@@ -37,10 +37,10 @@ function readNumber(raw: unknown): number | null {
 export function configFromParams(params: Params | null): PluginConfig | null {
   if (!params) return null;
 
-  const metricsBlueprint = readBlueprintParam(
-    readParamValue(params, "metricsBlueprint")
+  const copilotOrgUsageBlueprint = readBlueprintParam(
+    readParamValue(params, "copilotOrgUsageBlueprint")
   );
-  if (!metricsBlueprint) return null;
+  if (!copilotOrgUsageBlueprint) return null;
 
   const licensedSeats = readNumber(readParamValue(params, "licensedSeats"));
   const dayPropRaw = readParamValue(params, "dayProp");
@@ -59,5 +59,5 @@ export function configFromParams(params: Params | null): PluginConfig | null {
       ? copilotInsightsActionRaw.trim()
       : null;
 
-  return { metricsBlueprint, licensedSeats, dayProp, copilotInsightsBlueprint, copilotInsightsAction };
+  return { copilotOrgUsageBlueprint, licensedSeats, dayProp, copilotInsightsBlueprint, copilotInsightsAction };
 }

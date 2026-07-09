@@ -2,7 +2,7 @@ import type { Entity, Params } from "../types";
 
 // Params passed to the widget in local dev (outside Port's iframe).
 export const MOCK_PARAMS: Params = {
-  metricsBlueprint: {
+  copilotOrgUsageBlueprint: {
     type: "blueprint",
     value: { identifier: "organization-usage-metrics", title: "Org usage metrics" },
   },

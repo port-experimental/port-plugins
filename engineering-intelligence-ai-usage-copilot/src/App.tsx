@@ -168,7 +168,7 @@ export function App() {
   }, [ctx]);
 
   const fetchArgs = config
-    ? { blueprint: config.metricsBlueprint.identifier, dayProp: config.dayProp }
+    ? { blueprint: config.copilotOrgUsageBlueprint.identifier, dayProp: config.dayProp }
     : null;
 
   const query = useMetrics(ctx, fetchArgs, range, page);
@@ -247,7 +247,7 @@ export function App() {
           ctx={ctx}
           blueprintId={config.copilotInsightsBlueprint?.identifier ?? null}
           workflowId={config.copilotInsightsAction}
-          metricsBlueprint={config.metricsBlueprint.identifier}
+          copilotOrgUsageBlueprint={config.copilotOrgUsageBlueprint.identifier}
           orgId={orgId}
           range={range}
           selectedOrg={selectedOrg}
@@ -278,7 +278,7 @@ export function App() {
           ) : metrics.length === 0 ? (
             <EmptyState
               title="No usage data in range"
-              hint={`No "${config.metricsBlueprint.identifier}" entities between ${range.from} and ${range.to}.`}
+              hint={`No "${config.copilotOrgUsageBlueprint.identifier}" entities between ${range.from} and ${range.to}.`}
             />
           ) : (
             <>

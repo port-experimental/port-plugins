@@ -360,7 +360,7 @@ export function InsightsTab({
   ctx,
   blueprintId,
   workflowId,
-  metricsBlueprint,
+  copilotOrgUsageBlueprint,
   orgId,
   range,
   selectedOrg,
@@ -369,7 +369,7 @@ export function InsightsTab({
   ctx: PortCtx | null;
   blueprintId: string | null;
   workflowId: string | null;
-  metricsBlueprint: string | null;
+  copilotOrgUsageBlueprint: string | null;
   orgId: string | null;
   range: DateRange;
   selectedOrg: string | null;
@@ -462,7 +462,7 @@ export function InsightsTab({
       await triggerWorkflow(ctx, workflowId, {
         period_from: from,
         period_to: to,
-        ...(metricsBlueprint ? { metrics_blueprint: metricsBlueprint } : {}),
+        ...(copilotOrgUsageBlueprint ? { metrics_blueprint: copilotOrgUsageBlueprint } : {}),
         ...(org ? { org_filter: org } : {}),
       });
     } catch {

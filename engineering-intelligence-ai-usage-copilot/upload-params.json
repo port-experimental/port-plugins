@@ -1,25 +1,22 @@
 {
-  "metricsBlueprint": {
+  "copilotOrgUsageBlueprint": {
     "type": "blueprint",
     "isRequired": true,
-    "label": "GitHub Copilot Org Usage blueprint",
-    "default": "githubCopilotOrganizationUsage"
+    "label": "GitHub Copilot Org Usage blueprint"
   },
   "licensedSeats": {
     "type": "number",
     "isRequired": false,
-    "label": "Licensed seats (enables adoption rate)"
+    "label": "Licensed seats"
   },
   "copilotInsightsBlueprint": {
     "type": "blueprint",
     "isRequired": false,
-    "label": "Github Copilot Insights blueprint",
-    "default": "copilot_insights"
+    "label": "Github Copilot Insights blueprint"
   },
   "copilotInsightsAction": {
     "type": "string",
     "isRequired": false,
-    "label": "Github Copilot Insights workflow identifier",
-    "default": "generate_github_copilot_insights"
+    "label": "Github Copilot Insights workflow identifier"
   }
 }

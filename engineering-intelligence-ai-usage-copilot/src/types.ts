@@ -39,7 +39,7 @@ export type Params = Record<string, ParamValue>;
 
 export type PluginConfig = {
   /** Blueprint holding the daily organization-usage-metrics entities. */
-  metricsBlueprint: BlueprintParam;
+  copilotOrgUsageBlueprint: BlueprintParam;
   /** Licensed Copilot seats — enables the adoption-rate KPI when provided. */
   licensedSeats: number | null;
   /** Property key holding the ISO date of each daily record (default: `day`). */
@@ -192,7 +192,7 @@ export type BreakdownMetric =
 export type Granularity = "day" | "week" | "month";
 
 /**
- * How point-in-time (stock) metrics — active users, stickiness — are summarized
+ * How point-in-time (stock) metrics like active users are summarized
  * across a bucket or the whole range. Flow metrics (suggestions, LOC, PRs) are
  * always summed and ignore this. `latest` preserves the original behavior.
  */
