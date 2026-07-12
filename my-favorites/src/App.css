@@ -1,0 +1,1007 @@
+/* ═══════════════════════════════════════════
+   DESIGN TOKENS
+════════════════════════════════════════════ */
+:root {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Roboto,
+    Oxygen, Ubuntu, sans-serif;
+  font-size: 14px;
+
+  /* Surfaces */
+  --bg: var(--background-primary, #e9eaed);
+  --card: var(--background-dim, #ffffff);
+  --card2: var(--background-dim-transparent, #f2f3f5);
+
+  /* Borders — Port overrides these in dark mode automatically */
+  --border: var(--border-medium, rgba(0, 0, 0, 0.06));
+  --border-strong: var(--border-contrast-medium, rgba(0, 0, 0, 0.08));
+
+
+  /* Text */
+  --text: var(--text-high, #0f172a);
+  --muted: var(--text-medium, #64748b);
+  --text-faint: var(--text-low, #94a3b8);
+
+  /* Radii */
+  --radius: 10px;
+  --radius-sm: 7px;
+  --radius-xs: 5px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.07), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.09), 0 1px 4px rgba(0, 0, 0, 0.05);
+
+  /* Accent colours */
+  --gold: var(--color-gold-300, #d4961e);
+  --blue: var(--color-ocean-blue-300, #4479e8);
+  --blue-bg: var(--color-ocean-blue-100, #eff6ff);
+  --blue-text: var(--color-ocean-blue-700, #1d4ed8);
+  --red: var(--color-red-300, #f87171);
+  --red-dark: var(--color-red-600, #dc2626);
+  --red-bg: var(--color-red-100, #fef2f2);
+  --green: #16a34a;
+  --green-bg: #f0fdf4;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#plugin-root {
+  height: 100%;
+  min-height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+#plugin-root {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* ═══════════════════════════════════════════
+   SHELL WRAPPER
+════════════════════════════════════════════ */
+.shell {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  width: 100%;
+  min-height: 120px;
+  background: var(--bg);
+  overflow: hidden;
+  position: relative;
+  /* for toast positioning */
+}
+
+.shell--message {
+  padding: 24px 16px;
+  overflow-y: auto;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+
+/* ═══════════════════════════════════════════
+   TAB BAR
+════════════════════════════════════════════ */
+.fav-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px 8px;
+  background: var(--bg);
+  flex-shrink: 0;
+  gap: 8px;
+}
+
+.fav-tabs {
+  display: inline-flex;
+  /* shrink-wraps the tabs */
+  align-items: center;
+  gap: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  /* light: card2 is the greyer surface; active pill sits on whiter card */
+  background: var(--card2);
+  border-radius: 20px;
+  padding: 3px;
+  min-width: 0;
+  flex-shrink: 1;
+}
+
+/* dark: hierarchy inverts — track is the lower surface, active is higher */
+[data-theme="dark"] .fav-tabs {
+  background: var(--card);
+}
+
+.fav-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+/* Wrapper for each tab + its drop indicator */
+.fav-tab-wrap {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+/* Blue vertical insert line before/after a tab */
+.fav-tab-wrap--before::before,
+.fav-tab-wrap--after::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2px;
+  height: 60%;
+  border-radius: 99px;
+  background: var(--blue);
+  animation: drop-line-in 0.12s ease-out;
+}
+
+.fav-tab-wrap--before::before {
+  left: -1px;
+}
+
+.fav-tab-wrap--after::after {
+  right: -1px;
+}
+
+.fav-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 13px;
+  border: none;
+  border-radius: 16px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: grab;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s, opacity 0.15s;
+}
+
+.fav-tab:active {
+  cursor: grabbing;
+}
+
+.fav-tab:hover:not(.fav-tab--active) {
+  color: var(--text);
+  background: color-mix(in srgb, var(--text-high, #000) 6%, transparent);
+}
+
+/* light: active pill = whiter card surface with shadow */
+.fav-tab--active {
+  background: var(--card);
+  color: var(--text);
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+}
+
+/* dark: active pill = higher surface (card2 is brighter in dark) */
+[data-theme="dark"] .fav-tab--active {
+  background: var(--card2);
+  box-shadow: none;
+}
+
+.fav-tab--dragging {
+  opacity: 0.4;
+  box-shadow: none;
+}
+
+/* Count badge */
+.fav-tab-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: 20px;
+  background: var(--card2);
+  color: var(--muted);
+  font-size: 0.7rem;
+  font-weight: 600;
+  transition: background 0.15s, color 0.15s;
+}
+
+.fav-tab--active .fav-tab-badge {
+  background: var(--blue);
+  color: #fff;
+}
+
+
+/* ═══════════════════════════════════════════
+   ICON BUTTON (shared)
+════════════════════════════════════════════ */
+.fav-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+  flex-shrink: 0;
+}
+
+.fav-icon-btn:hover {
+  background: color-mix(in srgb, var(--text-high, #000) 8%, transparent);
+  color: var(--text);
+}
+
+.fav-icon-btn--spinning {
+  opacity: 0.5;
+}
+
+.fav-icon-btn--spinning svg {
+  animation: spin 0.8s linear infinite;
+}
+
+/* ═══════════════════════════════════════════
+   TAB PANELS
+════════════════════════════════════════════ */
+.fav-tabpanel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--bg);
+  border-radius: var(--radius);
+  margin: 0 12px 12px;
+  overflow: hidden;
+}
+
+.fav-tabpanel[hidden] {
+  display: none;
+}
+
+/* ═══════════════════════════════════════════
+   TAB CONTENT
+════════════════════════════════════════════ */
+.tab-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Reorder hint */
+.fav-hint {
+  flex-shrink: 0;
+  padding: 9px 18px 0;
+  font-size: 0.76rem;
+  color: var(--text-faint);
+  letter-spacing: 0.01em;
+}
+
+/* List scroll area */
+.fav-list-wrap {
+  flex: 1;
+  overflow-y: auto;
+  padding: 6px 8px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--text-faint) transparent;
+}
+
+.fav-list-wrap::-webkit-scrollbar {
+  width: 3px;
+}
+
+.fav-list-wrap::-webkit-scrollbar-thumb {
+  background: var(--text-faint);
+  border-radius: 2px;
+}
+
+.fav-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ═══════════════════════════════════════════
+   FAVORITE ITEM
+════════════════════════════════════════════ */
+.fav-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px 4px 10px;
+  border-radius: var(--radius);
+  background: var(--card);
+  cursor: default;
+  user-select: none;
+  transition: background 0.12s, transform 0.15s ease-in-out, opacity 0.15s;
+}
+
+.fav-item:hover {
+  background: var(--card2);
+}
+
+/* Item being dragged — placeholder stays in list, looks like a ghost slot */
+.fav-item--dragging {
+  opacity: 0.35;
+  background: var(--card);
+  border-radius: var(--radius);
+}
+
+.fav-item--dragging .fav-item-btn,
+.fav-item--dragging .fav-remove-btn {
+  pointer-events: none;
+}
+
+/* During any active drag, add smooth sliding room */
+.fav-list--dragging .fav-item {
+  transition: transform 0.15s ease-in-out, opacity 0.15s;
+}
+
+.fav-item--drop-target {
+  outline: 1px solid var(--blue);
+  border-radius: var(--radius);
+  background: var(--blue-bg);
+}
+
+/* Blue drop indicator line between items */
+.drop-indicator {
+  list-style: none;
+  height: 3px;
+  margin: 0 10px;
+  border-radius: 99px;
+  background: var(--blue);
+  animation: drop-line-in 0.14s ease-out;
+  pointer-events: none;
+}
+
+@keyframes drop-line-in {
+  from {
+    opacity: 0;
+    transform: scaleX(0.6);
+  }
+
+  to {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+/* Full-row clickable button */
+.fav-item-btn {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  gap: 10px;
+  padding: 6px 8px 6px 0;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+.fav-item-btn:hover .fav-drag-handle {
+  opacity: 1;
+}
+
+.fav-item-btn:hover .fav-item-icon {
+  background: var(--bg);
+}
+
+.fav-item-btn:hover .fav-item-title {
+  color: var(--blue);
+}
+
+.fav-item:hover .fav-remove-btn {
+  opacity: 1;
+}
+
+/* Drag handle — invisible at rest, interactive on hover */
+.fav-drag-handle {
+  display: inline-flex;
+  align-items: center;
+  color: var(--text-faint);
+  cursor: grab;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.15s, color 0.12s;
+  padding: 2px 0;
+}
+
+.fav-drag-handle:active {
+  cursor: grabbing;
+}
+
+.fav-item-btn:hover .fav-drag-handle {
+  opacity: 1;
+  color: var(--muted);
+}
+
+/* Rounded-square type icon */
+.fav-item-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 9px;
+  background: var(--bg);
+  color: var(--muted);
+  transition: background 0.12s;
+}
+
+.fav-item:hover .fav-item-icon {
+  background: var(--bg);
+}
+
+/* Title */
+.fav-item-title {
+  flex: 1;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.12s;
+}
+
+/* Right label (type / blueprint) — pill badge */
+.fav-item-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  font-size: 0.76rem;
+  font-weight: 500;
+  color: var(--muted);
+  white-space: nowrap;
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background: var(--bg);
+  border-radius: 8px;
+  padding: 3px 8px 3px 6px;
+}
+
+.fav-item-right-icon {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* Delete — invisible at rest */
+.fav-remove-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: var(--radius-xs);
+  background: none;
+  color: var(--text-faint);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s, color 0.12s, background 0.12s;
+}
+
+.fav-item:hover .fav-remove-btn {
+  opacity: 1;
+}
+
+.fav-remove-btn:focus-visible {
+  opacity: 1;
+  outline: 2px solid var(--blue);
+}
+
+.fav-remove-btn:hover {
+  color: var(--red-dark);
+}
+
+/* ═══════════════════════════════════════════
+   ADD AREA (bottom of tab panel)
+════════════════════════════════════════════ */
+.fav-add-area {
+  flex-shrink: 0;
+  padding: 10px 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+  /* anchor for the absolute-positioned panel */
+}
+
+.fav-add-label {
+  display: none;
+}
+
+/* Combobox trigger (button) and open input — shared shell */
+.fav-add-combobox {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 9px 13px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card);
+  cursor: pointer;
+  text-align: left;
+  gap: 8px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.fav-add-combobox:hover {
+  border-color: var(--border-strong);
+}
+
+.fav-add-combobox--open {
+  border-color: var(--border-strong);
+  /* box-shadow: 0 0 0 2px color-mix(in srgb, var(--blue) 15%, transparent); */
+}
+
+/* When the combobox acts as an input row */
+.fav-add-combobox--input {
+  cursor: text;
+}
+
+.fav-add-combobox-search-icon {
+  color: var(--text-faint);
+  flex-shrink: 0;
+}
+
+.fav-add-combobox-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 0.84rem;
+  color: var(--text);
+  min-width: 0;
+}
+
+.fav-add-combobox-input::placeholder {
+  color: var(--text-faint);
+}
+
+.fav-add-combobox-placeholder {
+  flex: 1;
+  font-size: 0.84rem;
+  color: var(--text-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fav-add-combobox-chevron {
+  color: var(--text-faint);
+  flex-shrink: 0;
+  transition: transform 0.2s;
+}
+
+.fav-add-combobox--open .fav-add-combobox-chevron {
+  transform: rotate(180deg);
+}
+
+/* ═══════════════════════════════════════════
+   ADD PANEL (dropdown card — floats above list)
+════════════════════════════════════════════ */
+.add-panel {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  /* sit just above the trigger row, aligned with the combobox inset */
+  left: 12px;
+  right: 12px;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  max-height: 280px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  animation: panel-in 0.12s ease-out;
+}
+
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Panel header — back (entity drill-down) on left, X close on right */
+.add-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 6px 4px 8px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  min-height: 32px;
+}
+
+.add-panel-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  background: none;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 3px 6px;
+  border-radius: var(--radius-xs);
+  transition: color 0.12s, background 0.12s;
+}
+
+.add-panel-back-btn:hover {
+  color: var(--text);
+  background: color-mix(in srgb, var(--text-high, #000) 5%, transparent);
+}
+
+.add-panel-close-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: none;
+  color: var(--text-faint);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: color 0.12s, background 0.12s;
+  flex-shrink: 0;
+}
+
+.add-panel-close-btn:hover {
+  color: var(--text);
+  background: color-mix(in srgb, var(--text-high, #000) 6%, transparent);
+}
+
+/* Search row — kept for reference but now hidden (search lives in combobox trigger) */
+.add-panel-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 13px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  background: var(--card2);
+}
+
+.add-search-icon {
+  color: var(--text-faint);
+  flex-shrink: 0;
+}
+
+.add-search-back {
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.add-search-clear {
+  width: 20px;
+  height: 20px;
+}
+
+.add-search-input {
+  flex: 1;
+  border: none;
+  background: none;
+  color: var(--text);
+  font-size: 0.875rem;
+  outline: none;
+  min-width: 0;
+}
+
+.add-search-input::placeholder {
+  color: var(--text-faint);
+}
+
+/* Items list */
+.add-panel-list {
+  list-style: none;
+  flex: 1;
+  overflow-y: auto;
+  padding: 5px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--text-faint) transparent;
+}
+
+.add-panel-list::-webkit-scrollbar {
+  width: 3px;
+}
+
+.add-panel-list::-webkit-scrollbar-thumb {
+  background: var(--text-faint);
+  border-radius: 2px;
+}
+
+.add-panel-status {
+  padding: 16px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+.add-panel-empty {
+  color: var(--text-faint);
+}
+
+/* Item button */
+.add-panel-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.1s;
+}
+
+.add-panel-item:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--text-high, #000) 5%, transparent);
+}
+
+.add-panel-item--added {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.add-item-icon {
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.add-item-title {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.add-item-sub {
+  display: none;
+}
+
+.add-item-check {
+  color: var(--blue);
+  flex-shrink: 0;
+}
+
+.add-item-chevron {
+  color: var(--text-faint);
+  flex-shrink: 0;
+}
+
+/* ═══════════════════════════════════════════
+   EMPTY STATE
+════════════════════════════════════════════ */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 24px 24px;
+  gap: 8px;
+  text-align: center;
+}
+
+.empty-state-icon {
+  color: var(--text-faint);
+  opacity: 0.5;
+  margin-bottom: 6px;
+}
+
+.empty-state-heading {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.empty-state-hint {
+  font-size: 0.8rem;
+  max-width: 220px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+/* ═══════════════════════════════════════════
+   LOADING STATE
+════════════════════════════════════════════ */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 48px 16px;
+  flex: 1;
+}
+
+.loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border-strong);
+  border-top-color: var(--blue);
+  border-radius: 50%;
+  animation: spin 0.65s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-dots {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.loading-dots span {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--muted);
+  animation: dot-pulse 1.2s infinite ease-in-out;
+}
+
+.loading-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.loading-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes dot-pulse {
+
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ═══════════════════════════════════════════
+   ERROR BANNER (full-page errors)
+════════════════════════════════════════════ */
+.error-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 16px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin: 14px;
+  box-shadow: var(--shadow-sm);
+}
+
+.error-icon {
+  color: var(--red-dark);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.error-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 3px;
+}
+
+.error-message {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.error-detail {
+  font-size: 0.8rem;
+  color: var(--muted);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.error-retry {
+  align-self: flex-start;
+}
+
+/* ═══════════════════════════════════════════
+   SAVE TOAST — floats in the corner, never shifts layout
+════════════════════════════════════════════ */
+.save-toast {
+  position: absolute;
+  bottom: 16px;
+  right: 14px;
+  z-index: 300;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  box-shadow: var(--shadow-md);
+  animation: toast-in 0.18s ease-out;
+  pointer-events: none;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.save-toast--saving {
+  background: var(--card);
+  color: var(--muted);
+  border: 1px solid var(--border-strong);
+}
+
+.save-toast--error {
+  background: var(--red-bg);
+  color: var(--red-dark);
+  border: 1px solid var(--red);
+}
+
+.save-toast--success {
+  background: var(--green-bg);
+  color: var(--green);
+  border: 1px solid #bbf7d0;
+}
+
+.toast-spin {
+  animation: spin 0.8s linear infinite;
+}
