@@ -1,0 +1,23 @@
+{
+  "skillRequestBlueprint": {
+    "type": "blueprint",
+    "isRequired": true,
+    "label": "Skill request blueprint"
+  },
+  "skillBlueprint": {
+    "type": "blueprint",
+    "isRequired": true,
+    "label": "Skill blueprint"
+  },
+  "skillGroupBlueprint": {
+    "type": "blueprint",
+    "isRequired": true,
+    "label": "Skill group blueprint"
+  },
+  "aiAgentIdentifier": {
+    "type": "string",
+    "isRequired": false,
+    "label": "AI agent identifier (optional)",
+    "description": "Identifier of a Port AI agent to use for 'Create with AI'. Leave blank to use the general-purpose Port AI assistant (/v1/ai/invoke)."
+  }
+}

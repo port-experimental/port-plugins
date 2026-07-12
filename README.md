@@ -17,6 +17,9 @@ This repository contains plugins contributed by [Port.io](https://www.port.io).
 | [Survey Analytics](./engineering-intelligence-survey-analytics) | 0.1.1 | Survey Intelligence: read-only analytics for survey responses (scores, trends, team breakdown, multi-select, and a bundled DORA benchmark) |
 | [Survey Forms](./engineering-intelligence-survey-forms) | 0.1.1 | Survey Intelligence: run engineering surveys inside Port; renders any authored survey and stores each submission as a scored response entity |
 | [Survey Builder](./engineering-intelligence-survey-builder) | 0.1.1 | Survey Intelligence: author engineering surveys (SPACE, AI Adoption, DORA, DX Core 4, or custom) visually and save them as Port survey entities |
+| [Skills Marketplace](./skill-catalog) | 0.1.0 | Card grid of skills with readiness scores, search, category grouping, and inline create/edit flows |
+| [Skill Request Form](./skill-request-form) | 0.1.0 | Author and submit skill create/update requests for review — markdown editor, multi-file authoring, AI drafting, live diff |
+| [Skill View](./skill-view) | 0.1.0 | File-navigator viewer for a skill entity — SKILL.md plus references, scripts, and assets |
 
 ## AI-assisted development - Skills (Cursor & Claude)
 

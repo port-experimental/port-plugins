@@ -1,0 +1,8 @@
+{
+  "skillBlueprint": {
+    "type": "string",
+    "isRequired": false,
+    "label": "Skill blueprint",
+    "description": "Blueprint identifier for skills. Defaults to '_skill'."
+  }
+}
