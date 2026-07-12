@@ -669,7 +669,7 @@ export function InsightsTab({
       {generating && !insight && <GeneratingBanner onRefresh={handleRefresh} />}
 
       {/* Content */}
-      {insightsQuery.isLoading ? (
+      {insightsQuery.isPending || insightsQuery.isLoading ? (
         <LoadingState label="Loading insights…" />
       ) : !insight ? (
         !generating && (
