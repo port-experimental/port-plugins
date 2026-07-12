@@ -1,0 +1,17 @@
+{
+  "skillRequestBlueprint": {
+    "type": "string",
+    "isRequired": false,
+    "label": "Skill request blueprint"
+  },
+  "skillGroupBlueprint": {
+    "type": "string",
+    "isRequired": false,
+    "label": "Skill group blueprint"
+  },
+  "aiAgentIdentifier": {
+    "type": "string",
+    "isRequired": false,
+    "label": "AI agent identifier (optional)"
+  }
+}
