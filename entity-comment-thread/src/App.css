@@ -1,0 +1,1136 @@
+/* ── Google Fonts ── */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap');
+
+/* ── Design tokens ── */
+:root {
+  --font-ui: 'DM Sans', -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'DM Mono', 'SFMono-Regular', Consolas, monospace;
+
+  --bg: #ffffff;
+  --bg2: #f7f9fa;
+  --card: #ffffff;
+  --toolbar-bg: #eef0f2;
+
+  --text: rgba(0, 0, 0, 0.9);
+  --muted: rgba(0, 0, 0, 0.6);
+  --text-faint: rgba(0, 0, 0, 0.28);
+
+  --border: #d3d3d3;
+  --border-hover: rgba(0, 0, 0, 0.35);
+
+  --accent: rgba(134, 141, 255, 1);
+  --accent-subtle: rgba(134, 141, 255, 0.12);
+
+  --success: rgba(79, 205, 68, 1);
+  --success-bg: rgba(79, 205, 68, 0.13);
+  --info: rgba(41, 199, 209, 1);
+  --info-bg: rgba(41, 199, 209, 0.12);
+  --error: rgba(220, 42, 42, 1);
+  --error-bg: rgba(220, 42, 42, 0.10);
+  --warning: rgba(246, 194, 60, 1);
+  --warning-bg: rgba(246, 194, 60, 0.13);
+
+  --link: #0969da;
+
+  --hover-bg: rgba(0, 0, 0, 0.03);
+  --hover-bg-md: rgba(0, 0, 0, 0.06);
+
+  --btn-ink: rgba(0, 0, 0, 0.88);
+  --btn-ink-text: #ffffff;
+
+  --radius-sm: 4px;
+  --radius: 8px;
+  --radius-card: 10px;
+
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.08), 0 0 0 1px var(--border);
+  --shadow-dropdown: 0 4px 12px rgba(0, 0, 0, 0.10), 0 0 0 1px var(--border);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1e1c25;
+    --bg2: #252330;
+    --card: #252330;
+    --toolbar-bg: #2e2b3a;
+
+    --text: rgba(255, 255, 255, 0.9);
+    --muted: rgba(255, 255, 255, 0.7);
+    --text-faint: rgba(255, 255, 255, 0.35);
+
+    --border: rgba(255, 255, 255, 0.12);
+    --border-hover: rgba(255, 255, 255, 0.28);
+
+    --hover-bg: rgba(255, 255, 255, 0.04);
+    --hover-bg-md: rgba(255, 255, 255, 0.08);
+
+    --btn-ink: rgba(255, 255, 255, 0.9);
+    --btn-ink-text: #1e1c25;
+
+    --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.25), 0 0 0 1px var(--border);
+    --shadow-dropdown: 0 4px 16px rgba(0, 0, 0, 0.40), 0 0 0 1px var(--border);
+  }
+}
+
+/* ── Reset ── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#plugin-root {
+  height: 100%;
+  min-height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+#plugin-root {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* ── Shell ── */
+.shell {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 120px;
+  padding: 12px 16px;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.shell--message {
+  justify-content: flex-start;
+  overflow-y: auto;
+}
+
+.main {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* ── Thread layout ── */
+.thread {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.thread__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 12px;
+  flex-shrink: 0;
+}
+
+/* ── Count chip (• 2 open) ── */
+.thread__counts {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.count-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.count-chip::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.count-chip--open {
+  background: var(--accent-subtle);
+  color: var(--accent);
+}
+
+.count-chip--open::before {
+  background: var(--accent);
+}
+
+.count-chip--resolved {
+  background: var(--success-bg);
+  color: var(--success);
+}
+
+.count-chip--resolved::before {
+  background: var(--success);
+}
+
+/* ── Segmented filter control ── */
+.thread__filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  background: var(--bg2);
+  border-radius: 20px;
+  padding: 3px;
+}
+
+.filter-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 13px;
+  border: none;
+  border-radius: 16px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: var(--font-ui);
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+}
+
+.filter-btn:hover:not(.filter-btn--active) {
+  color: var(--text);
+  background: var(--hover-bg-md);
+}
+
+.filter-btn--active {
+  background: var(--card);
+  color: var(--text);
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.07), 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+/* ── Thread list ── */
+.thread__list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: visible;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 2px 3px 6px;
+}
+
+.thread__list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.thread__list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.thread__list::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 2px;
+}
+
+/* ── Composer section ── */
+.thread__composer {
+  flex-shrink: 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  margin-top: 8px;
+}
+
+/* ── Comment card (top-level) ── */
+.comment {
+  position: relative;
+  display: flex;
+  gap: 10px;
+  transition: background 0.1s;
+}
+
+.comment--top {
+  background: var(--card);
+  border-radius: var(--radius-card);
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  padding: 14px 16px 12px;
+}
+
+.comment--top.comment--resolved {
+  opacity: 0.65;
+}
+
+/* ── Reply pill ── */
+.comment--reply {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 12px 8px;
+}
+
+/* ── Avatar ── */
+.comment__avatar {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  letter-spacing: 0.04em;
+}
+
+.comment--reply .comment__avatar {
+  width: 26px;
+  height: 26px;
+  font-size: 0.62rem;
+}
+
+/* ── Comment content ── */
+.comment__content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* ── Header row ── */
+.comment__header {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.comment__author-info {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
+.comment__author {
+  font-weight: 600;
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.comment__meta {
+  font-size: 12px;
+  color: var(--text-faint);
+  flex-shrink: 0;
+}
+
+/* ── Status pill ── */
+.status-badge {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 9px;
+  border-radius: 999px;
+  flex-shrink: 0;
+  letter-spacing: 0.01em;
+}
+
+.status-badge--open {
+  background: var(--accent-subtle);
+  color: var(--accent);
+}
+
+.status-badge--resolved {
+  background: var(--success-bg);
+  color: var(--success);
+}
+
+/* ── Edited badge ── */
+.comment__edited-badge {
+  font-size: 12px;
+  color: var(--text-faint);
+  font-style: italic;
+  flex-shrink: 0;
+}
+
+/* ── Overflow (⋮) menu ── */
+.comment__overflow {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.overflow-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--text-faint);
+  opacity: 0;
+  transition: opacity 0.1s, background 0.1s, color 0.1s;
+}
+
+.comment:hover .overflow-trigger,
+.overflow-trigger--open {
+  opacity: 1;
+}
+
+.overflow-trigger:hover,
+.overflow-trigger--open {
+  background: var(--hover-bg-md);
+  color: var(--muted);
+}
+
+.overflow-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 100;
+  min-width: 160px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-dropdown);
+  padding: 4px;
+  animation: menu-in 0.1s ease-out;
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+}
+
+/* Applied while a delete mutation is in-flight */
+.thread-item--deleting {
+  animation: fade-out 0.25s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.icon-spin {
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+}
+
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.overflow-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 10px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: none;
+  cursor: pointer;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--text);
+  text-align: left;
+  transition: background 0.1s;
+}
+
+.overflow-item:hover:not(:disabled) {
+  background: var(--hover-bg-md);
+}
+
+.overflow-item--danger {
+  color: var(--error);
+}
+
+.overflow-item--danger:hover:not(:disabled) {
+  background: var(--error-bg);
+}
+
+.overflow-item:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ── Comment body ── */
+.comment__body {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text);
+  word-break: break-word;
+  margin-top: 2px;
+}
+
+.comment__edited {
+  font-size: 11px;
+  font-style: italic;
+  color: var(--text-faint);
+}
+
+/* ── Markdown ── */
+.md-inline-code {
+  font-family: var(--font-mono);
+  font-size: 0.82em;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 1px 5px;
+}
+
+.md-code-block {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  margin: 6px 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.md-code-block code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--text);
+  white-space: pre;
+  display: block;
+}
+
+.md-code-lang {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-faint);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Mention chip: "• name" */
+.md-mention {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--accent-subtle);
+  color: var(--accent);
+  font-weight: 500;
+  border-radius: 999px;
+  padding: 2px 10px 2px 7px;
+  font-size: 0.9em;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.md-mention::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+}
+
+.md-link {
+  color: var(--link);
+  text-decoration: underline;
+  word-break: break-word;
+}
+
+.md-link:hover {
+  opacity: 0.8;
+}
+
+.md-blockquote {
+  border-left: 2px solid var(--border-hover);
+  margin: 4px 0;
+  padding: 2px 10px;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.md-list {
+  margin: 4px 0 4px 18px;
+  padding: 0;
+  line-height: 1.6;
+}
+
+/* ── Comment footer ── */
+.comment__footer {
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  cursor: pointer;
+  color: var(--text-faint);
+  font-family: var(--font-ui);
+  transition: background 0.1s, color 0.1s;
+  min-height: 22px;
+}
+
+.action-btn:hover:not(:disabled) {
+  background: var(--hover-bg-md);
+  color: var(--muted);
+}
+
+.action-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.action-btn--primary {
+  background: var(--accent);
+  color: #fff;
+  font-weight: 500;
+  border-radius: var(--radius-sm);
+}
+
+.action-btn--primary:hover:not(:disabled) {
+  opacity: 0.88;
+  background: var(--accent);
+  color: #fff;
+}
+
+/* ── Inline edit area ── */
+.comment__edit-area {
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.comment__edit-area .rich-input__textarea {
+  min-height: 44px;
+}
+
+.edit-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.edit-hint {
+  font-size: 11px;
+  color: var(--text-faint);
+}
+
+.edit-buttons {
+  display: flex;
+  gap: 6px;
+}
+
+/* ── Replying-to banner ── */
+.comment__reply-area {
+  margin-top: 8px;
+}
+
+.replying-to-banner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  margin-bottom: 6px;
+  background: var(--accent-subtle);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  color: var(--muted);
+  border-left: 2px solid var(--accent);
+}
+
+.replying-to-banner strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.cancel-reply {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-left: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--muted);
+  font-family: var(--font-ui);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  transition: background 0.1s, color 0.1s;
+}
+
+.cancel-reply:hover {
+  background: var(--hover-bg-md);
+  color: var(--text);
+}
+
+/* ── Thread item: card + replies grouped together ── */
+.thread-item {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Replies section: nested inside the parent card ── */
+.replies-section {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 220ms ease-out;
+}
+
+.replies-section--open {
+  grid-template-rows: 1fr;
+}
+
+.replies-section__inner {
+  overflow: hidden;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 8px;
+}
+
+/* ── Reply / Hide replies toggle button ── */
+.replies-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: var(--font-ui);
+  color: var(--text-faint);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  transition: background 0.1s, color 0.1s;
+}
+
+.replies-toggle:hover {
+  color: var(--muted);
+  background: var(--hover-bg-md);
+}
+
+/* ── Composer ── */
+.composer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.composer__input-wrap {
+  position: relative;
+}
+
+.composer__input-wrap .rich-input__textarea {
+  max-height: 200px;
+}
+
+/* ── Rich text input: toolbar box + separate textarea box ── */
+.rich-input {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Toolbar: auto-width rounded box, left-aligned */
+.rich-input__toolbar {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 12px;
+  background: var(--toolbar-bg);
+  border-radius: var(--radius-card);
+  align-self: flex-start;
+}
+
+.rich-input__group {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+}
+
+.rich-input__sep {
+  display: inline-block;
+  width: 1px;
+  height: 14px;
+  background: var(--border);
+  margin: 0 4px;
+  flex-shrink: 0;
+}
+
+.rti-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: none;
+  cursor: pointer;
+  color: var(--muted);
+  transition: background 0.1s, color 0.1s;
+  flex-shrink: 0;
+}
+
+.rti-btn:hover {
+  background: var(--hover-bg-md);
+  color: var(--text);
+}
+
+.rti-btn:active {
+  background: var(--accent-subtle);
+  color: var(--accent);
+}
+
+/* Positioned wrapper so the mention dropdown anchors to the textarea top edge */
+.rich-input__textarea-wrap {
+  position: relative;
+}
+
+/* Textarea is its own bordered box */
+.rich-input__textarea {
+  width: 100%;
+  min-height: 72px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  outline: none;
+  background: var(--card);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  line-height: 1.5;
+  resize: vertical;
+  box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.rich-input__textarea::placeholder {
+  color: var(--text-faint);
+}
+
+.rich-input__textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-subtle);
+}
+
+.rich-input__textarea:disabled {
+  opacity: 0.6;
+}
+
+/* Edit-mode textarea shares the same style */
+.comment__edit-area .rich-input__textarea {
+  min-height: 44px;
+}
+
+/* ── Mention dropdown (opens above the composer input-wrap) ── */
+.mention-dropdown {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  max-width: 320px;
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-dropdown);
+  z-index: 200;
+  overflow: hidden;
+  animation: menu-in 0.1s ease-out;
+}
+
+.mention-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--text);
+  transition: background 0.1s;
+}
+
+.mention-option:hover,
+.mention-option--active {
+  background: var(--hover-bg-md);
+}
+
+.mention-option__avatar {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  /* background set via inline style (hash-based color) */
+  color: #fff;
+  font-size: 0.64rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.03em;
+}
+
+.mention-option__name {
+  font-weight: 500;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mention-option__email {
+  font-size: 12px;
+  flex-shrink: 0;
+  color: var(--text-faint);
+}
+
+/* ── Composer footer ── */
+.composer__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.composer__actions {
+  display: flex;
+  gap: 6px;
+}
+
+/* ── Buttons ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 14px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: opacity 0.1s, background 0.1s, border-color 0.1s, color 0.1s;
+  font-family: var(--font-ui);
+  min-height: 30px;
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+}
+
+.btn--primary {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.btn--primary:hover:not(:disabled) {
+  opacity: 0.88;
+}
+
+/* Disabled primary looks like a muted ghost — matches Port's style */
+.btn--primary:disabled {
+  background: var(--bg2);
+  color: var(--text-faint);
+  border-color: var(--border);
+}
+
+.btn--ghost {
+  background: none;
+  color: var(--muted);
+  border-color: var(--border);
+}
+
+.btn--ghost:hover:not(:disabled) {
+  background: var(--hover-bg-md);
+  color: var(--text);
+  border-color: var(--border-hover);
+}
+
+.btn--ghost:disabled {
+  opacity: 0.45;
+}
+
+/* ── Error banner ── */
+.error-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--error-bg);
+  border: 1px solid var(--error);
+  border-radius: var(--radius);
+  font-size: 13px;
+}
+
+/* ── Empty state ── */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 40px 16px;
+  color: var(--text-faint);
+  text-align: center;
+}
+
+.empty-state__icon {
+  opacity: 0.5;
+}
+
+.empty-state__title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.empty-state__sub {
+  font-size: 12px;
+  color: var(--text-faint);
+  max-width: 220px;
+}
+
+/* ── Skeleton shimmer ── */
+.skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 4px;
+}
+
+.skeleton-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.skeleton-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--bg2);
+  flex-shrink: 0;
+  animation: shimmer 1.4s infinite;
+}
+
+.skeleton-lines {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 4px;
+}
+
+.skeleton-line {
+  height: 10px;
+  border-radius: var(--radius-sm);
+  background: var(--bg2);
+  animation: shimmer 1.4s infinite;
+}
+
+.skeleton-line--short {
+  width: 38%;
+}
+
+.skeleton-line--mid {
+  width: 65%;
+}
+
+.skeleton-line--long {
+  width: 92%;
+}
+
+@keyframes shimmer {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.4;
+  }
+}
+
+/* ── Shell message ── */
+.shell-message {
+  font-size: 13px;
+  color: var(--muted);
+  padding: 4px 0;
+}

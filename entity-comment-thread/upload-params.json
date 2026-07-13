@@ -1,0 +1,7 @@
+{
+  "commentBlueprint": {
+    "type": "blueprint",
+    "isRequired": true,
+    "label": "Comment blueprint"
+  }
+}
