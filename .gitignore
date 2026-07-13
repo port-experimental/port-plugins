@@ -4,3 +4,4 @@
 !**/dist/index.html
 .DS_Store
 **/.port
+_context/
