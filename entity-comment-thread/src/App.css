@@ -46,6 +46,7 @@
   --shadow-dropdown: 0 4px 12px rgba(0, 0, 0, 0.10), 0 0 0 1px var(--border);
 }
 
+/* OS-level dark mode */
 @media (prefers-color-scheme: dark) {
   :root {
     --bg: #1e1c25;
@@ -69,6 +70,32 @@
     --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.25), 0 0 0 1px var(--border);
     --shadow-dropdown: 0 4px 16px rgba(0, 0, 0, 0.40), 0 0 0 1px var(--border);
   }
+}
+
+/* Port's dark mode toggle — sets data-theme="dark" on html or a parent element */
+:root[data-theme="dark"],
+[data-theme="dark"] body,
+[data-theme="dark"] #plugin-root {
+  --bg: #1e1c25;
+  --bg2: #252330;
+  --card: #252330;
+  --toolbar-bg: #2e2b3a;
+
+  --text: rgba(255, 255, 255, 0.9);
+  --muted: rgba(255, 255, 255, 0.7);
+  --text-faint: rgba(255, 255, 255, 0.35);
+
+  --border: rgba(255, 255, 255, 0.12);
+  --border-hover: rgba(255, 255, 255, 0.28);
+
+  --hover-bg: rgba(255, 255, 255, 0.04);
+  --hover-bg-md: rgba(255, 255, 255, 0.08);
+
+  --btn-ink: rgba(255, 255, 255, 0.9);
+  --btn-ink-text: #1e1c25;
+
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.25), 0 0 0 1px var(--border);
+  --shadow-dropdown: 0 4px 16px rgba(0, 0, 0, 0.40), 0 0 0 1px var(--border);
 }
 
 /* ── Reset ── */

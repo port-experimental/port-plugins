@@ -40,10 +40,18 @@ export const usePostMessageData = () => {
   );
 
   const applyThemeCss = sdk.applyThemeCss;
+  const themeMode = sdk.theme?.mode;
 
   useEffect(() => {
     applyThemeCss();
   }, [applyThemeCss]);
+
+  useEffect(() => {
+    document.documentElement.setAttribute(
+      "data-theme",
+      themeMode === "dark" ? "dark" : "light"
+    );
+  }, [themeMode]);
 
   const result = useMemo(() => {
     if (DEV_MOCK) {
