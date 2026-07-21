@@ -4,7 +4,7 @@ Collaborative comment thread on any entity page — rich text, code snippets, @m
 
 ## Preview
 
-> Add `assets/preview.png` once the plugin is deployed and you have a screenshot.
+<img src="https://github.com/port-experimental/port-plugins/blob/main/entity-comment-thread/assets/preview.png?raw=true" width="360" alt="Entity Comment Thread plugin preview" />
 
 ## Features
 
