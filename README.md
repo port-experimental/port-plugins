@@ -18,6 +18,7 @@ This repository contains plugins contributed by [Port.io](https://www.port.io).
 | [Survey Forms](./engineering-intelligence-survey-forms) | 0.1.1 | Survey Intelligence: run engineering surveys inside Port; renders any authored survey and stores each submission as a scored response entity |
 | [Survey Builder](./engineering-intelligence-survey-builder) | 0.1.1 | Survey Intelligence: author engineering surveys (SPACE, AI Adoption, DORA, DX Core 4, or custom) visually and save them as Port survey entities |
 | [My Favorites](./my-favorites) | 0.2.0 | Bookmark and quick-access Pages, Actions, and Entities with drag-to-reorder and per-user persistence |
+| [Github Copilot AI Adoption and Usage](./engineering-intelligence-ai-usage-copilot) | 0.1.0 | Custom Port plugin that turns raw GitHub Copilot organization metrics into an interactive engineering intelligence dashboard |
 
 ## AI-assisted development - Skills (Cursor & Claude)
 
