@@ -27,7 +27,7 @@ Live countdown to a target date and time — custom plugin for [Port](https://ap
 
 No catalog setup required. The widget is driven entirely by plugin parameters.
 
-## Plugin parameters
+## Widget parameters
 
 | Key | Type | Required | Default | Description |
 |-----|------|----------|---------|-------------|
@@ -99,22 +99,31 @@ See [@port-labs/port-plugins-cli](https://www.npmjs.com/package/@port-labs/port-
 
 ```
 countdown/
+  assets/
+    preview.png
+  dist/
+    index.html
   src/
     components/
       CountdownDisplay.tsx
+      FormatHint.tsx
     hooks/
       useCountdown.ts
       usePostMessageData.ts
     utils/
       config.ts
       parseDateTime.ts
+      themeMode.ts
     types.ts
     App.tsx
     App.css
     index.tsx
+    index.html
   upload-params.json
+  package.json
   webpack.config.js
   tsconfig.json
+  README.md
 ```
 
 ## Troubleshooting

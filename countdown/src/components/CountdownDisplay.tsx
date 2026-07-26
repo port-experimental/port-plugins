@@ -20,17 +20,20 @@ function Colon() {
 type DigitGroupProps = {
   value: number;
   label: string;
+  /** Minimum digit slots (default 2). Days may grow beyond this. */
+  minDigits?: number;
 };
 
-function DigitGroup({ value, label }: DigitGroupProps) {
-  const padded = String(Math.min(99, Math.max(0, value))).padStart(2, "0");
-  const [tens, ones] = padded.split("");
+function DigitGroup({ value, label, minDigits = 2 }: DigitGroupProps) {
+  const safe = Math.max(0, Math.floor(value));
+  const digits = String(safe).padStart(minDigits, "0").split("");
 
   return (
-    <div className="digit-group" aria-label={`${value} ${label}`}>
+    <div className="digit-group" aria-label={`${safe} ${label}`}>
       <div className="digit-pair">
-        <DigitSlot digit={tens} />
-        <DigitSlot digit={ones} />
+        {digits.map((digit, index) => (
+          <DigitSlot key={`${index}-${digit}`} digit={digit} />
+        ))}
       </div>
       <span className="digit-group__label">{label}</span>
     </div>
