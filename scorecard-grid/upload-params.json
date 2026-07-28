@@ -1,0 +1,32 @@
+{
+  "blueprint": {
+    "type": "blueprint",
+    "isRequired": true,
+    "label": "Blueprint of the entities to display"
+  },
+  "scorecardIdentifier": {
+    "type": "string",
+    "isRequired": true,
+    "label": "Scorecard identifier on that blueprint"
+  },
+  "counters": {
+    "type": "array",
+    "isRequired": true,
+    "label": "Counter badges (see README)"
+  },
+  "drillDown": {
+    "type": "array",
+    "isRequired": true,
+    "label": "Drill-down sections (see README)"
+  },
+  "pollIntervalSeconds": {
+    "type": "number",
+    "isRequired": false,
+    "label": "Polling interval in seconds"
+  },
+  "iconProperty": {
+    "type": "string",
+    "isRequired": false,
+    "label": "Property key for icon lookup (e.g. language)"
+  }
+}
