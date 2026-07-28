@@ -4,7 +4,7 @@ A multi-blueprint entity table widget for [Port](https://app.port.io) dashboards
 
 ## Preview image
 
-<img alt="Blueprint Table widget" src="assets/preview.png" />
+<img width="2000" height="503" alt="Blueprint Table widget" src="https://github.com/port-experimental/port-plugins/blob/main/blueprint-table/assets/preview.png" />
 
 ## Features
 

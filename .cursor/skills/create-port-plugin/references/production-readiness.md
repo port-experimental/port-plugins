@@ -16,6 +16,7 @@ Reference templates (copy into new plugins): **`assets/template-App.tsx`**, **`a
 - [7. UX states (non-optional)](#7-ux-states-non-optional)
 - [8. Local dev smoke test](#8-local-dev-smoke-test)
 - [9. Port iframe smoke test (before handing to user)](#9-port-iframe-smoke-test-before-handing-to-user)
+- [10. `@port-labs/plugins-sdk` version](#10-port-labsplugins-sdk-version)
 - [Quick symptom table](#quick-symptom-table)
 
 ## 1. React hooks — async host context
@@ -143,6 +144,7 @@ Use `.shell--message` + `.muted` with **explicit** text color fallbacks for guar
 ```bash
 npm run dev   # http://localhost:9000 — must show UI (not blank)
 npm run build
+git add dist/index.html   # when version bumped or plugin is new
 ```
 
 | Check | Pass criteria |
@@ -158,6 +160,28 @@ npm run build
 3. Configure **all required** params (especially `type: "blueprint"`)
 4. Confirm: loading → empty or data; no blank card
 5. Open DevTools → Console: **no** React hooks errors
+
+## 10. `@port-labs/plugins-sdk` version
+
+**Mandatory on every audit and before marking a plugin done.**
+
+```bash
+npm view @port-labs/plugins-sdk version
+```
+
+| Source | Where to read |
+|--------|----------------|
+| Latest | `npm view` output (or [npm package page](https://www.npmjs.com/package/@port-labs/plugins-sdk)) |
+| Declared | `package.json` → `dependencies["@port-labs/plugins-sdk"]` |
+| Resolved | `package-lock.json` → `node_modules/@port-labs/plugins-sdk`.version |
+
+| Result | Action |
+|--------|--------|
+| Resolved ≥ latest | Pass — note versions in validation report |
+| Resolved < latest | Fail audit item — bump range to `^<latest>`, `npm install`, `npm run build`, smoke-test theme + host hooks |
+| No lockfile | Run `npm install` or flag "resolved version unknown" |
+
+Validation reports (`VALIDATION-REPORT.md`) must include a **Dependencies** section with the SDK table. Full workflow: [readme-and-audit.md](readme-and-audit.md) (**SDK version**).
 
 ## Quick symptom table
 

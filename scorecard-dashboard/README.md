@@ -4,7 +4,7 @@ A scorecard compliance dashboard widget for [Port](https://app.port.io) dashboar
 
 ## Preview image
 
-<img alt="Scorecard Dashboard widget" src="assets/preview.png" />
+<img width="2000" height="972" alt="Scorecard Dashboard widget" src="https://github.com/port-experimental/port-plugins/blob/main/scorecard-dashboard/assets/preview.png" />
 
 ## Features
 

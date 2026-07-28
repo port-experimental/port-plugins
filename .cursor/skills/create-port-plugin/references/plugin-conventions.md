@@ -21,8 +21,11 @@ const PLUGIN_IDENTIFIER_REGEX = /^(?!\.{1,2}$)[A-Za-z0-9@_.+:\\/=-]+$/;
 ```
 <plugins-repo>/
 ├── README.md                 # Plugins table (link, Version, description)  
+├── .gitignore                # **/dist/** ignored; !**/dist/index.html tracked
 ├── existing-plugin/
 │   ├── src/
+│   ├── dist/
+│   │   └── index.html        # Committed upload artifact (rebuild on version bump)
 │   ├── package.json
 │   ├── upload-params.json
 │   ├── webpack.config.js
@@ -38,6 +41,7 @@ Pick **sibling plugins** as references when patterns match (lists, DnD, mutation
 |------|--------|
 | `webpack.config.js`, `tsconfig.json`, `src/index.html`, `src/index.tsx`, `usePostMessageData.ts` | Copy verbatim from templates |
 | `package.json`, `App.tsx`, `App.css`, `types.ts`, `upload-params.json`, `README.md` | Adapt |
+| `dist/index.html` | **Commit** after `npm run build` — new plugin or version bump |
 
 Scaffold map: [scaffolding.md](scaffolding.md).
 

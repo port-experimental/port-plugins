@@ -1,0 +1,22 @@
+{
+  "copilotOrgUsageBlueprint": {
+    "type": "blueprint",
+    "isRequired": true,
+    "label": "GitHub Copilot Org Usage blueprint"
+  },
+  "licensedSeats": {
+    "type": "number",
+    "isRequired": false,
+    "label": "Licensed seats"
+  },
+  "copilotInsightsBlueprint": {
+    "type": "blueprint",
+    "isRequired": false,
+    "label": "Github Copilot Insights blueprint"
+  },
+  "copilotInsightsAction": {
+    "type": "string",
+    "isRequired": false,
+    "label": "Github Copilot Insights workflow identifier"
+  }
+}

@@ -1,0 +1,659 @@
+/* ── Theme: Port host tokens via plugins-sdk (applyThemeCss) ──
+   :root maps surfaces/text/borders only. Data-driven colors (dimension dots,
+   score meters) are passed inline as the --dot / --meter custom property. */
+:root {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Roboto,
+    Oxygen, Ubuntu, sans-serif;
+  font-size: 13px;
+
+  --bg: var(--background-primary, #f0f2f5);
+  --card: var(--background-dim, #ffffff);
+  --card2: var(--background-dim-transparent, #f7f8fa);
+  --border: var(--border-medium, rgba(0, 0, 0, 0.09));
+  --text: var(--text-high, #111827);
+  --muted: var(--text-medium, #6b7280);
+  --text-faint: var(--text-low, #9ca3af);
+  --radius: 8px;
+
+  --hover-bg: var(--background-dim-transparent, rgba(0, 0, 0, 0.04));
+  --primary: var(--accent-color, #5a4cff);
+  --primary-text: var(--button-text-primary, #ffffff);
+
+  --success-bg: var(--color-green-100, #e7f8e6);
+  --success-text: var(--color-green-700, #2c7a2c);
+  --error-bg: var(--color-red-100, #ffe9e5);
+  --error-text: var(--color-red-700, #b23a2a);
+  --badge-bg: var(--background-dim-transparent, rgba(0, 0, 0, 0.06));
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+
+html,
+body,
+#plugin-root {
+  height: 100%;
+  min-height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+#plugin-root {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* ── Shell ── */
+.shell {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  width: 100%;
+  min-height: 120px;
+  padding: 16px;
+  gap: 14px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--text-faint) transparent;
+}
+
+.shell--message {
+  justify-content: flex-start;
+}
+
+.shell::-webkit-scrollbar {
+  width: 6px;
+}
+.shell::-webkit-scrollbar-thumb {
+  background: var(--text-faint);
+  border-radius: 3px;
+}
+
+.main {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.link {
+  color: var(--primary);
+  text-decoration: none;
+}
+.link:hover {
+  text-decoration: underline;
+}
+
+/* ── Top bar ── */
+.topbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 12px;
+}
+
+.topbar__titlerow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.topbar__title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.topbar__meta {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+.deadline-badge {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--badge-bg);
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+/* ── Tabs ── */
+.tabs {
+  display: inline-flex;
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 2px;
+}
+
+.tab {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 5px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.tab--on {
+  background: var(--card);
+  color: var(--text);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+/* ── Buttons ── */
+.btn {
+  font: inherit;
+  font-weight: 600;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  padding: 8px 16px;
+  cursor: pointer;
+  white-space: nowrap;
+  min-width: 72px;
+}
+.btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.btn--primary {
+  background: color-mix(in srgb, var(--text) 85%, var(--bg));
+  color: var(--bg);
+  border-color: transparent;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.14);
+}
+.btn--primary:hover:not(:disabled) {
+  background: var(--text);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.22);
+  transform: translateY(-1px);
+}
+.btn--ghost {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--text);
+}
+.btn--ghost:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--primary) 14%, var(--card));
+  border-color: var(--primary);
+  color: var(--text);
+}
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+/* ── Survey form ── */
+.survey {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.survey__intro {
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+/* Card panel holding the questions - mirrors the builder's preview frame so the
+   question cards read as one cohesive surface instead of dark boxes on the page. */
+.survey__body {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.group__head {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.group__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.group__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--dot, var(--primary));
+  flex: none;
+}
+
+.group__desc {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.group__questions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ── Question card ── */
+.question {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.question--invalid {
+  border-color: var(--error-text);
+}
+
+.question__text {
+  font-weight: 500;
+  line-height: 1.45;
+  color: var(--text);
+}
+
+.question__req {
+  color: var(--error-text);
+}
+
+.question__help {
+  color: var(--muted);
+  font-size: 0.82rem;
+  margin-top: -4px;
+}
+
+.question__error {
+  color: var(--error-text);
+  font-size: 0.82rem;
+}
+
+/* ── Scale (likert / nps) ── */
+.scale {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  max-width: 560px;
+}
+
+.scale__buttons {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.scale__btn {
+  flex: 1 1 0;
+  min-width: 44px;
+  max-width: 110px;
+  height: 40px;
+  border: 1px solid var(--tint-bd, var(--border));
+  background: var(--tint-bg, var(--card));
+  color: var(--text);
+  border-radius: 8px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.12s ease, transform 0.04s ease;
+}
+.scale__btn:hover {
+  border-color: var(--primary);
+}
+.scale__btn:active {
+  transform: translateY(1px);
+}
+.scale__btn--on {
+  background: color-mix(in srgb, var(--text) 85%, var(--bg));
+  border-color: transparent;
+  color: var(--bg);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+}
+
+.scale__labels {
+  display: flex;
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+/* ── Choices / chips ── */
+.choices {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.choices--inline {
+  flex-direction: row;
+  gap: 8px;
+}
+
+.choice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.chip {
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  border-radius: 999px;
+  padding: 6px 16px;
+  font: inherit;
+  cursor: pointer;
+}
+.chip--on {
+  background: color-mix(in srgb, var(--text) 85%, var(--bg));
+  border-color: transparent;
+  color: var(--bg);
+  font-weight: 600;
+}
+
+.textarea,
+.select {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--card);
+  color: var(--text);
+  font: inherit;
+  padding: 8px 10px;
+}
+.textarea:focus,
+.select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 16%, transparent);
+}
+.textarea {
+  resize: vertical;
+}
+
+/* Keyboard focus for the form's tappable controls (mouse uses :hover). */
+
+/* ── Form footer ── */
+.survey__footer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: sticky;
+  bottom: -16px;
+  background: var(--bg);
+  padding: 10px 0 2px;
+  border-top: 1px solid var(--border);
+}
+
+.progress__track {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--card2);
+  overflow: hidden;
+}
+.progress__fill {
+  display: block;
+  height: 100%;
+  background: var(--primary);
+  transition: width 0.2s ease;
+}
+
+.survey__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.survey__hint {
+  color: var(--error-text);
+  font-size: 0.85rem;
+}
+
+/* ── Banners ── */
+.banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-radius: var(--radius);
+  padding: 12px 14px;
+}
+.banner__title {
+  font-weight: 600;
+}
+.banner__msg {
+  font-size: 0.85rem;
+  margin-top: 2px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.banner--success {
+  background: var(--success-bg);
+  color: var(--success-text);
+}
+.banner--error {
+  background: var(--error-bg);
+  color: var(--error-text);
+}
+
+/* ── Picker (dashboard survey selection) ── */
+.picker {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.picker__heading {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+.picker__sub {
+  margin-bottom: 10px;
+}
+.picker__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 10px;
+}
+
+.survey-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card);
+  padding: 14px;
+  transition: border-color 0.12s ease, transform 0.06s ease,
+    box-shadow 0.12s ease;
+}
+.survey-card:hover {
+  border-color: var(--primary);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+  transform: translateY(-1px);
+}
+.survey-card:focus-visible {
+  outline: none;
+  border-color: var(--primary);
+  filter: brightness(1.18);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+}
+
+.survey-card__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+.survey-card__title {
+  font-weight: 600;
+  color: var(--text);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.survey-card__desc {
+  color: var(--muted);
+  font-size: 0.85rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+.survey-card__foot {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: auto;
+}
+.survey-card__footleft {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.survey-card__meta {
+  color: var(--text);
+  font-size: 0.8rem;
+  opacity: 0.55;
+}
+.survey-card__cta {
+  color: var(--text);
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ── Success screen ── */
+.success-screen {
+  /* Fill the available height so the confirmation sits centered, not stranded
+     at the top with a large empty area below it. */
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 40px 24px;
+  text-align: center;
+}
+
+.success-screen__icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--success-bg);
+  color: var(--success-text);
+  font-size: 1.5rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.success-screen__title {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.success-screen__msg {
+  max-width: 300px;
+  line-height: 1.5;
+}
+
+/* ── States ── */
+.state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 32px 16px;
+  text-align: center;
+}
+.state--empty {
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+}
+.state__title {
+  font-weight: 600;
+}
+
+.spinner {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2.5px solid var(--border);
+  border-top-color: var(--primary);
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Honor the OS "reduce motion" setting: strip decorative transitions and
+   entrance animations. The loading spinner is a functional progress cue, so it
+   keeps turning. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .spinner {
+    animation-duration: 0.8s !important;
+    animation-iteration-count: infinite !important;
+  }
+}

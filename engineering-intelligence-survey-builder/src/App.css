@@ -1,0 +1,1602 @@
+/* ── Theme: Port host tokens via plugins-sdk (applyThemeCss) ──
+   :root maps surfaces/text/borders only. Data-driven colors (dimension dots)
+   are passed inline via custom properties. */
+:root {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Roboto,
+    Oxygen, Ubuntu, sans-serif;
+  font-size: 13px;
+
+  --bg: var(--background-primary, #f0f2f5);
+  --card: var(--background-dim, #ffffff);
+  --card2: var(--background-dim-transparent, #f7f8fa);
+  --border: var(--border-medium, rgba(0, 0, 0, 0.09));
+  --text: var(--text-high, #111827);
+  --muted: var(--text-medium, #6b7280);
+  --text-faint: var(--text-low, #9ca3af);
+  --radius: 8px;
+
+  --hover-bg: var(--background-dim-transparent, rgba(0, 0, 0, 0.04));
+  --primary: var(--accent-color, #5a4cff);
+  --primary-text: var(--button-text-primary, #ffffff);
+
+  --success-bg: var(--color-green-100, #e7f8e6);
+  --success-text: var(--color-green-700, #2c7a2c);
+  --error-bg: var(--color-red-100, #ffe9e5);
+  --error-text: var(--color-red-700, #b23a2a);
+  --badge-bg: var(--background-dim-transparent, rgba(0, 0, 0, 0.06));
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+
+html,
+body,
+#plugin-root {
+  height: 100%;
+  min-height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+#plugin-root {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* ── Shell (list + messages) ── */
+.shell {
+  display: flex;
+  flex-direction: column;
+  /* Center direct children (capped header + content) on the cross axis. This
+     centers the list column reliably without depending on auto-margin math. */
+  align-items: center;
+  flex: 1;
+  width: 100%;
+  min-height: 120px;
+  padding: 16px;
+  gap: 14px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--text-faint) transparent;
+}
+.shell--message {
+  justify-content: flex-start;
+}
+.shell::-webkit-scrollbar,
+.builder__editor::-webkit-scrollbar,
+.builder__preview::-webkit-scrollbar {
+  width: 6px;
+}
+.shell::-webkit-scrollbar-thumb,
+.builder__editor::-webkit-scrollbar-thumb,
+.builder__preview::-webkit-scrollbar-thumb {
+  background: var(--text-faint);
+  border-radius: 3px;
+}
+
+.main {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Cap the list's header and content to one column so they stay balanced on wide
+   viewports; the shell's align-items:center keeps the column centered. Literal
+   width (not a custom property) so a var-resolution quirk can't drop the cap. */
+.topbar--list,
+.main {
+  width: 100%;
+  max-width: 1120px;
+  margin-inline: auto;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+.small {
+  font-size: 0.8rem;
+}
+
+/* ── Top bar ── */
+.topbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 12px;
+}
+.topbar--list {
+  align-items: center;
+}
+.topbar__titlerow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.topbar__title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.topbar__meta {
+  display: block;
+  margin-top: 3px;
+  color: var(--text);
+  font-size: 0.85rem;
+  opacity: 0.65;
+}
+
+.badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--badge-bg);
+  color: var(--muted);
+  flex-shrink: 0;
+}
+/* Read-only version/year badge - outlined to read as secondary to the framework badge. */
+.badge--muted {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+
+/* ── Buttons ── */
+.btn {
+  font: inherit;
+  font-weight: 600;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  padding: 8px 16px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.btn--primary {
+  background: var(--primary);
+  color: var(--primary-text);
+  border-color: var(--primary);
+}
+.btn--ghost {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--text);
+}
+.btn--ghost:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--primary) 14%, var(--card));
+  border-color: var(--primary);
+  color: var(--text);
+}
+.btn--primary:hover:not(:disabled) {
+  filter: brightness(1.12);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 34%, transparent);
+}
+/* Top-level call-to-action (e.g. "+ New survey"): a high-contrast solid button
+   that pops on any theme. The accent (--primary) can blend into the surface, so
+   invert against --text/--bg, which are guaranteed to contrast. */
+.btn--cta {
+  /* Muted solid at rest (prominent but calm), full contrast on hover. Inverting
+     against --text/--bg keeps it readable on any theme; the mix softens it. */
+  background: color-mix(in srgb, var(--text) 80%, var(--bg));
+  color: var(--bg);
+  border-color: transparent;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.14);
+}
+.btn--cta:hover:not(:disabled) {
+  background: var(--text);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.22);
+  transform: translateY(-1px);
+}
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.btn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+.btn--danger {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--error-text);
+}
+.btn--danger:hover:not(:disabled) {
+  background: var(--error-bg);
+}
+.btn--sm {
+  padding: 5px 10px;
+  font-size: 0.82rem;
+  min-width: 72px;
+}
+
+/* ── Tabs (segmented pill) ── */
+.tabs {
+  display: inline-flex;
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 2px;
+  margin-bottom: 14px;
+}
+.tab {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 5px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.tab--on {
+  background: var(--card);
+  color: var(--text);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+.tabs__count {
+  font-size: 0.72rem;
+  background: var(--badge-bg);
+  border-radius: 999px;
+  padding: 0 6px;
+  color: var(--muted);
+}
+
+/* ── Tags ── */
+.tag {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--badge-bg);
+  color: var(--muted);
+  white-space: nowrap;
+}
+.tag--dim { background: rgba(90, 76, 255, 0.12); color: var(--primary); }
+.tag--req { background: var(--error-bg); color: var(--error-text); }
+.tag--rev { background: rgba(245, 158, 11, 0.16); color: #9a6a00; }
+.tag--muted { background: transparent; border: 1px solid var(--border); }
+.tag--status.tag--active { background: var(--success-bg); color: var(--success-text); }
+.tag--status.tag--draft { background: var(--badge-bg); color: var(--muted); }
+/* Closed = "no longer collecting", a neutral end-state - not an error. Red is
+   reserved for destructive actions (Delete) and failures. */
+.tag--status.tag--closed {
+  background: color-mix(in srgb, var(--muted) 16%, transparent);
+  color: var(--muted);
+}
+
+/* ── Form primitives ── */
+.section {
+  display: flex;
+  flex-direction: column;
+}
+.fld {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-bottom: 18px;
+}
+.fld--inline {
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+.fld__label {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--text);
+}
+.fld__required {
+  color: var(--error-text);
+  font-weight: 700;
+}
+.fld__hint {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+.input,
+.textarea,
+.select {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--card);
+  color: var(--text);
+  font: inherit;
+  padding: 8px 10px;
+}
+.input:focus,
+.textarea:focus,
+.select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 16%, transparent);
+}
+.textarea {
+  resize: vertical;
+}
+.input--num {
+  width: 84px;
+  text-align: right;
+}
+.color {
+  width: 100%;
+  height: 36px;
+  padding: 2px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--card);
+  cursor: pointer;
+}
+
+.grid {
+  display: grid;
+  gap: 16px;
+}
+.grid--2 { grid-template-columns: 1fr 1fr; }
+.grid--3 { grid-template-columns: 1fr 1fr 1fr; }
+.grid--name-color { grid-template-columns: 1fr 48px; gap: 8px; align-items: center; }
+
+/* Keep labels, controls and hints lined up across a row even when only some
+   fields carry a hint (or a label wraps). Each field shares the row's three
+   tracks via subgrid; browsers without subgrid fall back to top-aligned cells. */
+.grid--2,
+.grid--3 {
+  align-items: start;
+  margin-bottom: 18px;
+}
+@supports (grid-template-rows: subgrid) {
+  .grid--2,
+  .grid--3 {
+    grid-template-rows: auto auto auto;
+    row-gap: 7px;
+    column-gap: 16px;
+  }
+  .grid--2 > .fld,
+  .grid--3 > .fld {
+    display: grid;
+    grid-template-rows: subgrid;
+    grid-row: span 3;
+    margin-bottom: 0;
+  }
+}
+
+.subsection {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  margin: 10px 0 18px;
+}
+.subsection > legend {
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 0 6px;
+}
+
+/* ── Toggle switch ── */
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: var(--text);
+  cursor: pointer;
+}
+.toggle__track {
+  width: 36px;
+  height: 20px;
+  border-radius: 999px;
+  /* Theme-adaptive off-track: derived from the text color so it stays clearly
+     visible on both light and dark themes (host --border / --text-faint tokens
+     are too faint in dark mode). Border guarantees the pill is always legible. */
+  background: var(--text-faint);
+  background: color-mix(in srgb, var(--text) 32%, transparent);
+  border: 1px solid color-mix(in srgb, var(--text) 38%, transparent);
+  position: relative;
+  flex: none;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.toggle__thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  transition: transform 0.15s ease;
+}
+.toggle--on .toggle__track {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+.toggle--on .toggle__thumb {
+  transform: translateX(16px);
+}
+.toggle__label {
+  font-size: 0.85rem;
+}
+
+/* ── Icon buttons / row actions ── */
+.row-actions {
+  display: flex;
+  gap: 4px;
+  flex: none;
+}
+.iconbtn {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 0.9rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.iconbtn:hover:not(:disabled) {
+  background: var(--hover-bg);
+}
+.iconbtn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.iconbtn--danger:hover:not(:disabled) {
+  color: var(--error-text);
+  border-color: var(--error-text);
+  background: var(--error-bg);
+}
+
+.empty-inline {
+  color: var(--muted);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  text-align: center;
+  font-size: 0.9rem;
+  margin-bottom: 12px;
+}
+
+/* ── Survey list (dashboard) - framework blocks of cards ── */
+.survey-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.survey-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.survey-group__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 2px;
+  border-bottom: 1px solid var(--border);
+}
+.survey-group__name {
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.survey-group__active {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--success-text);
+}
+.survey-group__count {
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: var(--badge-bg);
+  color: var(--muted);
+  border-radius: 999px;
+  padding: 0 7px;
+}
+.survey-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 10px;
+}
+.survey-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card);
+  overflow: hidden;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease, transform 0.06s ease;
+}
+.survey-card:hover {
+  border-color: var(--primary);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+  transform: translateY(-1px);
+}
+.survey-card__open {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+  background: none;
+  border: 0;
+  font: inherit;
+  color: var(--text);
+  cursor: pointer;
+  padding: 14px 14px 10px;
+}
+.survey-card__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+.survey-card__head > .tag,
+.survey-card__head > .share-chip {
+  flex: none;
+}
+.survey-card__title {
+  font-weight: 600;
+  flex: 1;
+  min-width: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.survey-card__desc {
+  color: var(--muted);
+  font-size: 0.85rem;
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.survey-card__meta {
+  color: var(--text);
+  font-size: 0.8rem;
+  opacity: 0.55;
+}
+.survey-card__actions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+  padding: 0 14px 12px;
+  /* Pin to the bottom so action rows line up across cards of differing
+     description length (grid stretches every card to the tallest one). */
+  margin-top: auto;
+}
+.survey-card__share {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.survey-card__error {
+  color: var(--error-text);
+  font-size: 0.78rem;
+  padding: 0 14px 12px;
+}
+.survey-card--history {
+  opacity: 0.78;
+}
+.survey-card--history:hover {
+  opacity: 1;
+}
+/* Card primary action uses the same ghost box as Edit (uniform borders); it's
+   distinguished by sitting on the left (utilities group on the right) and, for
+   Share, the people icon. Highlighting comes from the shared .btn--ghost:hover. */
+.survey-card__actions > :first-child {
+  margin-right: auto;
+}
+
+/* Filter bar above the survey groups - a compact toolbar row. The base
+   .input/.select rule forces width:100%, which would stack them vertically;
+   override so the search grows and the selects size to content. */
+.filterbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.filterbar__search {
+  flex: 1 1 220px;
+  min-width: 180px;
+}
+.filterbar__search .input {
+  width: 100%;
+}
+.filterbar .select {
+  width: auto;
+  flex: 0 0 auto;
+  padding: 6px 28px 6px 10px;
+  font-size: 0.85rem;
+}
+
+/* Survey overview (read-only detail). */
+.overview {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+}
+/* Description sits above the cards as full-width text. */
+.overview__desc {
+  margin: 0;
+  line-height: 1.6;
+}
+/* Info cards stacked vertically, one per row. */
+.overview__info {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+/* Respondent form spans full width below the info cards. */
+.overview__section {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card);
+  padding: 14px 16px;
+}
+.overview__label {
+  display: block;
+  font-weight: 700;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+.overview__kv { display: flex; flex-direction: column; gap: 8px; margin: 0; }
+.overview__row { display: flex; gap: 12px; align-items: baseline; }
+.overview__row dt { flex: none; width: 110px; color: var(--muted); font-size: 0.85rem; }
+.overview__row dd { margin: 0; font-size: 0.9rem; }
+.survey-group__more {
+  margin-top: 10px;
+  align-self: flex-start;
+  background: none;
+  border: 0;
+  padding: 4px 0;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+}
+.survey-group__more:hover {
+  color: var(--text);
+  text-decoration: underline;
+}
+.viewer {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  padding: 16px;
+}
+.viewer .preview {
+  flex: 1;
+  min-height: 0;
+}
+
+/* ── Builder layout ── */
+.builder {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+}
+.builder__top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  flex-wrap: wrap;
+}
+.builder__topinfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.builder__title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.builder__topactions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.save-msg {
+  font-size: 0.82rem;
+  font-weight: 600;
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.save-msg--ok { color: var(--success-text); }
+.save-msg--err {
+  color: var(--error-text);
+  /* Errors can be long (e.g. a duplicate-title message) - show them in full. */
+  max-width: 360px;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  line-height: 1.4;
+}
+
+.builder__cols {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+.builder__editor {
+  overflow-y: auto;
+  padding: 16px;
+  border-right: 1px solid var(--border);
+}
+.builder__preview {
+  overflow-y: auto;
+  padding: 16px;
+  background: var(--card2);
+}
+@media (max-width: 880px) {
+  .builder__cols {
+    grid-template-columns: 1fr;
+  }
+  .builder__editor {
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+  }
+}
+
+.issues {
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--primary);
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-bottom: 14px;
+  font-size: 0.85rem;
+}
+.issues ul {
+  margin: 6px 0 0 16px;
+  color: var(--muted);
+}
+
+/* ── Dimensions editor ── */
+.dim-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.dim-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card);
+  padding: 12px;
+}
+.dim-row__dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-top: 8px;
+  flex: none;
+}
+.dim-row__fields {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ── Questions editor ── */
+.qlist {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.qcard {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card);
+  overflow: hidden;
+}
+.qcard--open {
+  border-color: var(--primary);
+}
+.qcard__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+}
+.qcard__grip {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: none;
+  border: 0;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  color: var(--text);
+  padding: 4px 6px;
+  border-radius: 6px;
+}
+/* Signal the whole header row is the expand/collapse control. */
+.qcard__grip:hover {
+  background: var(--hover-bg);
+}
+.qcard__num {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--card2);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+.qcard__summary {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.qcard__text {
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.qcard__tags {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+.qcard__chev {
+  color: var(--muted);
+  font-size: 0.9rem;
+  flex: none;
+}
+.qcard__body {
+  padding: 4px 14px 14px;
+  border-top: 1px solid var(--border);
+}
+.qcard__body .fld:first-child {
+  margin-top: 12px;
+}
+.qcard__toggles {
+  display: flex;
+  gap: 20px;
+  margin-top: 6px;
+}
+
+/* "Add question" row: type picker grows, the add button stays sized to content.
+   Without this the base .select width:100% forces a full-width dropdown with the
+   button orphaned on the next line. Mirrors the .filterbar select handling. */
+.qadd {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.qadd .select {
+  flex: 1 1 200px;
+  width: auto;
+  min-width: 0;
+}
+.qadd .btn {
+  flex: none;
+}
+
+/* ── Choices editor ── */
+.choices-editor {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px;
+  margin-bottom: 12px;
+  background: var(--card2);
+}
+.choices-editor__head {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+/* Align the "Score" header over its 70px column, accounting for the trailing
+   30px remove button + 8px gap, so the header sits above the score inputs. */
+.choices-editor__scorehead {
+  width: 70px;
+  margin-right: 38px;
+  text-align: center;
+}
+.choice-row {
+  display: grid;
+  grid-template-columns: 1fr 30px;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.choice-row--scored {
+  grid-template-columns: 1fr 70px 30px;
+}
+
+/* ── Target respondents ── */
+.targets__rows {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.targets__row {
+  display: grid;
+  grid-template-columns: 1fr 90px;
+  gap: 8px;
+  align-items: center;
+}
+.targets__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.targets__add {
+  display: flex;
+  gap: 8px;
+}
+
+/* ── Template picker (modal) ── */
+@keyframes overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes modal-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.985); }
+  to { opacity: 1; transform: none; }
+}
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 50;
+  animation: overlay-in 0.14s ease-out;
+}
+.modal {
+  background: var(--bg);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  padding: 20px;
+  width: 100%;
+  max-width: 640px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+  animation: modal-in 0.16s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.modal__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+.modal__title {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+.modal--confirm {
+  max-width: 420px;
+}
+.modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 20px;
+}
+.tpl-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+
+/* ── Build with AI: accent card + bottom prompts panel ── */
+.tpl-card--ai {
+  border-color: color-mix(in srgb, var(--primary) 50%, var(--border));
+  background: color-mix(in srgb, var(--primary) 7%, var(--card));
+}
+.tpl-card--ai:hover {
+  border-color: var(--primary);
+}
+.tpl-card--ai-open {
+  /* Softer "open" state: a slightly stronger tint + border, no hard double outline. */
+  border-color: color-mix(in srgb, var(--primary) 70%, var(--border));
+  background: color-mix(in srgb, var(--primary) 12%, var(--card));
+}
+.ai-prompts {
+  margin-top: 18px;
+  padding: 14px;
+  border: 1px solid color-mix(in srgb, var(--primary) 30%, var(--border));
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--primary) 6%, var(--card2));
+}
+.ai-prompts__title {
+  display: block;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+/* Sparkle mark + label, used on the "Build with AI" card and section title. */
+.ai-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.ai-label svg {
+  color: var(--primary);
+  flex: none;
+}
+.ai-prompts__hint {
+  margin-top: 4px;
+  font-size: 0.85rem;
+}
+.ai-prompts__list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  margin-top: 12px;
+}
+.ai-prompts__item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.ai-prompts__item:last-child {
+  border-bottom: 0;
+}
+.ai-prompts__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.ai-prompts__label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.ai-prompts__actions {
+  display: flex;
+  gap: 6px;
+  flex: none;
+}
+.ai-prompts__preview {
+  margin: 0;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--card);
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--muted);
+}
+.ai-prompts__copy {
+  flex: none;
+}
+.ai-prompts__more {
+  margin-top: 8px;
+}
+.modal__section {
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+.clone-group {
+  margin-top: 14px;
+}
+.clone-group__name {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+.clone-group__toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  background: none;
+  border: 0;
+  padding: 8px 0;
+  font: inherit;
+  cursor: pointer;
+}
+.clone-group__toggle:hover .clone-group__name,
+.clone-group__toggle:hover .clone-group__caret {
+  color: var(--text);
+}
+.clone-group__caret {
+  display: inline-block;
+  width: 0.9em;
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+.clone-group__count {
+  margin-left: auto;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--muted);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 1px 9px;
+}
+.tpl-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card);
+  padding: 14px;
+  color: var(--text);
+  transition: border-color 0.12s ease, transform 0.06s ease, box-shadow 0.12s ease;
+}
+.tpl-card:hover {
+  border-color: var(--primary);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+  transform: translateY(-1px);
+}
+.tpl-card--blank {
+  border-style: dashed;
+}
+.tpl-card__label {
+  font-weight: 700;
+}
+.tpl-card__blurb {
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+.tpl-card__meta {
+  color: var(--muted);
+  font-size: 0.76rem;
+  margin-top: 2px;
+}
+
+/* ── Live preview ── */
+.preview {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.preview__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.preview__label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.preview__frame {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card);
+  padding: 16px;
+}
+.preview__shell {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.preview__empty {
+  color: var(--muted);
+  text-align: center;
+  padding: 40px 16px;
+  font-size: 0.9rem;
+}
+
+/* ── Survey form (preview - shared with the runner) ── */
+.survey { display: flex; flex-direction: column; gap: 16px; }
+.survey__intro { color: var(--muted); line-height: 1.5; }
+.group { display: flex; flex-direction: column; gap: 12px; }
+.group__head { display: flex; flex-direction: column; gap: 2px; }
+.group__title { display: flex; align-items: center; gap: 8px; font-size: 0.95rem; font-weight: 600; }
+.group__dot { width: 10px; height: 10px; border-radius: 50%; background: var(--dot, var(--primary)); flex: none; }
+.group__desc { color: var(--muted); font-size: 0.85rem; }
+.group__questions { display: flex; flex-direction: column; gap: 10px; }
+
+.question {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.question--invalid { border-color: var(--error-text); }
+.question__text { font-weight: 500; line-height: 1.45; color: var(--text); }
+.question__req { color: var(--error-text); }
+.question__help { color: var(--muted); font-size: 0.82rem; margin-top: -4px; }
+.question__error { color: var(--error-text); font-size: 0.82rem; }
+
+.scale { display: flex; flex-direction: column; gap: 7px; max-width: 560px; }
+.scale__buttons { display: flex; gap: 6px; flex-wrap: wrap; justify-content: space-between; }
+.scale__btn {
+  flex: 1 1 0;
+  min-width: 40px;
+  max-width: 110px;
+  height: 40px;
+  border: 1px solid var(--tint-bd, var(--border));
+  background: var(--tint-bg, var(--card));
+  color: var(--text);
+  border-radius: 8px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.12s ease, transform 0.04s ease;
+}
+.scale__btn:hover { border-color: var(--primary); }
+.scale__btn:active { transform: translateY(1px); }
+.scale__btn:focus-visible,
+.chip:focus-visible,
+.choice input:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+.scale__btn--on {
+  background: color-mix(in srgb, var(--text) 85%, var(--bg));
+  border-color: transparent;
+  color: var(--bg);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+}
+.scale__labels { display: flex; justify-content: space-between; color: var(--muted); font-size: 0.78rem; }
+
+.choices { display: flex; flex-direction: column; gap: 6px; }
+.choices--inline { flex-direction: row; gap: 8px; }
+.choice { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.chip {
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  border-radius: 999px;
+  padding: 6px 16px;
+  font: inherit;
+  cursor: pointer;
+}
+.chip--on { background: color-mix(in srgb, var(--text) 85%, var(--bg)); border-color: transparent; color: var(--bg); font-weight: 600; }
+
+/* "⋯" overflow menu on a card. Opens upward because .survey-card is
+   overflow:hidden - a downward popover would be clipped. */
+.cardmenu { position: relative; display: inline-flex; }
+.cardmenu__trigger { padding: 4px 10px; font-weight: 700; line-height: 1; }
+/* Rendered in a portal with fixed positioning (top/left set inline) so it
+   floats above the overflow-hidden cards and never gets clipped. */
+.cardmenu__pop {
+  position: fixed;
+  min-width: 184px;
+  display: flex;
+  flex-direction: column;
+  padding: 4px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+}
+.cardmenu__item {
+  text-align: left;
+  padding: 7px 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.cardmenu__item:hover:not(:disabled) { background: var(--hover-bg); }
+.cardmenu__item:disabled { opacity: 0.5; cursor: default; }
+.cardmenu__item--danger { color: var(--error-text); }
+
+/* Per-card sharing chip - lighter than the status pill so it reads as a
+   secondary, different kind of info (distribution, not lifecycle). */
+.share-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.share-chip svg { opacity: 0.85; }
+/* Active but unshared: a subtle amber nudge to prompt sharing. */
+.share-chip--none {
+  color: var(--color-amber-700, #b7791f);
+  border-color: color-mix(in srgb, var(--color-amber-700, #b7791f) 35%, var(--border));
+  background: color-mix(in srgb, var(--color-amber-700, #b7791f) 8%, transparent);
+}
+
+/* ── Share drawer ── */
+.modal--share { max-width: 520px; }
+/* Audience toggle (mutually exclusive) and the wrapping team multiselect. */
+.seg { display: inline-flex; gap: 8px; flex-wrap: wrap; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* Stacked sections: Shared with · Copy invite · Audience editor. */
+.share-block {
+  padding: 14px 0;
+  border-top: 1px solid var(--border);
+}
+.share-block:first-of-type { border-top: 0; }
+.share-block__label {
+  display: block;
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+.share-copy { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.share-copy .muted { margin: 0; }
+/* Copy button sits below the editable invite textarea, right-aligned. */
+.share-copy__foot { display: flex; justify-content: flex-end; margin-top: 8px; }
+
+/* "Nudge now" button + feedback inside the Shared-with section. */
+.share-nudge { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+.share-nudge .save-msg--err { font-size: 0.8rem; }
+.share-nudge .save-msg--ok  { font-size: 0.8rem; color: var(--ok-text, green); }
+
+/* "Stop sharing" control inside the Shared-with section. */
+.share-unshare { margin-top: 10px; }
+.share-unshare__trigger { color: var(--error-text); }
+.share-unshare__actions { display: flex; gap: 8px; margin-top: 8px; }
+
+/* "Shared with" summary - a compact key/value list. */
+.share-summary { display: flex; flex-direction: column; gap: 8px; margin: 0; }
+.share-summary__row { display: flex; gap: 12px; align-items: baseline; }
+.share-summary__row dt {
+  flex: none;
+  width: 96px;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+.share-summary__row dd { margin: 0; font-size: 0.9rem; }
+
+/* Read-only chips for the current audience (not clickable). */
+.chips--static { display: inline-flex; }
+.chip--static {
+  padding: 2px 10px;
+  font-size: 0.8rem;
+  background: var(--card2);
+  cursor: default;
+}
+
+/* ── Team picker (searchable multi-select, used when > 8 teams) ── */
+.team-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+/* Single bordered box containing the input + collapsable list. */
+.team-picker__box {
+  position: relative;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--card);
+  overflow: hidden;
+}
+.team-picker__box::after {
+  content: '▾';
+  position: absolute;
+  right: 10px;
+  top: 9px;
+  pointer-events: none;
+  color: var(--muted);
+  font-size: 0.85rem;
+  line-height: 1;
+}
+.team-picker__box--open {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 16%, transparent);
+}
+.team-picker__box--open::after {
+  content: '▴';
+}
+.team-picker__input {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  padding: 8px 28px 8px 10px;
+  outline: none;
+}
+.team-picker__input::-webkit-search-cancel-button { cursor: pointer; }
+.team-picker__box--open .team-picker__input {
+  border-bottom: 1px solid var(--border);
+}
+.team-picker__list {
+  max-height: 180px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--text-faint) transparent;
+}
+.team-picker__empty {
+  display: block;
+  padding: 10px 12px;
+}
+.team-picker__row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  padding: 8px 12px;
+  font: inherit;
+  color: var(--text);
+  cursor: pointer;
+}
+.team-picker__row:last-child { border-bottom: 0; }
+.team-picker__row:hover { background: var(--hover-bg); }
+.team-picker__row--on {
+  background: color-mix(in srgb, var(--primary) 8%, var(--card));
+  font-weight: 600;
+  color: var(--primary);
+}
+/* Selected chip with remove ✕ - inherits chip--on for the filled style. */
+.chip--remove {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.82rem;
+}
+
+.survey__footer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 0 2px;
+  border-top: 1px solid var(--border);
+}
+.progress__track { height: 6px; border-radius: 999px; background: var(--card2); overflow: hidden; }
+.progress__fill { display: block; height: 100%; background: var(--primary); transition: width 0.2s ease; }
+.survey__actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.survey__hint { color: var(--error-text); font-size: 0.85rem; }
+
+/* ── Banners ── */
+.banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-radius: var(--radius);
+  padding: 12px 14px;
+}
+.banner__title { font-weight: 600; }
+.banner__msg { font-size: 0.85rem; margin-top: 2px; white-space: pre-wrap; word-break: break-word; }
+.banner--success { background: var(--success-bg); color: var(--success-text); }
+.banner--error { background: var(--error-bg); color: var(--error-text); }
+
+/* ── States ── */
+.state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 32px 16px;
+  text-align: center;
+}
+.state--empty { border: 1px dashed var(--border); border-radius: var(--radius); }
+.state__title { font-weight: 600; }
+.spinner {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2.5px solid var(--border);
+  border-top-color: var(--primary);
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Honor the OS "reduce motion" setting: strip decorative transitions and
+   entrance animations. The loading spinner is a functional progress cue, so it
+   keeps turning. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .spinner {
+    animation-duration: 0.8s !important;
+    animation-iteration-count: infinite !important;
+  }
+}

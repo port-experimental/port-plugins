@@ -1,0 +1,12 @@
+{
+  "title": {
+    "type": "string",
+    "isRequired": false,
+    "label": "Title"
+  },
+  "targetDateTime": {
+    "type": "string",
+    "isRequired": true,
+    "label": "Target datetime (e.g. 2026-12-31T23:59:59Z)"
+  }
+}

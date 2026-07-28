@@ -31,7 +31,7 @@ Tactical rules in **Non-negotiables**; anti-patterns in [guidelines.md](referenc
 
 ## Overview
 
-Each plugin compiles to **`dist/index.html`** (webpack, inlined assets), runs in a Port `<iframe>`, registers via CLI. **Reuse** an existing plugin or **create** from `assets/` templates.
+Each plugin compiles to **`dist/index.html`** (webpack, inlined assets), runs in a Port `<iframe>`, registers via CLI. **Commit** that file to git on every new plugin and every version bump — root `.gitignore` ignores other `dist/` output but **not** `dist/index.html`. **Reuse** an existing plugin or **create** from `assets/` templates.
 
 ## Choose a workflow
 
@@ -86,15 +86,16 @@ Before `upload-params.json`:
 ### 4. Verify build and production readiness
 
 - `npm run dev` → `http://localhost:9000` (port **9000** always) — UI must be **visible**, not a blank panel
-- `npm run build` → `dist/index.html`
+- `npm run build` → `dist/index.html`; **commit** `dist/index.html` (tracked upload artifact — see [readme-and-audit.md](references/readme-and-audit.md) **Build artifact**)
 - Webpack `inject: "body"`; root `height: 100%`; `#plugin-root` flex column — [ui-and-styling.md](references/ui-and-styling.md)
 - Entity search: `{ query: { combinator, rules } }`
 - `applyThemeCss()` on every host path (including Port iframe)
+- **`@port-labs/plugins-sdk`** — compare declared + lockfile-resolved version to latest on npm (see [readme-and-audit.md](references/readme-and-audit.md) **SDK version**)
 - **Mandatory:** [production-readiness.md](references/production-readiness.md) — hooks order, query UI states, param/entity resolution
 
 ### 5. Document and ship
 
-- Version bump **once per branch** — [readme-and-audit.md](references/readme-and-audit.md) (**Versioning**)
+- Version bump **once per branch** — [readme-and-audit.md](references/readme-and-audit.md) (**Versioning**); after bump, `npm run build` and **commit** updated `dist/index.html`
 - README from `assets/template-README.md` — [readme-and-audit.md](references/readme-and-audit.md)
 - **Add a row to the root `README.md` Plugins table** for every newly created plugin (append at the end of the table):
 
@@ -117,12 +118,14 @@ Before `upload-params.json`:
 
 ## Verify (before done)
 
-1. [production-readiness.md](references/production-readiness.md) — all §1–§9 (especially hooks before early returns, `isPending`, iframe layout).
-2. `npm run dev` shows guard or functional UI (not empty white); `npm run build` → `dist/index.html`.
-3. Plugin identifier passes regex (Non-negotiables).
-4. README section order + upload command per [readme-and-audit.md](references/readme-and-audit.md).
-5. Non-negotiables + [guidelines.md](references/guidelines.md) anti-patterns.
-6. If functional changes on branch: **one** version bump; root Plugins **Version** matches. New plugins: row added to root `README.md` Plugins table with correct folder link, version, and description.
+1. [production-readiness.md](references/production-readiness.md) — all §1–§10 (especially hooks before early returns, `isPending`, iframe layout, SDK version).
+2. `npm run dev` shows guard or functional UI (not empty white); `npm run build` → `dist/index.html`; **`dist/index.html` committed** and matches current `package.json` version.
+3. **`@port-labs/plugins-sdk`** — run `npm view @port-labs/plugins-sdk version`; record declared (`package.json`), resolved (`package-lock.json`), and latest; flag when behind (audit/validation reports must include this row).
+4. Plugin identifier passes regex (Non-negotiables).
+5. README section order + upload command per [readme-and-audit.md](references/readme-and-audit.md).
+6. Non-negotiables + [guidelines.md](references/guidelines.md) anti-patterns.
+7. README preview: `assets/preview.png` committed; `<img src>` is full GitHub blob URL with `width`, `height`, `alt`.
+8. If functional changes on branch: **one** version bump; root Plugins **Version** matches; **`dist/index.html` rebuilt and committed**. New plugins: row added to root `README.md` Plugins table with correct folder link, version, and description; initial **`dist/index.html` committed**.
 
 ## Non-negotiables
 
@@ -133,6 +136,7 @@ Before `upload-params.json`:
 | Hooks | **All** hooks at top of `App` before any `return`; gate fetches with `enabled` — [production-readiness.md](references/production-readiness.md) §1 |
 | Port iframe | No blank main while loading; `isPending \|\| isLoading`; `#plugin-root` flex + `min-height` on shell — [production-readiness.md](references/production-readiness.md) §2–§3 |
 | Params / entity | `template-config.ts` + `template-resolveHostEntity.ts` for blueprint params and entity pages — [production-readiness.md](references/production-readiness.md) §5–§6 |
+| SDK version | On every audit/validation: `npm view @port-labs/plugins-sdk version` vs `package.json` + lockfile; report gap; bump + rebuild when behind — [readme-and-audit.md](references/readme-and-audit.md) (**SDK version**) |
 | Charts | Recharts unless trivial; webpack safety — [webpack-port-upload-safety.md](references/webpack-port-upload-safety.md) |
 | CSS | `:root` = surfaces/text/borders; decorations class-local; palette `-bg`/`-text` for pills |
 | Runtime vs params | Fetch catalog via API + `PLUGIN_DATA` — no duplicate params |
@@ -145,6 +149,7 @@ Before `upload-params.json`:
 | Param schema | Every param: `type`, `isRequired`, `label` |
 | Param labels | Short in JSON; detail in README **Plugin parameters** |
 | README | Prerequisites tables before params — [readme-and-audit.md](references/readme-and-audit.md) |
+| Preview image | Commit `assets/preview.png`; README uses full `github.com/.../blob/{branch}/{plugin}/assets/preview.png` — [readme-and-audit.md](references/readme-and-audit.md) (**Preview image**) |
 | Search | Nested `query`; not top-level `combinator`/`rules` |
 | Page filters | `mergePageFilters` with **full** blueprint object — [plugin-architecture.md](references/plugin-architecture.md) |
 | Errors | Include full response body text |
@@ -154,6 +159,7 @@ Before `upload-params.json`:
 | Persistence | Port entities unless explicitly local-only UI — [guidelines.md](references/guidelines.md) |
 | Upload CLI | `--file`, `--identifier`, `--title`, `--params`, `--description`, `--upsert` only |
 | Versioning | Once per branch; greenfield stays `0.1.0` — [readme-and-audit.md](references/readme-and-audit.md) |
+| Build artifact | After `npm run build`, **commit** `<plugin>/dist/index.html` — new plugins and every version bump; other `dist/` files stay gitignored |
 | Root README | New plugin: append row to root `README.md` Plugins table — `| [Title](./folder) | version | one-line description |` |
 
 ## Reference index
