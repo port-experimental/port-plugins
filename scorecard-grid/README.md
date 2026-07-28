@@ -4,7 +4,7 @@ A colour-coded health grid widget for [Port](https://app.port.io) dashboards. Di
 
 ## Preview image
 
-<img width="1024" height="458" alt="Scorecard Grid widget showing colour-coded entity cubes grouped by scorecard level" src="https://github.com/port-experimental/port-plugins/blob/main/add-scorecard-grid/scorecard-grid/assets/preview.png" />
+<img width="1024" height="458" alt="Scorecard Grid widget showing colour-coded entity cubes grouped by scorecard level" src="https://github.com/port-experimental/port-plugins/blob/main/scorecard-grid/assets/preview.png" />
 
 ## Features
 
