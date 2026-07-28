@@ -4,8 +4,6 @@
     "title": "Payment API",
     "blueprint": "service",
     "properties": {
-      "open_bug_count": 3,
-      "open_vulnerability_count": 1,
       "language": "nodejs"
     },
     "relations": {
@@ -27,8 +25,6 @@
     "title": "User Service",
     "blueprint": "service",
     "properties": {
-      "open_bug_count": 0,
-      "open_vulnerability_count": 0,
       "language": "python"
     },
     "relations": {
@@ -50,8 +46,6 @@
     "title": "Legacy Batch",
     "blueprint": "service",
     "properties": {
-      "open_bug_count": 4,
-      "open_vulnerability_count": 3,
       "language": "java"
     },
     "relations": {},

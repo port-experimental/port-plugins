@@ -122,7 +122,7 @@ The `examples/` folder contains a full sample setup: three blueprints, matching 
 
 | File | Purpose |
 |------|---------|
-| [`examples/blueprints/service.json`](examples/blueprints/service.json) | Main blueprint — counter properties and relations to drill-down targets |
+| [`examples/blueprints/service.json`](examples/blueprints/service.json) | Main blueprint — aggregation properties for counters and relations to drill-down targets |
 | [`examples/blueprints/jira_bug.json`](examples/blueprints/jira_bug.json) | Bug blueprint used by the Bugs drill-down |
 | [`examples/blueprints/security_vulnerability.json`](examples/blueprints/security_vulnerability.json) | Vulnerability blueprint used by the Vulnerabilities drill-down |
 
@@ -132,7 +132,7 @@ Sample catalog data that works with the scorecard and drill-down queries. Each b
 
 | File | Entities |
 |------|----------|
-| [`examples/entities/service.json`](examples/entities/service.json) | `payment-api`, `user-service`, `legacy-batch` — varying scorecard levels and counter values |
+| [`examples/entities/service.json`](examples/entities/service.json) | `payment-api`, `user-service`, `legacy-batch` — varying scorecard levels (counter values come from aggregation properties) |
 | [`examples/entities/jira_bug.json`](examples/entities/jira_bug.json) | Bugs linked to `payment-api` and `legacy-batch` |
 | [`examples/entities/security_vulnerability.json`](examples/entities/security_vulnerability.json) | Vulnerabilities linked to `payment-api` and `legacy-batch` |
 

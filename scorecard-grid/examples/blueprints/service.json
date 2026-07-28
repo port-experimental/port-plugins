@@ -5,14 +5,6 @@
   "icon": "Microservice",
   "schema": {
     "properties": {
-      "open_bug_count": {
-        "type": "number",
-        "title": "Open bugs"
-      },
-      "open_vulnerability_count": {
-        "type": "number",
-        "title": "Open vulnerabilities"
-      },
       "language": {
         "type": "string",
         "title": "Primary language",
@@ -20,6 +12,61 @@
       }
     },
     "required": []
+  },
+  "calculationProperties": {},
+  "aggregationProperties": {
+    "open_bug_count": {
+      "title": "Open bugs",
+      "icon": "Jira",
+      "type": "number",
+      "target": "jira_bug",
+      "query": {
+        "combinator": "and",
+        "rules": [
+          {
+            "property": "status",
+            "operator": "notIn",
+            "value": ["Done"]
+          }
+        ]
+      },
+      "calculationSpec": {
+        "func": "count",
+        "calculationBy": "entities"
+      },
+      "pathFilter": [
+        {
+          "fromBlueprint": "jira_bug",
+          "path": ["service"]
+        }
+      ]
+    },
+    "open_vulnerability_count": {
+      "title": "Open vulnerabilities",
+      "icon": "Security",
+      "type": "number",
+      "target": "security_vulnerability",
+      "query": {
+        "combinator": "and",
+        "rules": [
+          {
+            "property": "status",
+            "operator": "notIn",
+            "value": ["Resolved"]
+          }
+        ]
+      },
+      "calculationSpec": {
+        "func": "count",
+        "calculationBy": "entities"
+      },
+      "pathFilter": [
+        {
+          "fromBlueprint": "security_vulnerability",
+          "path": ["service"]
+        }
+      ]
+    }
   },
   "relations": {
     "team": {
