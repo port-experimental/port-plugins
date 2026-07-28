@@ -19,7 +19,7 @@ This repository contains plugins contributed by [Port.io](https://www.port.io).
 | [Survey Builder](./engineering-intelligence-survey-builder) | 0.1.1 | Survey Intelligence: author engineering surveys (SPACE, AI Adoption, DORA, DX Core 4, or custom) visually and save them as Port survey entities |
 | [Github Copilot AI Adoption and Usage](./engineering-intelligence-ai-usage-copilot) | 0.1.0 | Custom Port plugin that turns raw GitHub Copilot organization metrics into an interactive engineering intelligence dashboard |
 | [Countdown](./countdown) | 0.1.0 | Live countdown to a target date and time |
-| [Scorecard Grid](./scorecard-grid) | 0.1.0 | Colour-coded health grid for any blueprint + scorecard — entities as sized cubes grouped by level, with drill-down panels and a sticky detail sidebar |
+| [Scorecard Grid](./scorecard-grid) | 0.1.0 | A colour-coded health grid widget for Port dashboards. Displays all entities of a blueprint as sized cubes grouped by their scorecard level, with counters, drill-down panels, and a sticky detail sidebar |
 
 ## AI-assisted development - Skills (Cursor & Claude)
 
