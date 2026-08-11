@@ -1,0 +1,50 @@
+{
+  "blueprint": "service",
+  "scorecardIdentifier": "production_readiness",
+  "counters": [
+    {
+      "emoji": "🪲",
+      "label": "Bugs",
+      "property": "open_bug_count"
+    },
+    {
+      "emoji": "🐛",
+      "label": "Vulnerabilities",
+      "property": "open_vulnerability_count"
+    }
+  ],
+  "drillDown": [
+    {
+      "label": "Bugs",
+      "blueprint": "jira_bug",
+      "query": {
+        "combinator": "and",
+        "rules": [
+          {
+            "property": "status",
+            "operator": "!=",
+            "value": "Done"
+          }
+        ]
+      },
+      "include": ["$title", "priority", "status"]
+    },
+    {
+      "label": "Vulnerabilities",
+      "blueprint": "security_vulnerability",
+      "query": {
+        "combinator": "and",
+        "rules": [
+          {
+            "property": "severity",
+            "operator": "in",
+            "value": ["High", "Critical"]
+          }
+        ]
+      },
+      "include": ["$title", "severity", "status"]
+    }
+  ],
+  "pollIntervalSeconds": 60,
+  "iconProperty": "language"
+}

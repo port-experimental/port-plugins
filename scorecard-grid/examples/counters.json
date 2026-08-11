@@ -1,0 +1,12 @@
+[
+  {
+    "emoji": "🪲",
+    "label": "Bugs",
+    "property": "open_bug_count"
+  },
+  {
+    "emoji": "🐛",
+    "label": "Vulnerabilities",
+    "property": "open_vulnerability_count"
+  }
+]

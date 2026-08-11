@@ -17,7 +17,9 @@ This repository contains plugins contributed by [Port.io](https://www.port.io).
 | [Survey Analytics](./engineering-intelligence-survey-analytics) | 0.1.1 | Survey Intelligence: read-only analytics for survey responses (scores, trends, team breakdown, multi-select, and a bundled DORA benchmark) |
 | [Survey Forms](./engineering-intelligence-survey-forms) | 0.1.1 | Survey Intelligence: run engineering surveys inside Port; renders any authored survey and stores each submission as a scored response entity |
 | [Survey Builder](./engineering-intelligence-survey-builder) | 0.1.1 | Survey Intelligence: author engineering surveys (SPACE, AI Adoption, DORA, DX Core 4, or custom) visually and save them as Port survey entities |
-| [Github Copilot AI Adoption and Usage](./engineering-intelligence-ai-usage-copilot) | 0.1.0 | Custom Port plugin that turns raw GitHub Copilot organization metrics into an interactive engineering intelligence dashboard |
+| [Copilot AI Adoption & Usage](./engineering-intelligence-ai-usage-copilot) | 0.1.1 | Custom Port plugin that turns raw GitHub Copilot organization metrics into an interactive engineering intelligence dashboard |
+| [Countdown](./countdown) | 0.1.0 | Live countdown to a target date and time |
+| [Scorecard Grid](./scorecard-grid) | 0.1.0 | A colour-coded health grid widget for Port dashboards. Displays all entities of a blueprint as sized cubes grouped by their scorecard level, with counters, drill-down panels, and a sticky detail sidebar |
 | [GitHub External Property Values](./github-external-property-values) | 0.1.0 | Lists every entity (and current property value) that a GitHub External Property sync rule covers |
 
 ## AI-assisted development - Skills (Cursor & Claude)
