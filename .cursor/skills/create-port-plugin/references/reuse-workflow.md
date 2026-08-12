@@ -143,7 +143,7 @@ User request
 - [ ] README **Prerequisites** drafted before params table
 
 **Params**
-- [ ] Minimal `upload-params.json`; short labels
+- [ ] Minimal `upload-params.json`; short labels; optional `description` tooltips when labels are ambiguous
 - [ ] No API-fetchable data in params
 - [ ] UX + safe rendering planned — [ui-and-styling.md](ui-and-styling.md), [guidelines.md](guidelines.md)
 

@@ -97,11 +97,12 @@ when the widget could call `GET /v1/blueprints`, `GET /v1/blueprints/{identifier
   "dueDateProperty": {
     "type": "string",
     "isRequired": false,
-    "label": "Due date property"
+    "label": "Due date property",
+    "description": "Datetime property key for due dates. Defaults to dueDate when empty."
   }
 }
 ```
-Document default `dueDate`, override behaviour, and validation in README **Plugin parameters** and **Prerequisites**.
+Keep **`label`** short; use optional **`description`** for Port UI tooltips when the label alone is unclear. Document defaults, override behaviour, and validation in README **Plugin parameters** and **Prerequisites**.
 
 ### ❌ Don't: Omit Port setup from README prerequisites
 

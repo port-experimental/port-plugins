@@ -146,8 +146,8 @@ Before `upload-params.json`:
 | Relations | Schema-first MCP; catalog + README; no relation string params by default |
 | Local dev | Port **9000**; small mocks; document mock portal link limits in README |
 | Subject blueprint | `PLUGIN_DATA.entity.blueprint` on entity pages when design default suffices |
-| Param schema | Every param: `type`, `isRequired`, `label` |
-| Param labels | Short in JSON; detail in README **Plugin parameters** |
+| Param schema | Every param: `type`, `isRequired`, `label`; optional `description` for Port UI tooltips |
+| Param labels | Short in JSON; use optional `description` when label alone is unclear; full detail in README **Plugin parameters** |
 | README | Prerequisites tables before params — [readme-and-audit.md](references/readme-and-audit.md) |
 | Preview image | Commit `assets/preview.png`; README uses full `github.com/.../blob/{branch}/{plugin}/assets/preview.png` — [readme-and-audit.md](references/readme-and-audit.md) (**Preview image**) |
 | Search | Nested `query`; not top-level `combinator`/`rules` |
