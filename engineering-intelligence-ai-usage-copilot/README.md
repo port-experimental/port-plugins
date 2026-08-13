@@ -1,6 +1,6 @@
 # Github Copilot AI Adoption and Usage
 
-Custom [Port](https://app.port.io) plugin that turns raw GitHub Copilot organization metrics into an interactive engineering intelligence dashboard. Tracks active users, acceptance rates, lines of code, PR activity, and (optionally) generates AI insight reports about your Copilot usage. See the [setup guide](https://docs.port.io/guides/all/create-github-copilot-ai-usage-dashboard).
+Custom [Port](https://app.port.io) plugin that turns raw GitHub Copilot organization metrics into an interactive engineering intelligence dashboard. Tracks active users, acceptance rates, lines of code, PR activity, and (optionally) generates AI insight reports about your Copilot usage. See the [setup guide](https://docs.port.io/guides/all/create-github-copilot-ai-usage-dashboard-custom-plugin).
 
 ## Preview image
 
