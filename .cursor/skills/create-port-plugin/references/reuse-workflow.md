@@ -182,4 +182,4 @@ Never substitute MCP or static catalog snapshots for live entity reads in plugin
 - [scaffolding.md](scaffolding.md) — templates
 - [implementation.md](implementation.md) — API, portal links, mocks
 - [plugin-architecture.md](plugin-architecture.md) — host bridge, build
-- [Port Plugins docs](https://docs.getport.io/customize-pages-dashboards-and-plugins/plugins)
+- [Port Plugins docs](https://docs.port.io/customize-pages-dashboards-and-plugins/plugins)

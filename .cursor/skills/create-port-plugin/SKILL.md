@@ -12,7 +12,7 @@ metadata:
 
 Platform rules (CSP, upload limits, param metadata), SDK APIs, and CLI behavior are defined by Port. **Treat Port docs and npm readmes as authoritative**; keep dependency versions current.
 
-- [Plugins — Port Docs](https://docs.getport.io/customize-pages-dashboards-and-plugins/plugins)
+- [Plugins — Port Docs](https://docs.port.io/customize-pages-dashboards-and-plugins/plugins)
 - [`@port-labs/plugins-sdk`](https://www.npmjs.com/package/@port-labs/plugins-sdk) — host bridge, `usePortPluginData`, theming, `mergePageFilters`
 - [`@port-labs/port-plugins-cli`](https://www.npmjs.com/package/@port-labs/port-plugins-cli) — upload, list, update, delete, metadata
 - Starter: [port-plugin-sample](https://github.com/port-labs/port-plugin-sample)

@@ -124,7 +124,7 @@ Do **not** commit other `dist/` files (source maps, chunks, etc.) — only `inde
 
 Each **plugin directory must** include a `README.md` that follows **this section order**. The repo-level widgets table (step 7) is only an index (widget link, **Version** from `package.json`, short description); the per-plugin README is the **authoritative** operator and maintainer guide. If a section does not apply don't include it
 
-1. **`#` Title + summary** — Human title; one paragraph describing behaviour, a link to [Port](https://app.getport.io), and which catalog concepts apply (blueprints, relations, dashboard vs entity page).
+1. **`#` Title + summary** — Human title; one paragraph describing behaviour, a link to [Port](https://app.port.io), and which catalog concepts apply (blueprints, relations, dashboard vs entity page).
 
 2. **Preview image** — At least **one** screenshot or short GIF of the widget running inside Port (dashboard and/or entity page, whichever the widget supports). **Commit** the file under `assets/preview.png` (additional screenshots: `assets/preview-*.png`) and reference it with a **full GitHub blob URL** — not a relative path, not `user-attachments`, not `raw.githubusercontent.com`.
 
@@ -142,7 +142,7 @@ Each **plugin directory must** include a `README.md` that follows **this section
 
    When the screenshot changes, update **both** the committed PNG and the README `width` / `height` if dimensions changed.
 
-3. **Badges (optional)** — e.g. widget surface (dashboard / entity), React and TypeScript versions; link to [Plugins](https://docs.getport.io/customize-pages-dashboards-and-plugins/plugins) where helpful.
+3. **Badges (optional)** — e.g. widget surface (dashboard / entity), React and TypeScript versions; link to [Plugins](https://docs.port.io/customize-pages-dashboards-and-plugins/plugins) where helpful.
 
 4. **Features** — Bullet list of user-visible capabilities.
 
@@ -190,7 +190,7 @@ Each **plugin directory must** include a `README.md` that follows **this section
 
      When auditing, confirm the README’s `--identifier` matches the folder name and satisfies this regex.
 
-     Do **not** duplicate the full CLI tutorial here. For install, `port-plugins config`, tokens vs client credentials, and `--port-api-base-url` / region, link once to [@port-labs/port-plugins-cli on npm](https://www.npmjs.com/package/@port-labs/port-plugins-cli) (and [Port Plugins](https://docs.getport.io/customize-pages-dashboards-and-plugins/plugins) where relevant).
+     Do **not** duplicate the full CLI tutorial here. For install, `port-plugins config`, tokens vs client credentials, and `--port-api-base-url` / region, link once to [@port-labs/port-plugins-cli on npm](https://www.npmjs.com/package/@port-labs/port-plugins-cli) (and [Port Plugins](https://docs.port.io/customize-pages-dashboards-and-plugins/plugins) where relevant).
 
    - **Add in Port** — Short steps: custom widget → pick plugin → params defaults vs overrides (cross-reference **Widget parameters** above).
    - **Entity-page behaviour** — When behaviour differs from dashboards: blueprints, relations, any **Get entity** (or other) calls required because host `PLUGIN_DATA` is incomplete.

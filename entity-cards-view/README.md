@@ -1,6 +1,6 @@
 # Entity Cards View
 
-A [Port](https://app.getport.io) custom widget for **dashboard** pages. Pick a blueprint, browse entities as cards with **search by title**, **pagination**, and a **Manage properties** panel to choose which blueprint properties appear on each card.
+A [Port](https://app.port.io) custom widget for **dashboard** pages. Pick a blueprint, browse entities as cards with **search by title**, **pagination**, and a **Manage properties** panel to choose which blueprint properties appear on each card.
 
 Dashboard **page filters** are merged into entity search when present.
 

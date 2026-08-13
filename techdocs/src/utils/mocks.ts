@@ -42,7 +42,7 @@ These links stay inside TechDocs instead of opening in Port:
 
 - [Frontend app](apps/Frontend/README.md)
 
-External links still open via Port: [Port documentation](https://docs.getport.io).
+External links still open via Port: [Port documentation](https://docs.port.io).
 `,
       filePath: "README.md",
       folderPath: "",
