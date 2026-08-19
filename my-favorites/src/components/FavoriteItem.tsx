@@ -107,8 +107,15 @@ export function FavoriteItem({
           <TabTypeIcon tab={tab} size={24} />
         </span>
 
-        {/* Title */}
-        <span className="fav-item-title">{item.title}</span>
+        {/* Title + optional description */}
+        <span className="fav-item-text">
+          <span className="fav-item-title">{item.title}</span>
+          {tab === "selfService" && (item as FavoriteAction).description ? (
+            <span className="fav-item-description">
+              {(item as FavoriteAction).description}
+            </span>
+          ) : null}
+        </span>
 
         {tab === "entities" && (
           <span className="fav-item-blueprint">
