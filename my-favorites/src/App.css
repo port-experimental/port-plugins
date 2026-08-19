@@ -436,7 +436,7 @@ body {
   padding: 14px 16px;
   border-radius: 12px;
   background: transparent;
-  cursor: default;
+  cursor: pointer;
   user-select: none;
   transition: background 0.12s, transform 0.15s ease-in-out, opacity 0.15s, box-shadow 0.15s;
 }
@@ -586,8 +586,7 @@ body {
   transition: opacity 0.12s;
 }
 
-.fav-item:hover .fav-item-actions,
-.fav-item:focus-within .fav-item-actions {
+.fav-item:hover .fav-item-actions {
   opacity: 1;
 }
 

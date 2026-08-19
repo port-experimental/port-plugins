@@ -22,6 +22,16 @@ type Props = {
   onRemove: (index: number) => void;
 };
 
+function getItemUrl(tab: TabKey, item: AnyFavorite): string | null {
+  if (tab === "pages") {
+    return buildPageUrl((item as FavoritePage).identifier);
+  }
+  if (tab === "entities") {
+    return buildEntityPageUrl((item as FavoriteEntity).blueprint, item.identifier);
+  }
+  return null;
+}
+
 function handleItemClick(tab: TabKey, item: AnyFavorite) {
   if (tab === "selfService") {
     if (!DEV_MOCK) {
@@ -29,10 +39,8 @@ function handleItemClick(tab: TabKey, item: AnyFavorite) {
     }
     return;
   }
-  const url =
-    tab === "pages"
-      ? buildPageUrl((item as FavoritePage).identifier)
-      : buildEntityPageUrl((item as FavoriteEntity).blueprint, item.identifier);
+  const url = getItemUrl(tab, item);
+  if (!url) return;
   window.open(url, "_top");
 }
 
@@ -82,6 +90,7 @@ export function FavoriteItem({
       onDragStart={handleDragStart}
       onDragOver={(e) => onDragOver(index, e)}
       onDragEnd={onDragEnd}
+      onClick={() => handleItemClick(tab, item)}
       className={[
         "fav-item",
         isDragging ? "fav-item--dragging" : "",
@@ -91,7 +100,6 @@ export function FavoriteItem({
       <button
         type="button"
         className="fav-item-btn"
-        onClick={() => handleItemClick(tab, item)}
         title={tab === "selfService" ? `Run ${item.title}` : `Open ${item.title}`}
       >
         {/* Type icon */}
@@ -108,11 +116,16 @@ export function FavoriteItem({
         <button
           type="button"
           className="fav-item-action-btn"
-          aria-label={tab === "selfService" ? `Run ${item.title}` : `Open ${item.title}`}
-          title={tab === "selfService" ? `Run ${item.title}` : `Open ${item.title}`}
-          onClick={(e) => {
+          aria-label={`Copy link for ${item.title}`}
+          title={`Copy link for ${item.title}`}
+          onClick={async (e) => {
             e.stopPropagation();
-            handleItemClick(tab, item);
+            const url = getItemUrl(tab, item) ?? item.identifier;
+            try {
+              await navigator.clipboard.writeText(url);
+            } catch {
+              // Ignore clipboard errors silently to avoid breaking click flow.
+            }
           }}
         >
           <Link2Icon size={18} aria-hidden />

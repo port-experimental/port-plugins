@@ -10,7 +10,7 @@ export async function fetchActions(
     await new Promise((r) => setTimeout(r, 200));
     return MOCK_ACTIONS;
   }
-  const res = await fetch(`${baseUrl}/v1/actions?version=v2`, {
+  const res = await fetch(`${baseUrl}/v1/actions?version=v2&trigger_type=self-service`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   if (!res.ok) {
