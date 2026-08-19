@@ -1,7 +1,8 @@
-import { GripVerticalIcon, Trash2Icon, LayoutDashboardIcon, Table2Icon, ZapIcon, BoxIcon } from "lucide-react";
+import { GripVerticalIcon, Link2Icon, StarIcon } from "lucide-react";
 import { showRunActionDialog } from "@port-labs/plugins-sdk";
 import type { TabKey, FavoritePage, FavoriteAction, FavoriteEntity } from "../types";
 import { DEV_MOCK } from "../hooks/usePostMessageData";
+import { TabTypeIcon } from "./TabTypeIcon";
 import {
   buildPageUrl,
   buildEntityPageUrl,
@@ -21,16 +22,6 @@ type Props = {
   onRemove: (index: number) => void;
 };
 
-function getItemIcon(tab: TabKey, item: AnyFavorite) {
-  if (tab === "pages") {
-    return (item as FavoritePage).icon === "table-2"
-      ? <Table2Icon size={16} aria-hidden />
-      : <LayoutDashboardIcon size={16} aria-hidden />;
-  }
-  if (tab === "selfService") return <ZapIcon size={16} aria-hidden />;
-  return <BoxIcon size={16} aria-hidden />;
-}
-
 function handleItemClick(tab: TabKey, item: AnyFavorite) {
   if (tab === "selfService") {
     if (!DEV_MOCK) {
@@ -45,13 +36,6 @@ function handleItemClick(tab: TabKey, item: AnyFavorite) {
   window.open(url, "_top");
 }
 
-function getRightLabel(tab: TabKey, item: AnyFavorite): string | undefined {
-  if (tab === "pages") return (item as FavoritePage).type;
-  if (tab === "selfService") return (item as FavoriteAction).blueprint;
-  const e = item as FavoriteEntity;
-  return e.blueprintTitle ?? e.blueprint;
-}
-
 export function FavoriteItem({
   item,
   tab,
@@ -63,9 +47,6 @@ export function FavoriteItem({
   onDragEnd,
   onRemove,
 }: Props) {
-  const rightLabel = getRightLabel(tab, item);
-
-
   function handleDragStart(e: React.DragEvent) {
     e.dataTransfer.effectAllowed = "move";
 
@@ -120,31 +101,40 @@ export function FavoriteItem({
 
         {/* Type icon */}
         <span className="fav-item-icon" aria-hidden>
-          {getItemIcon(tab, item)}
+          <TabTypeIcon tab={tab} size={24} />
         </span>
 
         {/* Title */}
         <span className="fav-item-title">{item.title}</span>
 
-        {/* Right label */}
-        {rightLabel && (
-          <span className="fav-item-right">
-            <span className="fav-item-right-icon" aria-hidden>
-              {getItemIcon(tab, item)}
-            </span>
-            {rightLabel}
-          </span>
-        )}
       </button>
 
-      <button
-        type="button"
-        className="fav-remove-btn"
-        aria-label={`Remove ${item.title}`}
-        onClick={(e) => { e.stopPropagation(); onRemove(index); }}
-      >
-        <Trash2Icon size={13} aria-hidden />
-      </button>
+      <div className="fav-item-actions">
+        <button
+          type="button"
+          className="fav-item-action-btn"
+          aria-label={tab === "selfService" ? `Run ${item.title}` : `Open ${item.title}`}
+          title={tab === "selfService" ? `Run ${item.title}` : `Open ${item.title}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleItemClick(tab, item);
+          }}
+        >
+          <Link2Icon size={18} aria-hidden />
+        </button>
+        <button
+          type="button"
+          className="fav-item-action-btn fav-item-action-btn--star"
+          aria-label={`Remove ${item.title} from favorites`}
+          title={`Remove ${item.title} from favorites`}
+          onClick={(e) => {
+            e.stopPropagation();
+            onRemove(index);
+          }}
+        >
+          <StarIcon size={18} fill="currentColor" aria-hidden />
+        </button>
+      </div>
     </li>
   );
 }

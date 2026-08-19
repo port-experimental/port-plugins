@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from "react";
-import { PlusIcon, SearchIcon, XIcon } from "lucide-react";
-import { FavoriteItem, type AnyFavorite } from "./FavoriteItem";
-import { AddDropdown } from "./AddDropdown";
+import { type AnyFavorite } from "./FavoriteItem";
 import { EmptyState } from "./EmptyState";
+import { FavoriteControls } from "./tab-content/FavoriteControls";
+import { DraggableFavoritesList } from "./tab-content/DraggableFavoritesList";
 import type {
   TabKey,
   FavoritesData,
@@ -13,18 +13,6 @@ import type {
   PortAction,
   PortBlueprint,
 } from "../types";
-
-const TAB_ADD_LABEL: Record<TabKey, string> = {
-  pages: "Page",
-  selfService: "Self service",
-  entities: "Entity",
-};
-
-const TAB_FILTER_PLACEHOLDER: Record<TabKey, string> = {
-  pages: "Search favorite pages",
-  selfService: "Search favorite actions or workflows",
-  entities: "Search favorite entities",
-};
 
 type Props = {
   tab: TabKey;
@@ -132,92 +120,28 @@ export function TabContent({
       return title.includes(q) || identifier.includes(q);
     });
 
-  // Build list rows with drop-indicator lines inserted between items
-  function renderList() {
-    const rows: React.ReactNode[] = [];
-
-    if (isDragging && insertIdx === 0) {
-      rows.push(<li key="drop-0" className="drop-indicator" aria-hidden />);
-    }
-
-    filteredItems.forEach(({ item, originalIndex }) => {
-      rows.push(
-        <FavoriteItem
-          key={item.identifier}
-          item={item}
-          tab={tab}
-          index={originalIndex}
-          isDragging={dragIdx === originalIndex}
-          isDraggingAny={isDragging}
-          onDragStart={handleDragStart}
-          onDragOver={handleDragOver}
-          onDragEnd={handleDragEnd}
-          onRemove={handleRemove}
-        />
-      );
-
-      if (isDragging && insertIdx === originalIndex + 1) {
-        rows.push(<li key={`drop-${originalIndex + 1}`} className="drop-indicator" aria-hidden />);
-      }
-    });
-
-    return rows;
-  }
-
   return (
     <div className="tab-content">
-      {items.length > 0 && (
-        <p className="fav-hint">Drag the handle to reorder.</p>
-      )}
-
       <div className="fav-list-controls-wrap" ref={controlsWrapRef}>
-        <div className="fav-list-controls">
-          <label className="fav-list-search" aria-label={`Filter ${tab} favorites`}>
-            <SearchIcon size={14} className="fav-list-search-icon" aria-hidden />
-            <input
-              type="text"
-              className="fav-list-search-input"
-              placeholder={TAB_FILTER_PLACEHOLDER[tab]}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-            {search && (
-              <button
-                type="button"
-                className="fav-list-search-clear"
-                onClick={() => setSearch("")}
-                aria-label="Clear search"
-              >
-                <XIcon size={14} aria-hidden />
-              </button>
-            )}
-          </label>
-          <button
-            type="button"
-            className="fav-list-add-btn"
-            onClick={() => setAddOpen((v) => !v)}
-            aria-expanded={addOpen}
-          >
-            <PlusIcon size={20} aria-hidden />
-            {TAB_ADD_LABEL[tab]}
-          </button>
-        </div>
-        {addOpen && (
-          <AddDropdown
-            tab={tab}
-            pages={pages}
-            actions={actions}
-            blueprints={blueprints}
-            alreadyAdded={new Set(items.map((i) => i.identifier))}
-            portToken={portToken}
-            portApiBaseUrl={portApiBaseUrl}
-            search={addSearch}
-            onSearchReset={() => setAddSearch("")}
-            onSearchChange={setAddSearch}
-            onAdd={handleAdd}
-            onClose={() => setAddOpen(false)}
-          />
-        )}
+        <FavoriteControls
+          tab={tab}
+          search={search}
+          onSearchChange={setSearch}
+          onSearchClear={() => setSearch("")}
+          addOpen={addOpen}
+          onToggleAdd={() => setAddOpen((v) => !v)}
+          pages={pages}
+          actions={actions}
+          blueprints={blueprints}
+          alreadyAdded={new Set(items.map((i) => i.identifier))}
+          portToken={portToken}
+          portApiBaseUrl={portApiBaseUrl}
+          addSearch={addSearch}
+          onAddSearchReset={() => setAddSearch("")}
+          onAddSearchChange={setAddSearch}
+          onAdd={handleAdd}
+          onCloseAdd={() => setAddOpen(false)}
+        />
       </div>
       <div className="fav-list-separator" aria-hidden />
 
@@ -227,9 +151,17 @@ export function TabContent({
         ) : filteredItems.length === 0 ? (
           <p className="fav-list-empty-filter">No matching favorites</p>
         ) : (
-          <ul className={`fav-list${isDragging ? " fav-list--dragging" : ""}`} role="list">
-            {renderList()}
-          </ul>
+          <DraggableFavoritesList
+            tab={tab}
+            filteredItems={filteredItems}
+            dragIdx={dragIdx}
+            insertIdx={insertIdx}
+            isDragging={isDragging}
+            onDragStart={handleDragStart}
+            onDragOver={handleDragOver}
+            onDragEnd={handleDragEnd}
+            onRemove={handleRemove}
+          />
         )}
       </div>
     </div>

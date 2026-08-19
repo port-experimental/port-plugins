@@ -424,28 +424,29 @@ body {
 .fav-item {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 8px 4px 10px;
-  border-radius: var(--radius);
-  background: var(--card);
+  gap: 10px;
+  min-height: 64px;
+  padding: 10px 14px;
+  border-radius: 18px;
+  background: transparent;
   cursor: default;
   user-select: none;
-  transition: background 0.12s, transform 0.15s ease-in-out, opacity 0.15s;
+  transition: background 0.12s, transform 0.15s ease-in-out, opacity 0.15s, box-shadow 0.15s;
 }
 
 .fav-item:hover {
-  background: var(--card2);
+  background: color-mix(in srgb, var(--card2) 70%, var(--card));
 }
 
 /* Item being dragged — placeholder stays in list, looks like a ghost slot */
 .fav-item--dragging {
   opacity: 0.35;
-  background: var(--card);
-  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--card2) 70%, var(--card));
+  border-radius: 18px;
 }
 
 .fav-item--dragging .fav-item-btn,
-.fav-item--dragging .fav-remove-btn {
+.fav-item--dragging .fav-item-actions {
   pointer-events: none;
 }
 
@@ -489,8 +490,8 @@ body {
   align-items: center;
   flex: 1;
   min-width: 0;
-  gap: 10px;
-  padding: 6px 8px 6px 0;
+  gap: 8px;
+  padding: 0;
   border: none;
   border-radius: var(--radius-sm);
   background: none;
@@ -507,7 +508,7 @@ body {
 }
 
 .fav-item-btn:hover .fav-item-title {
-  color: var(--blue);
+  color: var(--text);
 }
 
 .fav-item:hover .fav-remove-btn {
@@ -523,7 +524,7 @@ body {
   flex-shrink: 0;
   opacity: 0;
   transition: opacity 0.15s, color 0.12s;
-  padding: 2px 0;
+  padding: 2px 2px 2px 0;
 }
 
 .fav-drag-handle:active {
@@ -540,11 +541,13 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   flex-shrink: 0;
-  border-radius: 9px;
-  background: var(--bg);
+  border-radius: 10px;
+  background: #ffffff;
+  border: 1px solid #e3e3e3;
+  box-shadow: 0 2.5px 2.5px rgba(0, 0, 0, 0.05);
   color: var(--muted);
   transition: background 0.12s;
 }
@@ -556,67 +559,58 @@ body {
 /* Title */
 .fav-item-title {
   flex: 1;
-  font-size: 0.875rem;
-  font-weight: 600;
+  font-size: 16px;
+  font-weight: 500;
   color: var(--text);
+  line-height: 100%;
+  letter-spacing: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   transition: color 0.12s;
 }
 
-/* Right label (type / blueprint) — pill badge */
-.fav-item-right {
+.fav-item-actions {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  flex-shrink: 0;
-  font-size: 0.76rem;
-  font-weight: 500;
-  color: var(--muted);
-  white-space: nowrap;
-  max-width: 130px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  background: var(--bg);
-  border-radius: 8px;
-  padding: 3px 8px 3px 6px;
+  gap: 10px;
+  margin-left: 8px;
+  opacity: 0;
+  transition: opacity 0.12s;
 }
 
-.fav-item-right-icon {
-  display: inline-flex;
-  align-items: center;
-  flex-shrink: 0;
+.fav-item:hover .fav-item-actions,
+.fav-item:focus-within .fav-item-actions {
+  opacity: 1;
 }
 
-/* Delete — invisible at rest */
-.fav-remove-btn {
+.fav-item-action-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 26px;
-  height: 26px;
+  width: 32px;
+  height: 32px;
   flex-shrink: 0;
   border: none;
-  border-radius: var(--radius-xs);
+  border-radius: 999px;
   background: none;
-  color: var(--text-faint);
+  color: var(--muted);
   cursor: pointer;
-  opacity: 0;
-  transition: opacity 0.15s, color 0.12s, background 0.12s;
+  transition: color 0.12s, background 0.12s;
 }
 
-.fav-item:hover .fav-remove-btn {
-  opacity: 1;
+.fav-item-action-btn:hover {
+  background: color-mix(in srgb, var(--text-high, #000) 6%, transparent);
+  color: var(--text);
 }
 
-.fav-remove-btn:focus-visible {
-  opacity: 1;
-  outline: 2px solid var(--blue);
+.fav-item-action-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--blue) 35%, transparent);
+  outline-offset: 1px;
 }
 
-.fav-remove-btn:hover {
-  color: var(--red-dark);
+.fav-item-action-btn--star {
+  color: #f6bf26;
 }
 
 /* ═══════════════════════════════════════════

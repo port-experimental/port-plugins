@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback, type ReactNode } from "react";
-import { CheckIcon, AlertCircleIcon, Loader2Icon } from "lucide-react";
 import "./App.css";
 import { usePostMessageData } from "./hooks/usePostMessageData";
 import { useFavoriteData, parseFavorites } from "./hooks/useFavoriteData";
@@ -54,22 +53,6 @@ export function App() {
       setInitialized(true);
     }
   }, [initialized, userEntityQuery.isSuccess, userEntityQuery.data]);
-
-  // Auto-dismiss save error after 4 s
-  useEffect(() => {
-    if (saveMutation.isError) {
-      const t = setTimeout(() => saveMutation.reset(), 4000);
-      return () => clearTimeout(t);
-    }
-  }, [saveMutation.isError, saveMutation]);
-
-  // Auto-dismiss success toast after 2 s
-  useEffect(() => {
-    if (saveMutation.isSuccess) {
-      const t = setTimeout(() => saveMutation.reset(), 2000);
-      return () => clearTimeout(t);
-    }
-  }, [saveMutation.isSuccess, saveMutation]);
 
   const updateFavorites = useCallback(
     (next: FavoritesData) => {
@@ -204,25 +187,6 @@ export function App() {
         </div>
       ))}
 
-      {/* Toast notifications — float over content, don't shift layout */}
-      {saveMutation.isPending && (
-        <div className="save-toast save-toast--saving" aria-live="polite">
-          <Loader2Icon size={13} className="toast-spin" aria-hidden />
-          Saving…
-        </div>
-      )}
-      {saveMutation.isError && (
-        <div className="save-toast save-toast--error" role="alert">
-          <AlertCircleIcon size={13} aria-hidden />
-          Failed to save — changes may not persist
-        </div>
-      )}
-      {saveMutation.isSuccess && (
-        <div className="save-toast save-toast--success" aria-live="polite">
-          <CheckIcon size={13} aria-hidden />
-          Saved
-        </div>
-      )}
     </div>
   );
 }
