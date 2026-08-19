@@ -113,12 +113,13 @@ body {
   /* shrink-wraps the tabs */
   align-items: center;
   gap: 2px;
+  height: 42px;
   overflow-x: auto;
   scrollbar-width: none;
   /* light: card2 is the greyer surface; active pill sits on whiter card */
   background: var(--card2);
-  border-radius: 20px;
-  padding: 3px;
+  border-radius: 22px;
+  padding: 4px;
   min-width: 0;
   flex-shrink: 1;
 }
@@ -165,13 +166,14 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 5px 13px;
+  height: 34px;
+  padding: 0 12px;
   border: none;
-  border-radius: 16px;
+  border-radius: 18px;
   background: transparent;
   color: var(--muted);
-  font-size: 0.82rem;
-  font-weight: 500;
+  font-size: 0.9rem;
+  font-weight: 600;
   cursor: grab;
   white-space: nowrap;
   transition: background 0.15s, color 0.15s, box-shadow 0.15s, opacity 0.15s;
@@ -210,22 +212,16 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 17px;
-  height: 17px;
-  padding: 0 4px;
+  min-width: 19px;
+  height: 19px;
+  padding: 0 5px;
   border-radius: 20px;
   background: var(--card2);
   color: var(--muted);
-  font-size: 0.7rem;
+  font-size: 0.76rem;
   font-weight: 600;
   transition: background 0.15s, color 0.15s;
 }
-
-.fav-tab--active .fav-tab-badge {
-  background: var(--blue);
-  color: #fff;
-}
-
 
 /* ═══════════════════════════════════════════
    ICON BUTTON (shared)
@@ -295,6 +291,88 @@ body {
   letter-spacing: 0.01em;
 }
 
+.fav-list-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+}
+
+.fav-list-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  height: 40px;
+  padding: 0 14px;
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  border-radius: var(--radius);
+  background: var(--card);
+}
+
+.fav-list-search-icon {
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.fav-list-search-input {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.fav-list-search-input::placeholder {
+  color: var(--muted);
+}
+
+.fav-list-search-clear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.fav-list-search-clear:hover {
+  background: color-mix(in srgb, var(--text-high, #000) 6%, transparent);
+  color: var(--text);
+}
+
+.fav-list-add-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 40px;
+  min-width: 85px;
+  padding: 0 18px;
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: default;
+  flex-shrink: 0;
+}
+
+.fav-list-separator {
+  height: 1px;
+  margin: 0 0 4px;
+  background: color-mix(in srgb, var(--border) 45%, transparent);
+}
+
 /* List scroll area */
 .fav-list-wrap {
   flex: 1;
@@ -318,6 +396,13 @@ body {
   display: flex;
   flex-direction: column;
   gap: 6px;
+}
+
+.fav-list-empty-filter {
+  padding: 20px 16px;
+  font-size: 0.84rem;
+  color: var(--text-faint);
+  text-align: center;
 }
 
 /* ═══════════════════════════════════════════

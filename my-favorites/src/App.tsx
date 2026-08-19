@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, type ReactNode } from "react";
-import { RefreshCwIcon, CheckIcon, AlertCircleIcon, Loader2Icon } from "lucide-react";
+import { CheckIcon, AlertCircleIcon, Loader2Icon } from "lucide-react";
 import "./App.css";
 import { usePostMessageData } from "./hooks/usePostMessageData";
 import { useFavoriteData, parseFavorites } from "./hooks/useFavoriteData";
@@ -10,7 +10,7 @@ import type { TabKey, FavoritesData } from "./types";
 
 const TAB_LABELS: Record<TabKey, string> = {
   pages: "Pages",
-  selfService: "Self Service",
+  selfService: "Self service",
   entities: "Entities",
 };
 
@@ -28,7 +28,6 @@ function ShellMessage({ children }: { children: ReactNode }) {
 export function App() {
   const [favorites, setFavorites] = useState<FavoritesData>(EMPTY_FAVORITES);
   const [initialized, setInitialized] = useState(false);
-  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Tab drag state
   const [tabDragIdx, setTabDragIdx]     = useState<number | null>(null);
@@ -40,7 +39,7 @@ export function App() {
 
   const { portToken, portApiBaseUrl, user } = usePostMessageData();
 
-  const { userEntityQuery, pagesQuery, actionsQuery, blueprintsQuery, saveMutation } =
+  const { userEntityQuery, saveMutation } =
     useFavoriteData(portToken, portApiBaseUrl, user?.email);
 
   // Initialise favorites (and active tab) from server data once
@@ -71,12 +70,6 @@ export function App() {
       return () => clearTimeout(t);
     }
   }, [saveMutation.isSuccess, saveMutation]);
-
-  async function handleRefresh() {
-    setIsRefreshing(true);
-    await userEntityQuery.refetch();
-    setIsRefreshing(false);
-  }
 
   const updateFavorites = useCallback(
     (next: FavoritesData) => {
@@ -186,16 +179,6 @@ export function App() {
             </div>
           ))}
         </div>
-
-        <button
-          type="button"
-          className={`fav-icon-btn${isRefreshing ? " fav-icon-btn--spinning" : ""}`}
-          aria-label="Refresh"
-          onClick={handleRefresh}
-          disabled={isRefreshing}
-        >
-          <RefreshCwIcon size={15} aria-hidden />
-        </button>
       </div>
 
       {/* Tab panels */}
@@ -211,11 +194,6 @@ export function App() {
           <TabContent
             tab={tab}
             favorites={favorites}
-            pages={pagesQuery.data ?? []}
-            actions={actionsQuery.data ?? []}
-            blueprints={blueprintsQuery.data ?? []}
-            portToken={portToken}
-            portApiBaseUrl={portApiBaseUrl}
             onUpdate={updateFavorites}
           />
         </div>

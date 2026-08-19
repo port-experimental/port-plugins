@@ -1,7 +1,6 @@
-import { useState, useEffect, useRef } from "react";
-import { ChevronDownIcon, SearchIcon } from "lucide-react";
+import { useState } from "react";
+import { PlusIcon, SearchIcon, XIcon } from "lucide-react";
 import { FavoriteItem, type AnyFavorite } from "./FavoriteItem";
-import { AddDropdown } from "./AddDropdown";
 import { EmptyState } from "./EmptyState";
 import type {
   TabKey,
@@ -9,69 +8,32 @@ import type {
   FavoritePage,
   FavoriteAction,
   FavoriteEntity,
-  PortPage,
-  PortAction,
-  PortBlueprint,
 } from "../types";
 
-const TAB_SINGULAR: Record<TabKey, string> = {
-  pages: "page",
-  selfService: "self-service action",
-  entities: "entity",
+const TAB_ADD_LABEL: Record<TabKey, string> = {
+  pages: "Page",
+  selfService: "Self service",
+  entities: "Entity",
 };
 
-const TAB_PLACEHOLDER: Record<TabKey, string> = {
-  pages: "Search or select a page to add…",
-  selfService: "Search or select a self-service action to add…",
-  entities: "Search or select an entity to add…",
+const TAB_FILTER_PLACEHOLDER: Record<TabKey, string> = {
+  pages: "Search favorite pages",
+  selfService: "Search favorite actions or workflows",
+  entities: "Search favorite entities",
 };
 
 type Props = {
   tab: TabKey;
   favorites: FavoritesData;
-  pages: PortPage[];
-  actions: PortAction[];
-  blueprints: PortBlueprint[];
-  portToken: string;
-  portApiBaseUrl: string;
   onUpdate: (next: FavoritesData) => void;
 };
 
 export function TabContent({
   tab,
   favorites,
-  pages,
-  actions,
-  blueprints,
-  portToken,
-  portApiBaseUrl,
   onUpdate,
 }: Props) {
-  const [addOpen, setAddOpen] = useState(false);
   const [search, setSearch] = useState("");
-  const searchInputRef = useRef<HTMLInputElement>(null);
-  const addAreaRef = useRef<HTMLDivElement>(null);
-
-  // Focus the search input when the dropdown opens; clear on close
-  useEffect(() => {
-    if (addOpen) {
-      searchInputRef.current?.focus();
-    } else {
-      setSearch("");
-    }
-  }, [addOpen]);
-
-  // Close add panel on outside click
-  useEffect(() => {
-    if (!addOpen) return;
-    function handleOutside(e: MouseEvent) {
-      if (addAreaRef.current && !addAreaRef.current.contains(e.target as Node)) {
-        setAddOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleOutside);
-    return () => document.removeEventListener("mousedown", handleOutside);
-  }, [addOpen]);
   const [dragIdx, setDragIdx] = useState<number | null>(null);
   // insertIdx = 0..n — the gap before item[0], between items, or after last item
   const [insertIdx, setInsertIdx] = useState<number | null>(null);
@@ -95,11 +57,6 @@ export function TabContent({
 
   function handleRemove(index: number) {
     patch(items.filter((_, i) => i !== index));
-  }
-
-  function handleAdd(item: FavoritePage | FavoriteAction | FavoriteEntity) {
-    patch([...items, item as AnyFavorite]);
-    setAddOpen(false);
   }
 
   function handleDragStart(idx: number) {
@@ -130,8 +87,16 @@ export function TabContent({
     setInsertIdx(null);
   }
 
-  const alreadyAdded = new Set(items.map((i) => i.identifier));
   const isDragging = dragIdx !== null;
+  const q = search.trim().toLowerCase();
+  const filteredItems = items
+    .map((item, originalIndex) => ({ item, originalIndex }))
+    .filter(({ item }) => {
+      if (!q) return true;
+      const title = (item.title ?? "").toLowerCase();
+      const identifier = (item.identifier ?? "").toLowerCase();
+      return title.includes(q) || identifier.includes(q);
+    });
 
   // Build list rows with drop-indicator lines inserted between items
   function renderList() {
@@ -141,14 +106,14 @@ export function TabContent({
       rows.push(<li key="drop-0" className="drop-indicator" aria-hidden />);
     }
 
-    items.forEach((item, idx) => {
+    filteredItems.forEach(({ item, originalIndex }) => {
       rows.push(
         <FavoriteItem
           key={item.identifier}
           item={item}
           tab={tab}
-          index={idx}
-          isDragging={dragIdx === idx}
+          index={originalIndex}
+          isDragging={dragIdx === originalIndex}
           isDraggingAny={isDragging}
           onDragStart={handleDragStart}
           onDragOver={handleDragOver}
@@ -157,8 +122,8 @@ export function TabContent({
         />
       );
 
-      if (isDragging && insertIdx === idx + 1) {
-        rows.push(<li key={`drop-${idx + 1}`} className="drop-indicator" aria-hidden />);
+      if (isDragging && insertIdx === originalIndex + 1) {
+        rows.push(<li key={`drop-${originalIndex + 1}`} className="drop-indicator" aria-hidden />);
       }
     });
 
@@ -171,66 +136,47 @@ export function TabContent({
         <p className="fav-hint">Drag the handle to reorder.</p>
       )}
 
+      <div className="fav-list-controls">
+        <label className="fav-list-search" aria-label={`Filter ${tab} favorites`}>
+          <SearchIcon size={14} className="fav-list-search-icon" aria-hidden />
+          <input
+            type="text"
+            className="fav-list-search-input"
+            placeholder={TAB_FILTER_PLACEHOLDER[tab]}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          {search && (
+            <button
+              type="button"
+              className="fav-list-search-clear"
+              onClick={() => setSearch("")}
+              aria-label="Clear search"
+            >
+              <XIcon size={14} aria-hidden />
+            </button>
+          )}
+        </label>
+        <button
+          type="button"
+          className="fav-list-add-btn"
+          onClick={() => {}}
+        >
+          <PlusIcon size={20} aria-hidden />
+          {TAB_ADD_LABEL[tab]}
+        </button>
+      </div>
+      <div className="fav-list-separator" aria-hidden />
+
       <div className="fav-list-wrap">
         {items.length === 0 ? (
           <EmptyState tab={tab} />
+        ) : filteredItems.length === 0 ? (
+          <p className="fav-list-empty-filter">No matching favorites</p>
         ) : (
           <ul className={`fav-list${isDragging ? " fav-list--dragging" : ""}`} role="list">
             {renderList()}
           </ul>
-        )}
-      </div>
-
-      <div className="fav-add-area" ref={addAreaRef}>
-        {addOpen && (
-          <AddDropdown
-            tab={tab}
-            pages={pages}
-            actions={actions}
-            blueprints={blueprints}
-            alreadyAdded={alreadyAdded}
-            portToken={portToken}
-            portApiBaseUrl={portApiBaseUrl}
-          search={search}
-          onSearchReset={() => setSearch("")}
-          onAdd={handleAdd}
-          onClose={() => setAddOpen(false)}
-          />
-        )}
-        <p className="fav-add-label">Add a {TAB_SINGULAR[tab]}</p>
-        {addOpen ? (
-          <div className="fav-add-combobox fav-add-combobox--open fav-add-combobox--input">
-            <SearchIcon size={14} className="fav-add-combobox-search-icon" aria-hidden />
-            <input
-              ref={searchInputRef}
-              type="text"
-              className="fav-add-combobox-input"
-              placeholder={TAB_PLACEHOLDER[tab]}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              aria-label={TAB_PLACEHOLDER[tab]}
-            />
-            <ChevronDownIcon
-              size={16}
-              className="fav-add-combobox-chevron"
-              style={{ cursor: "pointer" }}
-              aria-hidden
-              onClick={() => setAddOpen(false)}
-            />
-          </div>
-        ) : (
-          <button
-            type="button"
-            className="fav-add-combobox"
-            onClick={() => setAddOpen(true)}
-            aria-expanded={false}
-            aria-label={TAB_PLACEHOLDER[tab]}
-          >
-            <span className="fav-add-combobox-placeholder">
-              {TAB_PLACEHOLDER[tab]}
-            </span>
-            <ChevronDownIcon size={16} className="fav-add-combobox-chevron" aria-hidden />
-          </button>
         )}
       </div>
     </div>
