@@ -1,6 +1,7 @@
 import { useState } from "react";
 import {
   ChevronLeftIcon,
+  SearchIcon,
   XIcon,
   CheckIcon,
   LayersIcon,
@@ -29,6 +30,7 @@ type Props = {
   portApiBaseUrl: string;
   search: string;
   onSearchReset: () => void;
+  onSearchChange: (value: string) => void;
   onAdd: (item: FavoritePage | FavoriteAction | FavoriteEntity) => void;
   onClose: () => void;
 };
@@ -52,6 +54,7 @@ export function AddDropdown({
   portApiBaseUrl,
   search,
   onSearchReset,
+  onSearchChange,
   onAdd,
   onClose,
 }: Props) {
@@ -155,11 +158,12 @@ export function AddDropdown({
     stage === "entities" &&
     (entitiesQuery.isPending || entitiesQuery.isLoading);
 
+  const showHeader = tab === "entities" && stage === "entities";
+
   return (
     <div className="add-panel">
-      {/* Header row — back (entity drill-down) + close button */}
-      <div className="add-panel-header">
-        {tab === "entities" && stage === "entities" ? (
+      {showHeader && (
+        <div className="add-panel-header">
           <button
             type="button"
             className="add-panel-back-btn"
@@ -169,17 +173,29 @@ export function AddDropdown({
             <ChevronLeftIcon size={13} aria-hidden />
             <span>{selectedBp?.title ?? "Back"}</span>
           </button>
-        ) : (
-          <span />
-        )}
-        <button
-          type="button"
-          className="add-panel-close-btn"
-          aria-label="Close"
-          onClick={onClose}
-        >
-          <XIcon size={14} aria-hidden />
-        </button>
+          <button
+            type="button"
+            className="add-panel-close-btn"
+            aria-label="Close"
+            onClick={onClose}
+          >
+            <XIcon size={14} aria-hidden />
+          </button>
+        </div>
+      )}
+
+      <div className="add-panel-search">
+        <div className="add-search-shell">
+          <SearchIcon size={15} className="add-search-icon" aria-hidden />
+          <input
+            type="text"
+            className="add-search-input"
+            placeholder={tab === "pages" ? "Search pages" : tab === "selfService" ? "Search actions" : "Search entities"}
+            value={search}
+            onChange={(e) => onSearchChange(e.target.value)}
+            aria-label="Search items to add"
+          />
+        </div>
       </div>
 
       {/* Results list */}

@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { PlusIcon, SearchIcon, XIcon } from "lucide-react";
 import { FavoriteItem, type AnyFavorite } from "./FavoriteItem";
+import { AddDropdown } from "./AddDropdown";
 import { EmptyState } from "./EmptyState";
 import type {
   TabKey,
@@ -8,6 +9,9 @@ import type {
   FavoritePage,
   FavoriteAction,
   FavoriteEntity,
+  PortPage,
+  PortAction,
+  PortBlueprint,
 } from "../types";
 
 const TAB_ADD_LABEL: Record<TabKey, string> = {
@@ -25,18 +29,42 @@ const TAB_FILTER_PLACEHOLDER: Record<TabKey, string> = {
 type Props = {
   tab: TabKey;
   favorites: FavoritesData;
+  pages: PortPage[];
+  actions: PortAction[];
+  blueprints: PortBlueprint[];
+  portToken: string;
+  portApiBaseUrl: string;
   onUpdate: (next: FavoritesData) => void;
 };
 
 export function TabContent({
   tab,
   favorites,
+  pages,
+  actions,
+  blueprints,
+  portToken,
+  portApiBaseUrl,
   onUpdate,
 }: Props) {
   const [search, setSearch] = useState("");
+  const [addSearch, setAddSearch] = useState("");
+  const [addOpen, setAddOpen] = useState(false);
+  const controlsWrapRef = useRef<HTMLDivElement>(null);
   const [dragIdx, setDragIdx] = useState<number | null>(null);
   // insertIdx = 0..n — the gap before item[0], between items, or after last item
   const [insertIdx, setInsertIdx] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!addOpen) return;
+    function handleOutside(e: MouseEvent) {
+      if (controlsWrapRef.current && !controlsWrapRef.current.contains(e.target as Node)) {
+        setAddOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleOutside);
+    return () => document.removeEventListener("mousedown", handleOutside);
+  }, [addOpen]);
 
   const items: AnyFavorite[] =
     tab === "pages"
@@ -57,6 +85,12 @@ export function TabContent({
 
   function handleRemove(index: number) {
     patch(items.filter((_, i) => i !== index));
+  }
+
+  function handleAdd(item: FavoritePage | FavoriteAction | FavoriteEntity) {
+    patch([...items, item as AnyFavorite]);
+    setAddOpen(false);
+    setAddSearch("");
   }
 
   function handleDragStart(idx: number) {
@@ -136,35 +170,54 @@ export function TabContent({
         <p className="fav-hint">Drag the handle to reorder.</p>
       )}
 
-      <div className="fav-list-controls">
-        <label className="fav-list-search" aria-label={`Filter ${tab} favorites`}>
-          <SearchIcon size={14} className="fav-list-search-icon" aria-hidden />
-          <input
-            type="text"
-            className="fav-list-search-input"
-            placeholder={TAB_FILTER_PLACEHOLDER[tab]}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+      <div className="fav-list-controls-wrap" ref={controlsWrapRef}>
+        <div className="fav-list-controls">
+          <label className="fav-list-search" aria-label={`Filter ${tab} favorites`}>
+            <SearchIcon size={14} className="fav-list-search-icon" aria-hidden />
+            <input
+              type="text"
+              className="fav-list-search-input"
+              placeholder={TAB_FILTER_PLACEHOLDER[tab]}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+            {search && (
+              <button
+                type="button"
+                className="fav-list-search-clear"
+                onClick={() => setSearch("")}
+                aria-label="Clear search"
+              >
+                <XIcon size={14} aria-hidden />
+              </button>
+            )}
+          </label>
+          <button
+            type="button"
+            className="fav-list-add-btn"
+            onClick={() => setAddOpen((v) => !v)}
+            aria-expanded={addOpen}
+          >
+            <PlusIcon size={20} aria-hidden />
+            {TAB_ADD_LABEL[tab]}
+          </button>
+        </div>
+        {addOpen && (
+          <AddDropdown
+            tab={tab}
+            pages={pages}
+            actions={actions}
+            blueprints={blueprints}
+            alreadyAdded={new Set(items.map((i) => i.identifier))}
+            portToken={portToken}
+            portApiBaseUrl={portApiBaseUrl}
+            search={addSearch}
+            onSearchReset={() => setAddSearch("")}
+            onSearchChange={setAddSearch}
+            onAdd={handleAdd}
+            onClose={() => setAddOpen(false)}
           />
-          {search && (
-            <button
-              type="button"
-              className="fav-list-search-clear"
-              onClick={() => setSearch("")}
-              aria-label="Clear search"
-            >
-              <XIcon size={14} aria-hidden />
-            </button>
-          )}
-        </label>
-        <button
-          type="button"
-          className="fav-list-add-btn"
-          onClick={() => {}}
-        >
-          <PlusIcon size={20} aria-hidden />
-          {TAB_ADD_LABEL[tab]}
-        </button>
+        )}
       </div>
       <div className="fav-list-separator" aria-hidden />
 
