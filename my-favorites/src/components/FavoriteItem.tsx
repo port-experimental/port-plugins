@@ -3,6 +3,7 @@ import { showRunActionDialog } from "@port-labs/plugins-sdk";
 import type { TabKey, FavoritePage, FavoriteAction, FavoriteEntity } from "../types";
 import { DEV_MOCK } from "../hooks/usePostMessageData";
 import { TabTypeIcon } from "./TabTypeIcon";
+import { ActionTooltip } from "./ActionTooltip";
 import {
   buildPageUrl,
   buildEntityPageUrl,
@@ -127,35 +128,37 @@ export function FavoriteItem({
       </button>
 
       <div className="fav-item-actions">
-        <button
-          type="button"
-          className="fav-item-action-btn"
-          aria-label={`Copy link for ${item.title}`}
-          title={`Copy link for ${item.title}`}
-          onClick={async (e) => {
-            e.stopPropagation();
-            const url = getItemUrl(tab, item) ?? item.identifier;
-            try {
-              await navigator.clipboard.writeText(url);
-            } catch {
-              // Ignore clipboard errors silently to avoid breaking click flow.
-            }
-          }}
-        >
-          <Link2Icon size={18} aria-hidden />
-        </button>
-        <button
-          type="button"
-          className="fav-item-action-btn fav-item-action-btn--star"
-          aria-label={`Remove ${item.title} from favorites`}
-          title={`Remove ${item.title} from favorites`}
-          onClick={(e) => {
-            e.stopPropagation();
-            onRemove(index);
-          }}
-        >
-          <StarIcon size={18} fill="currentColor" aria-hidden />
-        </button>
+        <ActionTooltip label="Copy link">
+          <button
+            type="button"
+            className="fav-item-action-btn"
+            aria-label={`Copy link for ${item.title}`}
+            onClick={async (e) => {
+              e.stopPropagation();
+              const url = getItemUrl(tab, item) ?? item.identifier;
+              try {
+                await navigator.clipboard.writeText(url);
+              } catch {
+                // Ignore clipboard errors silently to avoid breaking click flow.
+              }
+            }}
+          >
+            <Link2Icon size={18} aria-hidden />
+          </button>
+        </ActionTooltip>
+        <ActionTooltip label="Remove from favorites">
+          <button
+            type="button"
+            className="fav-item-action-btn fav-item-action-btn--star"
+            aria-label="Remove from favorites"
+            onClick={(e) => {
+              e.stopPropagation();
+              onRemove(index);
+            }}
+          >
+            <StarIcon size={18} fill="currentColor" aria-hidden />
+          </button>
+        </ActionTooltip>
       </div>
     </li>
   );
