@@ -10,6 +10,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { fetchEntitiesForBlueprint } from "../api/entities";
 import { LoadingDots } from "./LoadingState";
+import { TabTypeIcon } from "./TabTypeIcon";
 import type {
   TabKey,
   PortPage,
@@ -228,9 +229,17 @@ export function AddDropdown({
                     .join(" ")}
                   onClick={() => !isAdded && handleSelect(item.identifier)}
                 >
-                  {item.isBlueprintPicker && (
-                    <LayersIcon size={13} className="add-item-icon" aria-hidden />
-                  )}
+                  <span className="add-item-icon" aria-hidden>
+                    {item.isBlueprintPicker ? (
+                      <LayersIcon size={13} />
+                    ) : tab === "entities" && stage === "entities" ? (
+                      <TabTypeIcon tab="entities" size={16} />
+                    ) : tab === "selfService" ? (
+                      <TabTypeIcon tab="selfService" size={16} />
+                    ) : (
+                      <TabTypeIcon tab="pages" size={16} />
+                    )}
+                  </span>
                   <span className="add-item-title">{item.title}</span>
                   {isAdded ? (
                     <CheckIcon size={13} className="add-item-check" aria-hidden />

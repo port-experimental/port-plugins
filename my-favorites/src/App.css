@@ -569,7 +569,7 @@ body {
   font-size: 16px;
   font-weight: 500;
   color: var(--text);
-  line-height: 100%;
+  line-height: 1.2;
   letter-spacing: 0;
   white-space: nowrap;
   overflow: hidden;
@@ -716,7 +716,7 @@ body {
   z-index: 50;
   display: flex;
   flex-direction: column;
-  max-height: 180px;
+  max-height: 200px;
   border: 1px solid var(--border);
   border-radius: 14px;
   background: #ffffff;
@@ -877,6 +877,7 @@ body {
   gap: 8px;
   width: 100%;
   padding: 10px 12px;
+  height: 36px;
   border: none;
   border-radius: var(--radius-sm);
   background: transparent;
