@@ -566,6 +566,7 @@ body {
 /* Title */
 .fav-item-title {
   flex: 1;
+  min-width: 0;
   font-size: 16px;
   font-weight: 500;
   color: var(--text);
@@ -575,6 +576,23 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   transition: color 0.12s;
+}
+
+.fav-item-blueprint {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  margin-left: 12px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 8px;
+  background: #174d640d;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0;
+  color: color-mix(in srgb, var(--text-high, #000) 90%, transparent);
+  white-space: nowrap;
 }
 
 .fav-item-actions {

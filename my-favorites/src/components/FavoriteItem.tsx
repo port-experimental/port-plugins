@@ -110,6 +110,13 @@ export function FavoriteItem({
         {/* Title */}
         <span className="fav-item-title">{item.title}</span>
 
+        {tab === "entities" && (
+          <span className="fav-item-blueprint">
+            {(item as FavoriteEntity).blueprintTitle ??
+              (item as FavoriteEntity).blueprint}
+          </span>
+        )}
+
       </button>
 
       <div className="fav-item-actions">
