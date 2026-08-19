@@ -10,12 +10,12 @@ import type { TabKey, FavoritesData } from "./types";
 
 const TAB_LABELS: Record<TabKey, string> = {
   pages: "Pages",
-  actions: "Actions",
+  selfService: "Self Service",
   entities: "Entities",
 };
 
-const TABS: TabKey[] = ["pages", "actions", "entities"];
-const EMPTY_FAVORITES: FavoritesData = { pages: [], actions: [], entities: [] };
+const TABS: TabKey[] = ["pages", "entities", "selfService"];
+const EMPTY_FAVORITES: FavoritesData = { pages: [], selfService: [], entities: [] };
 
 function ShellMessage({ children }: { children: ReactNode }) {
   return (
@@ -130,7 +130,7 @@ export function App() {
 
   const tabCounts: Record<TabKey, number> = {
     pages: favorites.pages.length,
-    actions: favorites.actions.length,
+    selfService: favorites.selfService.length,
     entities: favorites.entities.length,
   };
 

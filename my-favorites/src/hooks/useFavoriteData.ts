@@ -5,10 +5,10 @@ import { fetchActions } from "../api/actions";
 import { fetchBlueprints } from "../api/blueprints";
 import type { FavoritesData } from "../types";
 
-const DEFAULT_TAB_ORDER: import("../types").TabKey[] = ["pages", "actions", "entities"];
+const DEFAULT_TAB_ORDER: import("../types").TabKey[] = ["pages", "entities", "selfService"];
 
 export function parseFavorites(raw: unknown): FavoritesData {
-  const empty: FavoritesData = { pages: [], actions: [], entities: [] };
+  const empty: FavoritesData = { pages: [], selfService: [], entities: [] };
   if (!raw) return empty;
   try {
     const parsed =
@@ -23,7 +23,7 @@ export function parseFavorites(raw: unknown): FavoritesData {
 
     return {
       pages:    Array.isArray(parsed.pages)    ? parsed.pages    : [],
-      actions:  Array.isArray(parsed.actions)  ? parsed.actions  : [],
+      selfService: Array.isArray(parsed.selfService) ? parsed.selfService : [],
       entities: Array.isArray(parsed.entities) ? parsed.entities : [],
       tabOrder,
     };

@@ -1,4 +1,4 @@
-export type TabKey = "pages" | "actions" | "entities";
+export type TabKey = "pages" | "selfService" | "entities";
 
 export type Page = {
   identifier?: string;
@@ -50,7 +50,7 @@ export type FavoriteEntity = {
 
 export type FavoritesData = {
   pages: FavoritePage[];
-  actions: FavoriteAction[];
+  selfService: FavoriteAction[];
   entities: FavoriteEntity[];
   tabOrder?: TabKey[];
 };

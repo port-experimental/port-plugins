@@ -16,13 +16,13 @@ import type {
 
 const TAB_SINGULAR: Record<TabKey, string> = {
   pages: "page",
-  actions: "action",
+  selfService: "self-service action",
   entities: "entity",
 };
 
 const TAB_PLACEHOLDER: Record<TabKey, string> = {
   pages: "Search or select a page to add…",
-  actions: "Search or select an action to add…",
+  selfService: "Search or select a self-service action to add…",
   entities: "Search or select an entity to add…",
 };
 
@@ -79,15 +79,15 @@ export function TabContent({
   const items: AnyFavorite[] =
     tab === "pages"
       ? favorites.pages
-      : tab === "actions"
-      ? favorites.actions
+      : tab === "selfService"
+      ? favorites.selfService
       : favorites.entities;
 
   function patch(newItems: AnyFavorite[]) {
     if (tab === "pages") {
       onUpdate({ ...favorites, pages: newItems as FavoritePage[] });
-    } else if (tab === "actions") {
-      onUpdate({ ...favorites, actions: newItems as FavoriteAction[] });
+    } else if (tab === "selfService") {
+      onUpdate({ ...favorites, selfService: newItems as FavoriteAction[] });
     } else {
       onUpdate({ ...favorites, entities: newItems as FavoriteEntity[] });
     }

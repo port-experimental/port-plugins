@@ -79,7 +79,7 @@ export function AddDropdown({
         subtitle: p.type === "blueprint-entities" ? "catalog" : p.type,
       }));
     }
-    if (tab === "actions") {
+    if (tab === "selfService") {
       return actions.map((a) => ({
         identifier: a.identifier,
         title: a.title ?? a.identifier,
@@ -129,7 +129,7 @@ export function AddDropdown({
           type: page.type === "blueprint-entities" ? "catalog" : page.type,
           icon: page.type === "blueprint-entities" ? 'table-2' : 'layout-dashboard',
         } satisfies FavoritePage);
-    } else if (tab === "actions") {
+    } else if (tab === "selfService") {
       const action = actions.find((a) => a.identifier === identifier);
       if (action)
         onAdd({

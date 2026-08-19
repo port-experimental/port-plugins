@@ -94,7 +94,7 @@ port-plugins upload \
   --identifier my-favorites-port-plugin \
   --title "My Favorites" \
   --params "$(cat upload-params.json)" \
-  --description "Bookmark and quick-access Pages, Actions, and Entities." \
+  --description "Bookmark and quick-access Pages, Self service, and Entities." \
   --upsert
 ```
 

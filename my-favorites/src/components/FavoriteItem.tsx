@@ -27,12 +27,12 @@ function getItemIcon(tab: TabKey, item: AnyFavorite) {
       ? <Table2Icon size={16} aria-hidden />
       : <LayoutDashboardIcon size={16} aria-hidden />;
   }
-  if (tab === "actions") return <ZapIcon size={16} aria-hidden />;
+  if (tab === "selfService") return <ZapIcon size={16} aria-hidden />;
   return <BoxIcon size={16} aria-hidden />;
 }
 
 function handleItemClick(tab: TabKey, item: AnyFavorite) {
-  if (tab === "actions") {
+  if (tab === "selfService") {
     if (!DEV_MOCK) {
       showRunActionDialog((item as FavoriteAction).identifier);
     }
@@ -47,7 +47,7 @@ function handleItemClick(tab: TabKey, item: AnyFavorite) {
 
 function getRightLabel(tab: TabKey, item: AnyFavorite): string | undefined {
   if (tab === "pages") return (item as FavoritePage).type;
-  if (tab === "actions") return (item as FavoriteAction).blueprint;
+  if (tab === "selfService") return (item as FavoriteAction).blueprint;
   const e = item as FavoriteEntity;
   return e.blueprintTitle ?? e.blueprint;
 }
@@ -111,7 +111,7 @@ export function FavoriteItem({
         type="button"
         className="fav-item-btn"
         onClick={() => handleItemClick(tab, item)}
-        title={tab === "actions" ? `Run ${item.title}` : `Open ${item.title}`}
+        title={tab === "selfService" ? `Run ${item.title}` : `Open ${item.title}`}
       >
         {/* Drag handle */}
         <span className="fav-drag-handle" aria-label="Drag to reorder">

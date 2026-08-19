@@ -11,7 +11,7 @@ export const MOCK_FAVORITES: FavoritesData = {
     { identifier: "services-page", title: "Services", type: "blueprint-entities" },
     { identifier: "overview-page", title: "Overview", type: "dashboard" },
   ],
-  actions: [
+  selfService: [
     {
       identifier: "scaffold_service",
       title: "Scaffold Service",

@@ -6,8 +6,8 @@ const MESSAGES: Record<TabKey, { heading: string; hint: string }> = {
     heading: "No favorite pages yet",
     hint: "Add pages you visit often for quick access.",
   },
-  actions: {
-    heading: "No favorite actions yet",
+  selfService: {
+    heading: "No favorite self-service actions yet",
     hint: "Add self-service actions you run regularly.",
   },
   entities: {
