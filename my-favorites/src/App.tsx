@@ -3,6 +3,7 @@ import "./App.css";
 import { usePostMessageData } from "./hooks/usePostMessageData";
 import { useFavoriteData, parseFavorites } from "./hooks/useFavoriteData";
 import { TabContent } from "./components/TabContent";
+import { TabTypeIcon } from "./components/TabTypeIcon";
 import { LoadingState } from "./components/LoadingState";
 import { ErrorBanner } from "./components/ErrorBanner";
 import type { TabKey, FavoritesData } from "./types";
@@ -156,6 +157,9 @@ export function App() {
                   setTabInsertIdx(null);
                 }}
               >
+                <span className="fav-tab-icon" aria-hidden>
+                  <TabTypeIcon tab={tab} size={18} />
+                </span>
                 {TAB_LABELS[tab]}
                 <span className="fav-tab-badge">{tabCounts[tab]}</span>
               </button>

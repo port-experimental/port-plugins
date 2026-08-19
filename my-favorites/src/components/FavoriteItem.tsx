@@ -1,4 +1,4 @@
-import { GripVerticalIcon, Link2Icon, StarIcon } from "lucide-react";
+import { Link2Icon, StarIcon } from "lucide-react";
 import { showRunActionDialog } from "@port-labs/plugins-sdk";
 import type { TabKey, FavoritePage, FavoriteAction, FavoriteEntity } from "../types";
 import { DEV_MOCK } from "../hooks/usePostMessageData";
@@ -94,11 +94,6 @@ export function FavoriteItem({
         onClick={() => handleItemClick(tab, item)}
         title={tab === "selfService" ? `Run ${item.title}` : `Open ${item.title}`}
       >
-        {/* Drag handle */}
-        <span className="fav-drag-handle" aria-label="Drag to reorder">
-          <GripVerticalIcon size={14} aria-hidden />
-        </span>
-
         {/* Type icon */}
         <span className="fav-item-icon" aria-hidden>
           <TabTypeIcon tab={tab} size={24} />

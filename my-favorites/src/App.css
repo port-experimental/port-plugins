@@ -179,6 +179,13 @@ body {
   transition: background 0.15s, color 0.15s, box-shadow 0.15s, opacity 0.15s;
 }
 
+.fav-tab-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
 .fav-tab:active {
   cursor: grabbing;
 }
@@ -424,10 +431,10 @@ body {
 .fav-item {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 14px;
   min-height: 64px;
-  padding: 10px 14px;
-  border-radius: 18px;
+  padding: 14px 16px;
+  border-radius: 12px;
   background: transparent;
   cursor: default;
   user-select: none;
@@ -490,7 +497,7 @@ body {
   align-items: center;
   flex: 1;
   min-width: 0;
-  gap: 8px;
+  gap: 10px;
   padding: 0;
   border: none;
   border-radius: var(--radius-sm);
