@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { type AnyFavorite } from "./FavoriteItem";
 import { EmptyState } from "./EmptyState";
+import { AddDropdown } from "./AddDropdown";
 import { FavoriteControls } from "./tab-content/FavoriteControls";
 import { DraggableFavoritesList } from "./tab-content/DraggableFavoritesList";
 import type {
@@ -44,6 +45,20 @@ export function TabContent({
   const [insertIdx, setInsertIdx] = useState<number | null>(null);
 
   useEffect(() => {
+    setAddOpen(false);
+    setAddSearch("");
+  }, [tab]);
+
+  const items: AnyFavorite[] =
+    tab === "pages"
+      ? favorites.pages
+      : tab === "selfService"
+      ? favorites.selfService
+      : favorites.entities;
+
+  const isEmpty = items.length === 0;
+
+  useEffect(() => {
     if (!addOpen) return;
     function handleOutside(e: MouseEvent) {
       if (controlsWrapRef.current && !controlsWrapRef.current.contains(e.target as Node)) {
@@ -53,13 +68,6 @@ export function TabContent({
     document.addEventListener("mousedown", handleOutside);
     return () => document.removeEventListener("mousedown", handleOutside);
   }, [addOpen]);
-
-  const items: AnyFavorite[] =
-    tab === "pages"
-      ? favorites.pages
-      : tab === "selfService"
-      ? favorites.selfService
-      : favorites.entities;
 
   function patch(newItems: AnyFavorite[]) {
     if (tab === "pages") {
@@ -120,34 +128,59 @@ export function TabContent({
       return title.includes(q) || identifier.includes(q);
     });
 
+  const addDropdown = addOpen ? (
+    <AddDropdown
+      tab={tab}
+      pages={pages}
+      actions={actions}
+      blueprints={blueprints}
+      alreadyAdded={new Set(items.map((i) => i.identifier))}
+      portToken={portToken}
+      portApiBaseUrl={portApiBaseUrl}
+      search={addSearch}
+      onSearchReset={() => setAddSearch("")}
+      onSearchChange={setAddSearch}
+      onAdd={handleAdd}
+      onClose={() => setAddOpen(false)}
+    />
+  ) : null;
+
   return (
     <div className="tab-content">
-      <div className="fav-list-controls-wrap" ref={controlsWrapRef}>
-        <FavoriteControls
-          tab={tab}
-          search={search}
-          onSearchChange={setSearch}
-          onSearchClear={() => setSearch("")}
-          addOpen={addOpen}
-          onToggleAdd={() => setAddOpen((v) => !v)}
-          pages={pages}
-          actions={actions}
-          blueprints={blueprints}
-          alreadyAdded={new Set(items.map((i) => i.identifier))}
-          portToken={portToken}
-          portApiBaseUrl={portApiBaseUrl}
-          addSearch={addSearch}
-          onAddSearchReset={() => setAddSearch("")}
-          onAddSearchChange={setAddSearch}
-          onAdd={handleAdd}
-          onCloseAdd={() => setAddOpen(false)}
-        />
-      </div>
-      <div className="fav-list-separator" aria-hidden />
+      {!isEmpty && (
+        <>
+          <div className="fav-list-controls-wrap" ref={controlsWrapRef}>
+            <FavoriteControls
+              tab={tab}
+              search={search}
+              onSearchChange={setSearch}
+              onSearchClear={() => setSearch("")}
+              addOpen={addOpen}
+              onToggleAdd={() => setAddOpen((v) => !v)}
+              pages={pages}
+              actions={actions}
+              blueprints={blueprints}
+              alreadyAdded={new Set(items.map((i) => i.identifier))}
+              portToken={portToken}
+              portApiBaseUrl={portApiBaseUrl}
+              addSearch={addSearch}
+              onAddSearchReset={() => setAddSearch("")}
+              onAddSearchChange={setAddSearch}
+              onAdd={handleAdd}
+              onCloseAdd={() => setAddOpen(false)}
+            />
+          </div>
+          <div className="fav-list-separator" aria-hidden />
+        </>
+      )}
 
-      <div className="fav-list-wrap">
-        {items.length === 0 ? (
-          <EmptyState tab={tab} />
+      <div className={`fav-list-wrap${isEmpty ? " fav-list-wrap--empty" : ""}`}>
+        {isEmpty ? (
+          <div className="empty-state-wrap" ref={controlsWrapRef}>
+            <EmptyState tab={tab} onAddClick={() => setAddOpen((v) => !v)}>
+              {addDropdown}
+            </EmptyState>
+          </div>
         ) : filteredItems.length === 0 ? (
           <p className="fav-list-empty-filter">No matching favorites</p>
         ) : (
