@@ -4,6 +4,7 @@ import { EmptyState } from "./EmptyState";
 import { AddDropdown } from "./AddDropdown";
 import { FavoriteControls } from "./tab-content/FavoriteControls";
 import { DraggableFavoritesList } from "./tab-content/DraggableFavoritesList";
+import { SearchNoResults } from "./SearchNoResults";
 import type {
   TabKey,
   FavoritesData,
@@ -190,7 +191,7 @@ export function TabContent({
             </EmptyState>
           </div>
         ) : filteredItems.length === 0 ? (
-          <p className="fav-list-empty-filter">No matching favorites</p>
+          <SearchNoResults />
         ) : (
           <DraggableFavoritesList
             tab={tab}

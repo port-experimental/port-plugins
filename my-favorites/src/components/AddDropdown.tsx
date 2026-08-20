@@ -4,6 +4,7 @@ import { fetchEntitiesForBlueprint } from "../api/entities";
 import { LoadingDots } from "./LoadingState";
 import { TabTypeIcon } from "./TabTypeIcon";
 import { BlueprintLabel } from "./BlueprintLabel";
+import { SearchNoResults } from "./SearchNoResults";
 import type {
   TabKey,
   PortPage,
@@ -213,7 +214,13 @@ export function AddDropdown({
             <LoadingDots />
           </li>
         ) : isEmpty ? (
-          <li className="add-panel-status add-panel-empty">No matching items</li>
+          q ? (
+            <li className="add-panel-empty-state" role="status">
+              <SearchNoResults />
+            </li>
+          ) : (
+            <li className="add-panel-status add-panel-empty">No matching items</li>
+          )
         ) : tab === "pages" ? (
           filteredPageItems.map((item) => {
             const isAdded = alreadyAdded.has(item.identifier);
