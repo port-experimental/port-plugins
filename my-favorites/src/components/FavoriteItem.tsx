@@ -3,6 +3,7 @@ import { showRunActionDialog } from "@port-labs/plugins-sdk";
 import type { TabKey, FavoritePage, FavoriteAction, FavoriteEntity } from "../types";
 import { DEV_MOCK } from "../hooks/usePostMessageData";
 import { TabTypeIcon } from "./TabTypeIcon";
+import { BlueprintLabel } from "./BlueprintLabel";
 import { ActionTooltip } from "./ActionTooltip";
 import {
   buildPageUrl,
@@ -119,10 +120,11 @@ export function FavoriteItem({
         </span>
 
         {tab === "entities" && (
-          <span className="fav-item-blueprint">
-            {(item as FavoriteEntity).blueprintTitle ??
-              (item as FavoriteEntity).blueprint}
-          </span>
+          <BlueprintLabel
+            title={(item as FavoriteEntity).blueprintTitle}
+            identifier={(item as FavoriteEntity).blueprint}
+            className="fav-item-blueprint"
+          />
         )}
 
       </button>

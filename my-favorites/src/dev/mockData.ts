@@ -85,6 +85,7 @@ export const MOCK_ACTIONS: PortAction[] = [
 
 export const MOCK_BLUEPRINTS: PortBlueprint[] = [
   { identifier: "service", title: "Service" },
+  { identifier: "task", title: "Task" },
   { identifier: "githubRepository", title: "Repository" },
   { identifier: "githubPullRequest", title: "Pull Request" },
   { identifier: "githubTeam", title: "GitHub Team" },
@@ -93,10 +94,14 @@ export const MOCK_BLUEPRINTS: PortBlueprint[] = [
 
 export const MOCK_ENTITIES: Record<string, PortEntity[]> = {
   service: [
+    { identifier: "entity-1", title: "Entity 1", blueprint: "service" },
+    { identifier: "entity-2", title: "Entity 2", blueprint: "service" },
     { identifier: "my-service", title: "My Service", blueprint: "service" },
     { identifier: "auth-service", title: "Auth Service", blueprint: "service" },
-    { identifier: "api-gateway", title: "API Gateway", blueprint: "service" },
-    { identifier: "payment-service", title: "Payment Service", blueprint: "service" },
+  ],
+  task: [
+    { identifier: "entity-3", title: "Entity 3", blueprint: "task" },
+    { identifier: "entity-4", title: "Entity 4", blueprint: "task" },
   ],
   githubRepository: [
     { identifier: "repo-frontend", title: "Frontend Repo", blueprint: "githubRepository" },

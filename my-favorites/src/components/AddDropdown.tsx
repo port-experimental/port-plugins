@@ -1,21 +1,15 @@
-import { useState } from "react";
-import {
-  ChevronLeftIcon,
-  SearchIcon,
-  XIcon,
-  CheckIcon,
-  LayersIcon,
-  ChevronRightIcon,
-} from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { SearchIcon, CheckIcon } from "lucide-react";
+import { useQueries } from "@tanstack/react-query";
 import { fetchEntitiesForBlueprint } from "../api/entities";
 import { LoadingDots } from "./LoadingState";
 import { TabTypeIcon } from "./TabTypeIcon";
+import { BlueprintLabel } from "./BlueprintLabel";
 import type {
   TabKey,
   PortPage,
   PortAction,
   PortBlueprint,
+  PortEntity,
   FavoritePage,
   FavoriteAction,
   FavoriteEntity,
@@ -36,14 +30,35 @@ type Props = {
   onClose: () => void;
 };
 
-type Stage = "main" | "entities";
-
 type ListItem = {
   identifier: string;
   title: string;
   subtitle?: string;
-  isBlueprintPicker?: boolean;
 };
+
+type EntityGroup = {
+  blueprint: PortBlueprint;
+  entities: PortEntity[];
+};
+
+function entityFavoriteKey(blueprintId: string, entityId: string) {
+  return `${blueprintId}:${entityId}`;
+}
+
+function entityMatchesSearch(
+  blueprint: PortBlueprint,
+  entity: PortEntity,
+  query: string
+) {
+  if (!query) return true;
+  const fields = [
+    entity.title,
+    entity.identifier,
+    blueprint.title,
+    blueprint.identifier,
+  ];
+  return fields.some((value) => (value ?? "").toLowerCase().includes(query));
+}
 
 export function AddDropdown({
   tab,
@@ -54,57 +69,49 @@ export function AddDropdown({
   portToken,
   portApiBaseUrl,
   search,
-  onSearchReset,
   onSearchChange,
   onAdd,
-  onClose,
 }: Props) {
-  const [stage, setStage] = useState<Stage>("main");
-  const [selectedBp, setSelectedBp] = useState<PortBlueprint | null>(null);
-  const entitiesQuery = useQuery({
-    queryKey: ["entities", selectedBp?.identifier, portToken],
-    queryFn: () =>
-      fetchEntitiesForBlueprint(portApiBaseUrl, portToken, selectedBp!.identifier),
-    enabled: tab === "entities" && stage === "entities" && !!selectedBp,
-    staleTime: 60_000,
+  const entityQueries = useQueries({
+    queries: blueprints.map((bp) => ({
+      queryKey: ["entities", bp.identifier, portToken],
+      queryFn: () =>
+        fetchEntitiesForBlueprint(portApiBaseUrl, portToken, bp.identifier),
+      enabled: tab === "entities",
+      staleTime: 60_000,
+    })),
   });
 
-  function handleGoBack() {
-    setStage("main");
-    setSelectedBp(null);
-    onSearchReset();
-  }
-
-  function buildListItems(): ListItem[] {
-    if (tab === "pages") {
-      return pages.filter(p => p.type !== "entity" && p.showInSidebar !== false).map((p) => ({
+  function buildPageItems(): ListItem[] {
+    return pages
+      .filter((p) => p.type !== "entity" && p.showInSidebar !== false)
+      .map((p) => ({
         identifier: p.identifier,
         title: p.title ?? p.identifier,
         subtitle: p.type === "blueprint-entities" ? "catalog" : p.type,
       }));
-    }
-    if (tab === "selfService") {
-      return actions.map((a) => ({
-        identifier: a.identifier,
-        title: a.title ?? a.identifier,
-        subtitle: a.description,
-      }));
-    }
-    if (stage === "main") {
-      return blueprints.map((b) => ({
-        identifier: b.identifier,
-        title: b.title ?? b.identifier,
-        isBlueprintPicker: true,
-      }));
-    }
-    return (entitiesQuery.data ?? []).map((e) => ({
-      identifier: e.identifier,
-      title: e.title ?? e.identifier,
+  }
+
+  function buildActionItems(): ListItem[] {
+    return actions.map((a) => ({
+      identifier: a.identifier,
+      title: a.title ?? a.identifier,
+      subtitle: a.description,
     }));
   }
 
+  function buildEntityGroups(): EntityGroup[] {
+    return blueprints
+      .map((blueprint, index) => ({
+        blueprint,
+        entities: entityQueries[index]?.data ?? [],
+      }))
+      .filter((group) => group.entities.length > 0);
+  }
+
   const q = search.trim().toLowerCase();
-  const filtered = buildListItems().filter((item) => {
+
+  const filteredPageItems = buildPageItems().filter((item) => {
     if (!q) return true;
     return (
       (item.title ?? "").toLowerCase().includes(q) ||
@@ -113,85 +120,86 @@ export function AddDropdown({
     );
   });
 
-  function handleSelect(identifier: string) {
-    if (tab === "entities" && stage === "main") {
-      const bp = blueprints.find((b) => b.identifier === identifier);
-      if (bp) {
-        setSelectedBp(bp);
-        setStage("entities");
-        onSearchReset();
-      }
-      return;
-    }
+  const filteredActionItems = buildActionItems().filter((item) => {
+    if (!q) return true;
+    return (
+      (item.title ?? "").toLowerCase().includes(q) ||
+      (item.identifier ?? "").toLowerCase().includes(q) ||
+      ((item.subtitle ?? "").toLowerCase().includes(q))
+    );
+  });
 
-    if (tab === "pages") {
-      const page = pages.find((p) => p.identifier === identifier);
-      if (page)
-        onAdd({
-          identifier: page.identifier,
-          title: page.title,
-          type: page.type === "blueprint-entities" ? "catalog" : page.type,
-          icon: page.type === "blueprint-entities" ? 'table-2' : 'layout-dashboard',
-        } satisfies FavoritePage);
-    } else if (tab === "selfService") {
-      const action = actions.find((a) => a.identifier === identifier);
-      if (action)
-        onAdd({
-          identifier: action.identifier,
-          title: action.title,
-          description: action.description,
-          blueprint: action.blueprint,
-        } satisfies FavoriteAction);
-    } else {
-      const entity = entitiesQuery.data?.find((e) => e.identifier === identifier);
-      if (entity && selectedBp)
-        onAdd({
-          identifier: entity.identifier,
-          title: entity.title ?? entity.identifier,
-          blueprint: selectedBp.identifier,
-          blueprintTitle: selectedBp.title,
-        } satisfies FavoriteEntity);
-    }
+  const filteredEntityGroups = buildEntityGroups()
+    .map((group) => ({
+      ...group,
+      entities: group.entities.filter((entity) =>
+        entityMatchesSearch(group.blueprint, entity, q)
+      ),
+    }))
+    .filter((group) => group.entities.length > 0);
+
+  function handlePageSelect(identifier: string) {
+    const page = pages.find((p) => p.identifier === identifier);
+    if (page)
+      onAdd({
+        identifier: page.identifier,
+        title: page.title,
+        type: page.type === "blueprint-entities" ? "catalog" : page.type,
+        icon: page.type === "blueprint-entities" ? "table-2" : "layout-dashboard",
+      } satisfies FavoritePage);
+  }
+
+  function handleActionSelect(identifier: string) {
+    const action = actions.find((a) => a.identifier === identifier);
+    if (action)
+      onAdd({
+        identifier: action.identifier,
+        title: action.title,
+        description: action.description,
+        blueprint: action.blueprint,
+      } satisfies FavoriteAction);
+  }
+
+  function handleEntitySelect(blueprint: PortBlueprint, entity: PortEntity) {
+    onAdd({
+      identifier: entity.identifier,
+      title: entity.title ?? entity.identifier,
+      blueprint: blueprint.identifier,
+      blueprintTitle: blueprint.title,
+    } satisfies FavoriteEntity);
   }
 
   const isEntityLoading =
     tab === "entities" &&
-    stage === "entities" &&
-    (entitiesQuery.isPending || entitiesQuery.isLoading);
+    entityQueries.some((query) => query.isPending || query.isLoading);
 
-  const showHeader = tab === "entities" && stage === "entities";
+  const entityGroupCount = filteredEntityGroups.reduce(
+    (count, group) => count + group.entities.length,
+    0
+  );
+
+  const isEmpty =
+    tab === "pages"
+      ? filteredPageItems.length === 0
+      : tab === "selfService"
+      ? filteredActionItems.length === 0
+      : !isEntityLoading && entityGroupCount === 0;
 
   return (
     <div className="add-panel">
-      {showHeader && (
-        <div className="add-panel-header">
-          <button
-            type="button"
-            className="add-panel-back-btn"
-            aria-label="Back to blueprints"
-            onClick={handleGoBack}
-          >
-            <ChevronLeftIcon size={13} aria-hidden />
-            <span>{selectedBp?.title ?? "Back"}</span>
-          </button>
-          <button
-            type="button"
-            className="add-panel-close-btn"
-            aria-label="Close"
-            onClick={onClose}
-          >
-            <XIcon size={14} aria-hidden />
-          </button>
-        </div>
-      )}
-
       <div className="add-panel-search">
         <div className="add-search-shell">
           <SearchIcon size={15} className="add-search-icon" aria-hidden />
           <input
             type="text"
             className="add-search-input"
-            placeholder={tab === "pages" ? "Search pages" : tab === "selfService" ? "Search actions" : "Search entities"}
+            placeholder={
+              tab === "pages"
+                ? "Search pages"
+                : tab === "selfService"
+                ? "Search actions"
+                : "Search entities"
+            }
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
             aria-label="Search items to add"
@@ -199,23 +207,16 @@ export function AddDropdown({
         </div>
       </div>
 
-      {/* Results list */}
       <ul className="add-panel-list" role="listbox">
-        {isEntityLoading ? (
+        {tab === "entities" && isEntityLoading ? (
           <li className="add-panel-status">
             <LoadingDots />
           </li>
-        ) : filtered.length === 0 ? (
-          <li className="add-panel-status add-panel-empty">
-            No matching items
-          </li>
-        ) : (
-          filtered.map((item) => {
-            const isAdded =
-              tab !== "entities" || stage === "entities"
-                ? alreadyAdded.has(item.identifier)
-                : false;
-
+        ) : isEmpty ? (
+          <li className="add-panel-status add-panel-empty">No matching items</li>
+        ) : tab === "pages" ? (
+          filteredPageItems.map((item) => {
+            const isAdded = alreadyAdded.has(item.identifier);
             return (
               <li key={item.identifier} role="option" aria-selected={false}>
                 <button
@@ -227,29 +228,94 @@ export function AddDropdown({
                   ]
                     .filter(Boolean)
                     .join(" ")}
-                  onClick={() => !isAdded && handleSelect(item.identifier)}
+                  onClick={() => !isAdded && handlePageSelect(item.identifier)}
                 >
                   <span className="add-item-icon" aria-hidden>
-                    {item.isBlueprintPicker ? (
-                      <LayersIcon size={13} />
-                    ) : tab === "entities" && stage === "entities" ? (
-                      <TabTypeIcon tab="entities" size={16} />
-                    ) : tab === "selfService" ? (
-                      <TabTypeIcon tab="selfService" size={16} />
-                    ) : (
-                      <TabTypeIcon tab="pages" size={16} />
-                    )}
+                    <TabTypeIcon tab="pages" size={16} />
                   </span>
                   <span className="add-item-title">{item.title}</span>
                   {isAdded ? (
                     <CheckIcon size={13} className="add-item-check" aria-hidden />
-                  ) : item.isBlueprintPicker ? (
-                    <ChevronRightIcon size={13} className="add-item-chevron" aria-hidden />
                   ) : null}
                 </button>
               </li>
             );
           })
+        ) : tab === "selfService" ? (
+          filteredActionItems.map((item) => {
+            const isAdded = alreadyAdded.has(item.identifier);
+            return (
+              <li key={item.identifier} role="option" aria-selected={false}>
+                <button
+                  type="button"
+                  disabled={isAdded}
+                  className={[
+                    "add-panel-item",
+                    isAdded ? "add-panel-item--added" : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
+                  onClick={() => !isAdded && handleActionSelect(item.identifier)}
+                >
+                  <span className="add-item-icon" aria-hidden>
+                    <TabTypeIcon tab="selfService" size={16} />
+                  </span>
+                  <span className="add-item-title">{item.title}</span>
+                  {isAdded ? (
+                    <CheckIcon size={13} className="add-item-check" aria-hidden />
+                  ) : null}
+                </button>
+              </li>
+            );
+          })
+        ) : (
+          filteredEntityGroups.flatMap((group) => [
+            <li
+              key={`header-${group.blueprint.identifier}`}
+              className="add-panel-group-header"
+              role="presentation"
+            >
+              {group.blueprint.title ?? group.blueprint.identifier}
+            </li>,
+            ...group.entities.map((entity) => {
+              const key = entityFavoriteKey(
+                group.blueprint.identifier,
+                entity.identifier
+              );
+              const isAdded = alreadyAdded.has(key);
+              return (
+                <li key={key} role="option" aria-selected={false}>
+                  <button
+                    type="button"
+                    disabled={isAdded}
+                    className={[
+                      "add-panel-item",
+                      isAdded ? "add-panel-item--added" : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
+                    onClick={() =>
+                      !isAdded && handleEntitySelect(group.blueprint, entity)
+                    }
+                  >
+                    <span className="add-item-icon" aria-hidden>
+                      <TabTypeIcon tab="entities" size={16} />
+                    </span>
+                    <span className="add-item-title">
+                      {entity.title ?? entity.identifier}
+                    </span>
+                    <BlueprintLabel
+                      title={group.blueprint.title}
+                      identifier={group.blueprint.identifier}
+                    />
+                    {isAdded ? (
+                      <CheckIcon size={13} className="add-item-check" aria-hidden />
+                    ) : null}
+                  </button>
+                </li>
+              );
+            }),
+          ])
         )}
       </ul>
     </div>

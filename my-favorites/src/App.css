@@ -596,10 +596,13 @@ body {
 }
 
 .fav-item-blueprint {
+  margin-left: 12px;
+}
+
+.blueprint-label {
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
-  margin-left: 12px;
   height: 24px;
   padding: 0 8px;
   border-radius: 8px;
@@ -780,7 +783,7 @@ body {
   z-index: 50;
   display: flex;
   flex-direction: column;
-  max-height: 200px;
+  max-height: 240px;
   border: 1px solid var(--border);
   border-radius: 14px;
   background: #ffffff;
@@ -942,6 +945,8 @@ body {
   width: 100%;
   padding: 10px 12px;
   height: 36px;
+  margin-top: 4px;
+  margin-bottom: 4px;
   border: none;
   border-radius: var(--radius-sm);
   background: transparent;
@@ -979,6 +984,18 @@ body {
 
 .add-item-sub {
   display: none;
+}
+
+.add-panel-group-header {
+  padding: 8px 12px 8px;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.2;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.add-panel-group-header:first-child {
+  padding-top: 4px;
 }
 
 .add-item-check {

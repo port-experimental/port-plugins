@@ -128,13 +128,21 @@ export function TabContent({
       return title.includes(q) || identifier.includes(q);
     });
 
+  const alreadyAdded = new Set(
+    items.map((i) =>
+      tab === "entities"
+        ? `${(i as FavoriteEntity).blueprint}:${i.identifier}`
+        : i.identifier
+    )
+  );
+
   const addDropdown = addOpen ? (
     <AddDropdown
       tab={tab}
       pages={pages}
       actions={actions}
       blueprints={blueprints}
-      alreadyAdded={new Set(items.map((i) => i.identifier))}
+      alreadyAdded={alreadyAdded}
       portToken={portToken}
       portApiBaseUrl={portApiBaseUrl}
       search={addSearch}
@@ -160,7 +168,7 @@ export function TabContent({
               pages={pages}
               actions={actions}
               blueprints={blueprints}
-              alreadyAdded={new Set(items.map((i) => i.identifier))}
+              alreadyAdded={alreadyAdded}
               portToken={portToken}
               portApiBaseUrl={portApiBaseUrl}
               addSearch={addSearch}
