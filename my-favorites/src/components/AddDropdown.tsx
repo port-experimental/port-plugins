@@ -14,12 +14,16 @@ import type {
   FavoritePage,
   FavoriteAction,
   FavoriteEntity,
+  SelfServiceKind,
 } from "../types";
+import type { SelfServiceWorkflowPickerItem } from "../api/workflows";
+import { selfServiceFavoriteKey } from "../api/workflows";
 
 type Props = {
   tab: TabKey;
   pages: PortPage[];
   actions: PortAction[];
+  workflows: SelfServiceWorkflowPickerItem[];
   blueprints: PortBlueprint[];
   alreadyAdded: Set<string>;
   portToken: string;
@@ -32,9 +36,12 @@ type Props = {
 };
 
 type ListItem = {
+  key: string;
   identifier: string;
   title: string;
   subtitle?: string;
+  kind?: SelfServiceKind;
+  triggerIdentifier?: string;
 };
 
 type EntityGroup = {
@@ -65,6 +72,7 @@ export function AddDropdown({
   tab,
   pages,
   actions,
+  workflows,
   blueprints,
   alreadyAdded,
   portToken,
@@ -87,6 +95,7 @@ export function AddDropdown({
     return pages
       .filter((p) => p.type !== "entity" && p.showInSidebar !== false)
       .map((p) => ({
+        key: p.identifier,
         identifier: p.identifier,
         title: p.title ?? p.identifier,
         subtitle: p.type === "blueprint-entities" ? "catalog" : p.type,
@@ -95,10 +104,33 @@ export function AddDropdown({
 
   function buildActionItems(): ListItem[] {
     return actions.map((a) => ({
+      key: selfServiceFavoriteKey("action", a.identifier),
+      kind: "action" as const,
       identifier: a.identifier,
       title: a.title ?? a.identifier,
       subtitle: a.description,
     }));
+  }
+
+  function buildWorkflowItems(): ListItem[] {
+    return workflows.map((w) => ({
+      key: selfServiceFavoriteKey(
+        "workflow",
+        w.workflowIdentifier,
+        w.triggerIdentifier
+      ),
+      kind: "workflow" as const,
+      identifier: w.workflowIdentifier,
+      triggerIdentifier: w.triggerIdentifier,
+      title: w.title,
+      subtitle: w.description,
+    }));
+  }
+
+  function buildSelfServiceItems(): ListItem[] {
+    return [...buildActionItems(), ...buildWorkflowItems()].sort((a, b) =>
+      a.title.localeCompare(b.title, undefined, { sensitivity: "base" })
+    );
   }
 
   function buildEntityGroups(): EntityGroup[] {
@@ -121,13 +153,15 @@ export function AddDropdown({
     );
   });
 
-  const filteredActionItems = buildActionItems().filter((item) => {
+  const filteredSelfServiceItems = buildSelfServiceItems().filter((item) => {
     if (!q) return true;
-    return (
-      (item.title ?? "").toLowerCase().includes(q) ||
-      (item.identifier ?? "").toLowerCase().includes(q) ||
-      ((item.subtitle ?? "").toLowerCase().includes(q))
-    );
+    const fields = [
+      item.title,
+      item.identifier,
+      item.subtitle,
+      item.triggerIdentifier,
+    ];
+    return fields.some((value) => (value ?? "").toLowerCase().includes(q));
   });
 
   const filteredEntityGroups = buildEntityGroups()
@@ -154,11 +188,39 @@ export function AddDropdown({
     const action = actions.find((a) => a.identifier === identifier);
     if (action)
       onAdd({
+        type: "action",
         identifier: action.identifier,
         title: action.title,
         description: action.description,
         blueprint: action.blueprint,
       } satisfies FavoriteAction);
+  }
+
+  function handleWorkflowSelect(
+    workflowIdentifier: string,
+    triggerIdentifier: string
+  ) {
+    const workflow = workflows.find(
+      (w) =>
+        w.workflowIdentifier === workflowIdentifier &&
+        w.triggerIdentifier === triggerIdentifier
+    );
+    if (workflow)
+      onAdd({
+        type: "workflow",
+        identifier: workflow.workflowIdentifier,
+        triggerIdentifier: workflow.triggerIdentifier,
+        title: workflow.title,
+        description: workflow.description,
+      } satisfies FavoriteAction);
+  }
+
+  function handleSelfServiceSelect(item: ListItem) {
+    if (item.kind === "workflow" && item.triggerIdentifier) {
+      handleWorkflowSelect(item.identifier, item.triggerIdentifier);
+      return;
+    }
+    handleActionSelect(item.identifier);
   }
 
   function handleEntitySelect(blueprint: PortBlueprint, entity: PortEntity) {
@@ -183,7 +245,7 @@ export function AddDropdown({
     tab === "pages"
       ? filteredPageItems.length === 0
       : tab === "selfService"
-      ? filteredActionItems.length === 0
+      ? filteredSelfServiceItems.length === 0
       : !isEntityLoading && entityGroupCount === 0;
 
   return (
@@ -198,7 +260,7 @@ export function AddDropdown({
               tab === "pages"
                 ? "Search pages"
                 : tab === "selfService"
-                ? "Search actions"
+                ? "Search actions and workflows"
                 : "Search entities"
             }
             value={search}
@@ -249,10 +311,10 @@ export function AddDropdown({
             );
           })
         ) : tab === "selfService" ? (
-          filteredActionItems.map((item) => {
-            const isAdded = alreadyAdded.has(item.identifier);
+          filteredSelfServiceItems.map((item) => {
+            const isAdded = alreadyAdded.has(item.key);
             return (
-              <li key={item.identifier} role="option" aria-selected={false}>
+              <li key={item.key} role="option" aria-selected={false}>
                 <button
                   type="button"
                   disabled={isAdded}
@@ -262,7 +324,7 @@ export function AddDropdown({
                   ]
                     .filter(Boolean)
                     .join(" ")}
-                  onClick={() => !isAdded && handleActionSelect(item.identifier)}
+                  onClick={() => !isAdded && handleSelfServiceSelect(item)}
                 >
                   <span className="add-item-icon" aria-hidden>
                     <TabTypeIcon tab="selfService" size={16} />

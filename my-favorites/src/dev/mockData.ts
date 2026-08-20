@@ -13,10 +13,18 @@ export const MOCK_FAVORITES: FavoritesData = {
   ],
   selfService: [
     {
+      type: "action",
       identifier: "scaffold_service",
       title: "Scaffold Service",
       description: "Create a new service",
       blueprint: "service",
+    },
+    {
+      type: "workflow",
+      identifier: "deploy-service",
+      triggerIdentifier: "trigger",
+      title: "Deploy Service",
+      description: "Deploy a service to an environment",
     },
   ],
   entities: [
@@ -80,6 +88,27 @@ export const MOCK_ACTIONS: PortAction[] = [
     title: "Run Security Scan",
     description: "Trigger a Snyk security scan",
     blueprint: "service",
+  },
+];
+
+export const MOCK_WORKFLOW_TRIGGERS = [
+  {
+    workflowIdentifier: "deploy-service",
+    triggerIdentifier: "trigger",
+    title: "Deploy Service",
+    description: "Deploy a service to staging or production",
+  },
+  {
+    workflowIdentifier: "onboard-developer",
+    triggerIdentifier: "self_serve",
+    title: "Onboard Developer",
+    description: "Provision accounts and access for a new developer",
+  },
+  {
+    workflowIdentifier: "incident-response",
+    triggerIdentifier: "create_incident",
+    title: "Create Incident",
+    description: "Open an incident and notify on-call",
   },
 ];
 

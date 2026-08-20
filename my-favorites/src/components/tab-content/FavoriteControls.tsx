@@ -9,6 +9,7 @@ import type {
   PortAction,
   PortBlueprint,
 } from "../../types";
+import type { SelfServiceWorkflowPickerItem } from "../../api/workflows";
 
 const TAB_ADD_LABEL: Record<TabKey, string> = {
   pages: "Page",
@@ -31,6 +32,7 @@ type Props = {
   onToggleAdd: () => void;
   pages: PortPage[];
   actions: PortAction[];
+  workflows: SelfServiceWorkflowPickerItem[];
   blueprints: PortBlueprint[];
   alreadyAdded: Set<string>;
   portToken: string;
@@ -51,6 +53,7 @@ export function FavoriteControls({
   onToggleAdd,
   pages,
   actions,
+  workflows,
   blueprints,
   alreadyAdded,
   portToken,
@@ -99,6 +102,7 @@ export function FavoriteControls({
           tab={tab}
           pages={pages}
           actions={actions}
+          workflows={workflows}
           blueprints={blueprints}
           alreadyAdded={alreadyAdded}
           portToken={portToken}

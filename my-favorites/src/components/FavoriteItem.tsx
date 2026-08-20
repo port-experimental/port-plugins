@@ -1,5 +1,5 @@
 import { Link2Icon, StarIcon } from "lucide-react";
-import { showRunActionDialog } from "@port-labs/plugins-sdk";
+import { showRunActionDialog, showRunWorkflowDialog } from "@port-labs/plugins-sdk";
 import type { TabKey, FavoritePage, FavoriteAction, FavoriteEntity } from "../types";
 import { DEV_MOCK } from "../hooks/usePostMessageData";
 import { TabTypeIcon } from "./TabTypeIcon";
@@ -8,6 +8,8 @@ import { ActionTooltip } from "./ActionTooltip";
 import {
   buildPageUrl,
   buildEntityPageUrl,
+  buildSelfServiceActionUrl,
+  buildWorkflowManagementUrl,
 } from "../utils/portalUrl";
 
 export type AnyFavorite = FavoritePage | FavoriteAction | FavoriteEntity;
@@ -31,13 +33,27 @@ function getItemUrl(tab: TabKey, item: AnyFavorite): string | null {
   if (tab === "entities") {
     return buildEntityPageUrl((item as FavoriteEntity).blueprint, item.identifier);
   }
+  if (tab === "selfService") {
+    const self = item as FavoriteAction;
+    return self.type === "workflow"
+      ? buildWorkflowManagementUrl()
+      : buildSelfServiceActionUrl();
+  }
   return null;
 }
 
 function handleItemClick(tab: TabKey, item: AnyFavorite) {
   if (tab === "selfService") {
     if (!DEV_MOCK) {
-      showRunActionDialog((item as FavoriteAction).identifier);
+      const self = item as FavoriteAction;
+      if (self.type === "workflow") {
+        showRunWorkflowDialog({
+          workflowIdentifier: self.identifier,
+          triggerIdentifier: self.triggerIdentifier!,
+        });
+      } else {
+        showRunActionDialog(self.identifier);
+      }
     }
     return;
   }
@@ -137,7 +153,8 @@ export function FavoriteItem({
             aria-label={`Copy link for ${item.title}`}
             onClick={async (e) => {
               e.stopPropagation();
-              const url = getItemUrl(tab, item) ?? item.identifier;
+              const url = getItemUrl(tab, item);
+              if (!url) return;
               try {
                 await navigator.clipboard.writeText(url);
               } catch {

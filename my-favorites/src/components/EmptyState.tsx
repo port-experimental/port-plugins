@@ -17,9 +17,9 @@ const MESSAGES: Record<
     buttonLabel: "Entity",
   },
   selfService: {
-    heading: "There are no favorite actions",
-    hint: "Add an action as a favorite to display it here",
-    buttonLabel: "Action",
+    heading: "There are no favorite actions or workflows",
+    hint: "Add an action or workflow as a favorite to display it here",
+    buttonLabel: "Self service",
   },
 };
 

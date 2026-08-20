@@ -34,8 +34,12 @@ export type FavoritePage = {
   icon?: string;
 };
 
+export type SelfServiceKind = "action" | "workflow";
+
 export type FavoriteAction = {
+  type: SelfServiceKind;
   identifier: string;
+  triggerIdentifier?: string;
   title: string;
   description?: string;
   blueprint?: string;

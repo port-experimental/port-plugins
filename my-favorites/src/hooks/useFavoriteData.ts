@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { fetchUserEntity, patchUserFavorites } from "../api/user";
 import { fetchPages } from "../api/pages";
 import { fetchActions } from "../api/actions";
+import { fetchSelfServiceWorkflowTriggers } from "../api/workflows";
 import { fetchBlueprints } from "../api/blueprints";
 import type { FavoritesData } from "../types";
 
@@ -61,6 +62,13 @@ export function useFavoriteData(
     staleTime: 10 * 60_000,
   });
 
+  const workflowsQuery = useQuery({
+    queryKey: ["workflows", portToken],
+    queryFn: () => fetchSelfServiceWorkflowTriggers(portApiBaseUrl!, portToken!),
+    enabled,
+    staleTime: 10 * 60_000,
+  });
+
   const blueprintsQuery = useQuery({
     queryKey: ["blueprints", portToken],
     queryFn: () => fetchBlueprints(portApiBaseUrl!, portToken!),
@@ -101,6 +109,7 @@ export function useFavoriteData(
     userEntityQuery,
     pagesQuery,
     actionsQuery,
+    workflowsQuery,
     blueprintsQuery,
     saveMutation,
   };

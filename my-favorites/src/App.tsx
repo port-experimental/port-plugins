@@ -39,7 +39,7 @@ export function App() {
 
   const { portToken, portApiBaseUrl, user } = usePostMessageData();
 
-  const { userEntityQuery, pagesQuery, actionsQuery, blueprintsQuery, saveMutation } =
+  const { userEntityQuery, pagesQuery, actionsQuery, workflowsQuery, blueprintsQuery, saveMutation } =
     useFavoriteData(portToken, portApiBaseUrl, user?.email);
 
   // Initialise favorites (and active tab) from server data once
@@ -183,6 +183,7 @@ export function App() {
             favorites={favorites}
             pages={pagesQuery.data ?? []}
             actions={actionsQuery.data ?? []}
+            workflows={workflowsQuery.data ?? []}
             blueprints={blueprintsQuery.data ?? []}
             portToken={portToken}
             portApiBaseUrl={portApiBaseUrl}

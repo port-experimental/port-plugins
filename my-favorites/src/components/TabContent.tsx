@@ -15,12 +15,15 @@ import type {
   PortAction,
   PortBlueprint,
 } from "../types";
+import type { SelfServiceWorkflowPickerItem } from "../api/workflows";
+import { selfServiceFavoriteKey } from "../api/workflows";
 
 type Props = {
   tab: TabKey;
   favorites: FavoritesData;
   pages: PortPage[];
   actions: PortAction[];
+  workflows: SelfServiceWorkflowPickerItem[];
   blueprints: PortBlueprint[];
   portToken: string;
   portApiBaseUrl: string;
@@ -32,6 +35,7 @@ export function TabContent({
   favorites,
   pages,
   actions,
+  workflows,
   blueprints,
   portToken,
   portApiBaseUrl,
@@ -130,11 +134,20 @@ export function TabContent({
     });
 
   const alreadyAdded = new Set(
-    items.map((i) =>
-      tab === "entities"
-        ? `${(i as FavoriteEntity).blueprint}:${i.identifier}`
-        : i.identifier
-    )
+    items.map((i) => {
+      if (tab === "entities") {
+        return `${(i as FavoriteEntity).blueprint}:${i.identifier}`;
+      }
+      if (tab === "selfService") {
+        const self = i as FavoriteAction;
+        return selfServiceFavoriteKey(
+          self.type,
+          self.identifier,
+          self.triggerIdentifier
+        );
+      }
+      return i.identifier;
+    })
   );
 
   const addDropdown = addOpen ? (
@@ -142,6 +155,7 @@ export function TabContent({
       tab={tab}
       pages={pages}
       actions={actions}
+      workflows={workflows}
       blueprints={blueprints}
       alreadyAdded={alreadyAdded}
       portToken={portToken}
@@ -168,6 +182,7 @@ export function TabContent({
               onToggleAdd={() => setAddOpen((v) => !v)}
               pages={pages}
               actions={actions}
+              workflows={workflows}
               blueprints={blueprints}
               alreadyAdded={alreadyAdded}
               portToken={portToken}

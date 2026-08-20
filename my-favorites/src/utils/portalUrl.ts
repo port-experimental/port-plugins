@@ -15,9 +15,12 @@ export function buildPageUrl(pageIdentifier: string): string {
   return `${origin}/${encodeURIComponent(pageIdentifier)}`;
 }
 
-export function buildActionUrl(actionIdentifier: string): string {
-  const origin = getPortalOrigin();
-  return `${origin}/self-service?activeActionIdentifier=${encodeURIComponent(actionIdentifier)}`;
+export function buildSelfServiceActionUrl(): string {
+  return `${getPortalOrigin()}/workflows/self-service`;
+}
+
+export function buildWorkflowManagementUrl(): string {
+  return `${getPortalOrigin()}/workflows/workflows-management`;
 }
 
 export function buildEntityPageUrl(
