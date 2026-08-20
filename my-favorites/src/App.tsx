@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, type ReactNode } from "react";
+import { useState, useEffect, useCallback, useRef, type ReactNode } from "react";
 import { RefreshCwIcon } from "lucide-react";
 import "./App.css";
 import { usePostMessageData } from "./hooks/usePostMessageData";
@@ -30,6 +30,7 @@ export function App() {
   const [favorites, setFavorites] = useState<FavoritesData>(EMPTY_FAVORITES);
   const [initialized, setInitialized] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const initialRefreshStarted = useRef(false);
 
   // Tab drag state
   const [tabDragIdx, setTabDragIdx]     = useState<number | null>(null);
@@ -51,18 +52,54 @@ export function App() {
     refreshFavorites,
   } = useFavoriteData(portToken, portApiBaseUrl, user?.email);
 
-  // Initialise favorites (and active tab) from server data once
+  const applyFavorites = useCallback((next: FavoritesData) => {
+    setFavorites(next);
+    if (next.tabOrder && next.tabOrder.length > 0) {
+      setActiveTab(next.tabOrder[0]);
+    }
+  }, []);
+
+  const runRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      const { reconciled, changed } = await refreshFavorites();
+      applyFavorites(reconciled);
+      if (changed && userEntityQuery.data) {
+        saveMutation.mutate({
+          favorites: reconciled,
+          userIdentifier: userEntityQuery.data.identifier,
+        });
+      }
+      return true;
+    } catch (error) {
+      console.error("Failed to refresh favorites:", error);
+      return false;
+    } finally {
+      setRefreshing(false);
+    }
+  }, [refreshFavorites, applyFavorites, userEntityQuery.data, saveMutation]);
+
+  // Sync favorites against Port on initial load
   useEffect(() => {
-    if (!initialized && userEntityQuery.isSuccess && userEntityQuery.data) {
-      const parsed = parseFavorites(userEntityQuery.data.properties?.favorites);
-      setFavorites(parsed);
-      // Restore the first tab in the saved order
-      if (parsed.tabOrder && parsed.tabOrder.length > 0) {
-        setActiveTab(parsed.tabOrder[0]);
+    if (
+      initialRefreshStarted.current ||
+      initialized ||
+      !userEntityQuery.isSuccess ||
+      !userEntityQuery.data
+    ) {
+      return;
+    }
+    initialRefreshStarted.current = true;
+    const userEntity = userEntityQuery.data;
+
+    void (async () => {
+      const ok = await runRefresh();
+      if (!ok) {
+        applyFavorites(parseFavorites(userEntity.properties?.favorites));
       }
       setInitialized(true);
-    }
-  }, [initialized, userEntityQuery.isSuccess, userEntityQuery.data]);
+    })();
+  }, [initialized, userEntityQuery.isSuccess, userEntityQuery.data, runRefresh, applyFavorites]);
 
   const updateFavorites = useCallback(
     (next: FavoritesData) => {
@@ -78,22 +115,8 @@ export function App() {
   );
 
   const handleRefresh = useCallback(async () => {
-    setRefreshing(true);
-    try {
-      const { reconciled, changed } = await refreshFavorites();
-      setFavorites(reconciled);
-      if (changed && userEntityQuery.data) {
-        saveMutation.mutate({
-          favorites: reconciled,
-          userIdentifier: userEntityQuery.data.identifier,
-        });
-      }
-    } catch (error) {
-      console.error("Failed to refresh favorites:", error);
-    } finally {
-      setRefreshing(false);
-    }
-  }, [refreshFavorites, userEntityQuery.data, saveMutation]);
+    await runRefresh();
+  }, [runRefresh]);
 
   if (!portApiBaseUrl || !portToken) {
     return (
@@ -103,7 +126,11 @@ export function App() {
     );
   }
 
-  if (userEntityQuery.isPending || userEntityQuery.isLoading) {
+  if (
+    userEntityQuery.isPending ||
+    userEntityQuery.isLoading ||
+    !initialized
+  ) {
     return (
       <div className="shell">
         <LoadingState message="Loading your favorites…" />
