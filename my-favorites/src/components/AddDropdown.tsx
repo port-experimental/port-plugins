@@ -42,16 +42,18 @@ type ListItem = {
   subtitle?: string;
   kind?: SelfServiceKind;
   triggerIdentifier?: string;
+  category?: string;
+};
+
+type SelfServiceGroup = {
+  category: string;
+  items: ListItem[];
 };
 
 type EntityGroup = {
   blueprint: PortBlueprint;
   entities: PortEntity[];
 };
-
-function entityFavoriteKey(blueprintId: string, entityId: string) {
-  return `${blueprintId}:${entityId}`;
-}
 
 function entityMatchesSearch(
   blueprint: PortBlueprint,
@@ -64,6 +66,62 @@ function entityMatchesSearch(
     entity.identifier,
     blueprint.title,
     blueprint.identifier,
+  ];
+  return fields.some((value) => (value ?? "").toLowerCase().includes(query));
+}
+
+function entityFavoriteKey(blueprintId: string, entityId: string) {
+  return `${blueprintId}:${entityId}`;
+}
+
+const OTHER = "Other";
+
+function capitalizeCategory(value: string): string {
+  const trimmed = value.trim();
+  if (!trimmed) return OTHER;
+  return trimmed.charAt(0).toUpperCase() + trimmed.slice(1).toLowerCase();
+}
+
+function actionCategory(action: PortAction): string {
+  const operation = action.trigger?.operation?.trim();
+  if (!operation) return OTHER;
+  return capitalizeCategory(operation);
+}
+
+function workflowCategory(workflow: SelfServiceWorkflowPickerItem): string {
+  const category = workflow.category?.trim();
+  if (!category) return OTHER;
+  return capitalizeCategory(category);
+}
+
+function groupSelfServiceItems(items: ListItem[]): SelfServiceGroup[] {
+  const groups = new Map<string, ListItem[]>();
+
+  for (const item of items) {
+    const category = item.category ?? OTHER;
+    const bucket = groups.get(category) ?? [];
+    bucket.push({ ...item, category });
+    groups.set(category, bucket);
+  }
+
+  return [...groups.entries()]
+    .sort(([a], [b]) => a.localeCompare(b, undefined, { sensitivity: "base" }))
+    .map(([category, groupItems]) => ({
+      category,
+      items: groupItems.sort((a, b) =>
+        a.title.localeCompare(b.title, undefined, { sensitivity: "base" })
+      ),
+    }));
+}
+
+function selfServiceItemMatchesSearch(item: ListItem, query: string): boolean {
+  if (!query) return true;
+  const fields = [
+    item.title,
+    item.identifier,
+    item.subtitle,
+    item.triggerIdentifier,
+    item.category,
   ];
   return fields.some((value) => (value ?? "").toLowerCase().includes(query));
 }
@@ -109,6 +167,7 @@ export function AddDropdown({
       identifier: a.identifier,
       title: a.title ?? a.identifier,
       subtitle: a.description,
+      category: actionCategory(a),
     }));
   }
 
@@ -124,13 +183,12 @@ export function AddDropdown({
       triggerIdentifier: w.triggerIdentifier,
       title: w.title,
       subtitle: w.description,
+      category: workflowCategory(w),
     }));
   }
 
-  function buildSelfServiceItems(): ListItem[] {
-    return [...buildActionItems(), ...buildWorkflowItems()].sort((a, b) =>
-      a.title.localeCompare(b.title, undefined, { sensitivity: "base" })
-    );
+  function buildSelfServiceGroups(): SelfServiceGroup[] {
+    return groupSelfServiceItems([...buildActionItems(), ...buildWorkflowItems()]);
   }
 
   function buildEntityGroups(): EntityGroup[] {
@@ -153,16 +211,17 @@ export function AddDropdown({
     );
   });
 
-  const filteredSelfServiceItems = buildSelfServiceItems().filter((item) => {
-    if (!q) return true;
-    const fields = [
-      item.title,
-      item.identifier,
-      item.subtitle,
-      item.triggerIdentifier,
-    ];
-    return fields.some((value) => (value ?? "").toLowerCase().includes(q));
-  });
+  const filteredSelfServiceGroups = buildSelfServiceGroups()
+    .map((group) => ({
+      ...group,
+      items: group.items.filter((item) => selfServiceItemMatchesSearch(item, q)),
+    }))
+    .filter((group) => group.items.length > 0);
+
+  const filteredSelfServiceItemCount = filteredSelfServiceGroups.reduce(
+    (count, group) => count + group.items.length,
+    0
+  );
 
   const filteredEntityGroups = buildEntityGroups()
     .map((group) => ({
@@ -245,7 +304,7 @@ export function AddDropdown({
     tab === "pages"
       ? filteredPageItems.length === 0
       : tab === "selfService"
-      ? filteredSelfServiceItems.length === 0
+      ? filteredSelfServiceItemCount === 0
       : !isEntityLoading && entityGroupCount === 0;
 
   return (
@@ -311,32 +370,41 @@ export function AddDropdown({
             );
           })
         ) : tab === "selfService" ? (
-          filteredSelfServiceItems.map((item) => {
-            const isAdded = alreadyAdded.has(item.key);
-            return (
-              <li key={item.key} role="option" aria-selected={false}>
-                <button
-                  type="button"
-                  disabled={isAdded}
-                  className={[
-                    "add-panel-item",
-                    isAdded ? "add-panel-item--added" : "",
-                  ]
-                    .filter(Boolean)
-                    .join(" ")}
-                  onClick={() => !isAdded && handleSelfServiceSelect(item)}
-                >
-                  <span className="add-item-icon" aria-hidden>
-                    <TabTypeIcon tab="selfService" size={16} />
-                  </span>
-                  <span className="add-item-title">{item.title}</span>
-                  {isAdded ? (
-                    <CheckIcon size={13} className="add-item-check" aria-hidden />
-                  ) : null}
-                </button>
-              </li>
-            );
-          })
+          filteredSelfServiceGroups.flatMap((group) => [
+            <li
+              key={`header-${group.category}`}
+              className="add-panel-group-header"
+              role="presentation"
+            >
+              {group.category}
+            </li>,
+            ...group.items.map((item) => {
+              const isAdded = alreadyAdded.has(item.key);
+              return (
+                <li key={item.key} role="option" aria-selected={false}>
+                  <button
+                    type="button"
+                    disabled={isAdded}
+                    className={[
+                      "add-panel-item",
+                      isAdded ? "add-panel-item--added" : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
+                    onClick={() => !isAdded && handleSelfServiceSelect(item)}
+                  >
+                    <span className="add-item-icon" aria-hidden>
+                      <TabTypeIcon tab="selfService" size={16} />
+                    </span>
+                    <span className="add-item-title">{item.title}</span>
+                    {isAdded ? (
+                      <CheckIcon size={13} className="add-item-check" aria-hidden />
+                    ) : null}
+                  </button>
+                </li>
+              );
+            }),
+          ])
         ) : (
           filteredEntityGroups.flatMap((group) => [
             <li

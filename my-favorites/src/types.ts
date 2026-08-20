@@ -76,6 +76,7 @@ export type PortAction = {
   blueprint?: string;
   trigger?: {
     type: string;
+    operation?: string;
     blueprintIdentifier?: string;
   };
 };

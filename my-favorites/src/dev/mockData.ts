@@ -64,30 +64,35 @@ export const MOCK_ACTIONS: PortAction[] = [
     title: "Scaffold Service",
     description: "Create a new service from a template",
     blueprint: "service",
+    trigger: { type: "self-service", operation: "CREATE" },
   },
   {
     identifier: "deploy_service",
     title: "Deploy to Production",
     description: "Trigger a production deployment",
     blueprint: "service",
+    trigger: { type: "self-service", operation: "DAY-2" },
   },
   {
     identifier: "create_jira_bug",
     title: "Create Bug",
     description: "Open a new Jira bug ticket",
     blueprint: "jira_bug",
+    trigger: { type: "self-service", operation: "CREATE" },
   },
   {
     identifier: "add_team_member",
     title: "Add Team Member",
     description: "Onboard a new team member",
     blueprint: "_team",
+    trigger: { type: "self-service", operation: "DAY-2" },
   },
   {
     identifier: "run_security_scan",
     title: "Run Security Scan",
     description: "Trigger a Snyk security scan",
     blueprint: "service",
+    trigger: { type: "self-service", operation: "DAY-2" },
   },
 ];
 
@@ -97,18 +102,21 @@ export const MOCK_WORKFLOW_TRIGGERS = [
     triggerIdentifier: "trigger",
     title: "Deploy Service",
     description: "Deploy a service to staging or production",
+    category: "Deployments",
   },
   {
     workflowIdentifier: "onboard-developer",
     triggerIdentifier: "self_serve",
     title: "Onboard Developer",
     description: "Provision accounts and access for a new developer",
+    category: "People",
   },
   {
     workflowIdentifier: "incident-response",
     triggerIdentifier: "create_incident",
     title: "Create Incident",
     description: "Open an incident and notify on-call",
+    category: "Operations",
   },
 ];
 

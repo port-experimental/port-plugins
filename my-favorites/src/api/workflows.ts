@@ -6,6 +6,7 @@ export type SelfServiceWorkflowPickerItem = {
   triggerIdentifier: string;
   title: string;
   description?: string;
+  category?: string;
 };
 
 type WorkflowNode = {
@@ -18,6 +19,7 @@ type ApiWorkflow = {
   identifier?: string;
   title?: string;
   description?: string;
+  category?: string;
   nodes?: WorkflowNode[];
 };
 
@@ -37,6 +39,7 @@ function mapWorkflow(
   workflowId: string,
   title?: string,
   description?: string,
+  category?: string,
   nodes?: WorkflowNode[]
 ): SelfServiceWorkflowPickerItem | null {
   const triggerIdentifier = findSelfServeTriggerNode(nodes)?.identifier;
@@ -47,6 +50,7 @@ function mapWorkflow(
     triggerIdentifier,
     title: title ?? workflowId,
     description,
+    category,
   };
 }
 
@@ -62,6 +66,7 @@ async function mapWorkflowFromDetail(
     workflowId,
     workflow.title,
     workflow.description,
+    workflow.category,
     workflow.nodes
   );
   if (direct) return direct;
@@ -78,6 +83,7 @@ async function mapWorkflowFromDetail(
     workflowId,
     workflow.title ?? detailWorkflow.title,
     workflow.description ?? detailWorkflow.description,
+    workflow.category ?? detailWorkflow.category,
     detailWorkflow.nodes
   );
 }
