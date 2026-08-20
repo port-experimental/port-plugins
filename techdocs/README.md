@@ -1,6 +1,6 @@
 # TechDocs Plugin
 
-A [Port](https://app.getport.io) plugin that provides a documentation browser for your repositories. It fetches `techDoc` entities from your Port catalog and renders their markdown content in a two-pane layout with sidebar navigation grouped by repository and folder. 
+A [Port](https://app.port.io) plugin that provides a documentation browser for your repositories. It fetches `techDoc` entities from your Port catalog and renders their markdown content in a two-pane layout with sidebar navigation grouped by repository and folder. 
 Look at the following [guide](https://docs.port.io/guides/all/manage-and-surface-technical-docs/) for more context. 
 
 ![Version](https://img.shields.io/badge/version-0.3.0-blue)
@@ -38,7 +38,7 @@ TechDocs resolves **relative** markdown links against the current document’s `
 | Repo-root path | `[Guide](/docs/guide.md)` | Resolved from repository root (leading `/`) |
 | Same-page hash | `[Endpoints](#endpoints)` | Scrolls within the current doc (when a heading id exists) |
 | Cross-repo relative | `[Other](../README.md)` on repo B | Resolves within repo B only — not another repository’s docs |
-| External | `[Port](https://docs.getport.io)` | Opens via Port’s iframe link bridge |
+| External | `[Port](https://docs.port.io)` | Opens via Port’s iframe link bridge |
 
 **Requirements for internal links to work in production:**
 
@@ -49,7 +49,7 @@ Port’s plugin SDK intercepts ordinary `<a href>` clicks in the iframe. Interna
 
 ## Prerequisites
 
-- A [Port](https://app.getport.io) account
+- A [Port](https://app.port.io) account
 - A [GitHub Ocean integration](https://docs.port.io/build-your-software-catalog/sync-data-to-catalog/git/github/) configured to ingest README files
 - Node.js >= 20
 
@@ -145,7 +145,7 @@ port-plugins upload \
 
 When the widget runs on an **entity page** (Port sends `PLUGIN_DATA.entity` with blueprint and identifier), the sidebar lists only **tech docs related to that host entity**. On **dashboards** (no host entity), it loads all ingested tech docs as before.
 
-Related docs are resolved with [`POST /v1/blueprints/{techDocBlueprint}/entities/search`](https://docs.getport.io/api-reference/search-entities) using **`relatedTo`** from the host entity on the tech doc blueprint.
+Related docs are resolved with [`POST /v1/blueprints/{techDocBlueprint}/entities/search`](https://docs.port.io/api-reference/search-entities) using **`relatedTo`** from the host entity on the tech doc blueprint.
 
 
 ## Widget Parameters
