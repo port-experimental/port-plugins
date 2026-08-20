@@ -31,3 +31,27 @@ export async function fetchEntitiesForBlueprint(
   const data = await res.json();
   return (data.entities ?? []) as PortEntity[];
 }
+
+export async function fetchEntityByIdentifier(
+  baseUrl: string,
+  token: string,
+  blueprintIdentifier: string,
+  entityIdentifier: string
+): Promise<PortEntity | null> {
+  if (DEV_MOCK) {
+    await new Promise((r) => setTimeout(r, 100));
+    const entities = MOCK_ENTITIES[blueprintIdentifier] ?? [];
+    return entities.find((e) => e.identifier === entityIdentifier) ?? null;
+  }
+  const res = await fetch(
+    `${baseUrl}/v1/blueprints/${encodeURIComponent(blueprintIdentifier)}/entities/${encodeURIComponent(entityIdentifier)}`,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  if (res.status === 404) return null;
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`Port API ${res.status}:\n${body}`);
+  }
+  const data = await res.json();
+  return (data.entity ?? data) as PortEntity;
+}

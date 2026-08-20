@@ -29,3 +29,27 @@ export async function fetchBlueprints(
       )
   );
 }
+
+export async function fetchBlueprintByIdentifier(
+  baseUrl: string,
+  token: string,
+  blueprintIdentifier: string
+): Promise<PortBlueprint | null> {
+  if (DEV_MOCK) {
+    await new Promise((r) => setTimeout(r, 100));
+    return (
+      MOCK_BLUEPRINTS.find((bp) => bp.identifier === blueprintIdentifier) ?? null
+    );
+  }
+  const res = await fetch(
+    `${baseUrl}/v1/blueprints/${encodeURIComponent(blueprintIdentifier)}`,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  if (res.status === 404) return null;
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`Port API ${res.status}:\n${body}`);
+  }
+  const data = await res.json();
+  return (data.blueprint ?? data) as PortBlueprint;
+}

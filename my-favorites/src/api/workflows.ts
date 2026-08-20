@@ -88,6 +88,41 @@ async function mapWorkflowFromDetail(
   );
 }
 
+export async function fetchWorkflowByIdentifier(
+  baseUrl: string,
+  token: string,
+  workflowIdentifier: string
+): Promise<SelfServiceWorkflowPickerItem | null> {
+  if (DEV_MOCK) {
+    await new Promise((r) => setTimeout(r, 100));
+    return (
+      MOCK_WORKFLOW_TRIGGERS.find(
+        (w) => w.workflowIdentifier === workflowIdentifier
+      ) ?? null
+    );
+  }
+
+  const res = await fetch(
+    `${baseUrl}/v1/workflows/${encodeURIComponent(workflowIdentifier)}`,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  if (res.status === 404) return null;
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`Port API ${res.status}:\n${body}`);
+  }
+
+  const detail = await res.json();
+  const detailWorkflow = (detail.workflow ?? detail) as ApiWorkflow;
+  return mapWorkflow(
+    workflowIdentifier,
+    detailWorkflow.title,
+    detailWorkflow.description,
+    detailWorkflow.category,
+    detailWorkflow.nodes
+  );
+}
+
 export async function fetchSelfServiceWorkflowTriggers(
   baseUrl: string,
   token: string

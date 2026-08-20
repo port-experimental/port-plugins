@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, type ReactNode } from "react";
+import { RefreshCwIcon } from "lucide-react";
 import "./App.css";
 import { usePostMessageData } from "./hooks/usePostMessageData";
 import { useFavoriteData, parseFavorites } from "./hooks/useFavoriteData";
@@ -28,6 +29,7 @@ function ShellMessage({ children }: { children: ReactNode }) {
 export function App() {
   const [favorites, setFavorites] = useState<FavoritesData>(EMPTY_FAVORITES);
   const [initialized, setInitialized] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   // Tab drag state
   const [tabDragIdx, setTabDragIdx]     = useState<number | null>(null);
@@ -39,8 +41,15 @@ export function App() {
 
   const { portToken, portApiBaseUrl, user } = usePostMessageData();
 
-  const { userEntityQuery, pagesQuery, actionsQuery, workflowsQuery, blueprintsQuery, saveMutation } =
-    useFavoriteData(portToken, portApiBaseUrl, user?.email);
+  const {
+    userEntityQuery,
+    pagesQuery,
+    actionsQuery,
+    workflowsQuery,
+    blueprintsQuery,
+    saveMutation,
+    refreshFavorites,
+  } = useFavoriteData(portToken, portApiBaseUrl, user?.email);
 
   // Initialise favorites (and active tab) from server data once
   useEffect(() => {
@@ -67,6 +76,24 @@ export function App() {
     },
     [userEntityQuery.data, saveMutation]
   );
+
+  const handleRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      const { reconciled, changed } = await refreshFavorites();
+      setFavorites(reconciled);
+      if (changed && userEntityQuery.data) {
+        saveMutation.mutate({
+          favorites: reconciled,
+          userIdentifier: userEntityQuery.data.identifier,
+        });
+      }
+    } catch (error) {
+      console.error("Failed to refresh favorites:", error);
+    } finally {
+      setRefreshing(false);
+    }
+  }, [refreshFavorites, userEntityQuery.data, saveMutation]);
 
   if (!portApiBaseUrl || !portToken) {
     return (
@@ -166,6 +193,15 @@ export function App() {
             </div>
           ))}
         </div>
+        <button
+          type="button"
+          className={`fav-refresh-btn${refreshing ? " fav-refresh-btn--spinning" : ""}`}
+          aria-label="Refresh favorites"
+          disabled={refreshing || saveMutation.isPending}
+          onClick={() => void handleRefresh()}
+        >
+          <RefreshCwIcon size={16} aria-hidden />
+        </button>
       </div>
 
       {/* Tab panels */}
