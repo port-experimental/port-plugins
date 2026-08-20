@@ -15,12 +15,21 @@ export function buildPageUrl(pageIdentifier: string): string {
   return `${origin}/${encodeURIComponent(pageIdentifier)}`;
 }
 
-export function buildSelfServiceActionUrl(): string {
-  return `${getPortalOrigin()}/workflows/self-service`;
+export function buildSelfServiceActionUrl(actionIdentifier: string): string {
+  const origin = getPortalOrigin();
+  const qs = new URLSearchParams({ action: actionIdentifier });
+  return `${origin}/workflows/self-service?${qs.toString()}`;
 }
 
-export function buildWorkflowManagementUrl(): string {
-  return `${getPortalOrigin()}/workflows/workflows-management`;
+export function buildWorkflowSelfServeUrl(
+  workflowIdentifier: string,
+  triggerIdentifier: string
+): string {
+  const origin = getPortalOrigin();
+  const qs = new URLSearchParams({
+    workflow: `${workflowIdentifier}/${triggerIdentifier}`,
+  });
+  return `${origin}/workflows/self-service?${qs.toString()}`;
 }
 
 export function buildEntityPageUrl(

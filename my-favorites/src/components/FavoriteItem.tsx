@@ -9,7 +9,7 @@ import {
   buildPageUrl,
   buildEntityPageUrl,
   buildSelfServiceActionUrl,
-  buildWorkflowManagementUrl,
+  buildWorkflowSelfServeUrl,
 } from "../utils/portalUrl";
 
 export type AnyFavorite = FavoritePage | FavoriteAction | FavoriteEntity;
@@ -36,8 +36,8 @@ function getItemUrl(tab: TabKey, item: AnyFavorite): string | null {
   if (tab === "selfService") {
     const self = item as FavoriteAction;
     return self.type === "workflow"
-      ? buildWorkflowManagementUrl()
-      : buildSelfServiceActionUrl();
+      ? buildWorkflowSelfServeUrl(self.identifier, self.triggerIdentifier!)
+      : buildSelfServiceActionUrl(self.identifier);
   }
   return null;
 }
