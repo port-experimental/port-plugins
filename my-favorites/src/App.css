@@ -621,7 +621,8 @@ body {
 }
 
 .fav-item-blueprint {
-  margin-left: 12px;
+  margin-left: auto;
+  padding-left: 12px;
 }
 
 .blueprint-label {
@@ -644,13 +645,23 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  margin-left: 12px;
+  flex-shrink: 0;
+  max-width: 0;
   opacity: 0;
-  transition: opacity 0.12s;
+  overflow: hidden;
+  pointer-events: none;
+  transition:
+    max-width 0.15s ease,
+    opacity 0.12s ease,
+    margin-left 0.15s ease;
 }
 
-.fav-item:hover .fav-item-actions {
+.fav-item:hover .fav-item-actions,
+.fav-item:focus-within .fav-item-actions {
+  max-width: 90px;
+  margin-left: 12px;
   opacity: 1;
+  pointer-events: auto;
 }
 
 .fav-item-action-btn {
