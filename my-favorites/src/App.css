@@ -946,6 +946,8 @@ body {
   list-style: none;
   flex: 1;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
   padding: 4px 8px;
   scrollbar-width: thin;
   scrollbar-color: var(--text-faint) transparent;

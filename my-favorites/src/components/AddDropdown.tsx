@@ -2,6 +2,7 @@ import {
   forwardRef,
   useCallback,
   useLayoutEffect,
+  useRef,
   useState,
   type CSSProperties,
   type RefObject,
@@ -72,49 +73,66 @@ function useFloatingPanelStyle(
   gap: number
 ): CSSProperties {
   const [style, setStyle] = useState<CSSProperties>({ visibility: "hidden" });
+  const lockedLeftRef = useRef<number | null>(null);
+  const lockedWidthRef = useRef<number | null>(null);
 
-  const updatePosition = useCallback(() => {
-    const anchor = anchorRef.current;
-    if (!anchor) return;
+  const updatePosition = useCallback(
+    (remeasureHorizontal = false) => {
+      const anchor = anchorRef.current;
+      if (!anchor) return;
 
-    const rect = anchor.getBoundingClientRect();
-    const left = rect.left + inset.left;
-    const width = rect.width - inset.left - inset.right;
-    const spaceBelow = window.innerHeight - rect.bottom - gap;
-    const spaceAbove = rect.top - gap;
-    const resolvedPlacement = resolvePlacement(rect, gap, placement);
+      const rect = anchor.getBoundingClientRect();
+      const measuredLeft = rect.left + inset.left;
+      const measuredWidth = rect.width - inset.left - inset.right;
 
-    if (resolvedPlacement === "below") {
+      if (remeasureHorizontal || lockedWidthRef.current === null) {
+        lockedLeftRef.current = measuredLeft;
+        lockedWidthRef.current = measuredWidth;
+      }
+
+      const left = lockedLeftRef.current ?? measuredLeft;
+      const width = lockedWidthRef.current ?? measuredWidth;
+      const spaceBelow = window.innerHeight - rect.bottom - gap;
+      const spaceAbove = rect.top - gap;
+      const resolvedPlacement = resolvePlacement(rect, gap, placement);
+
+      if (resolvedPlacement === "below") {
+        setStyle({
+          position: "fixed",
+          top: rect.bottom + gap,
+          left,
+          width,
+          maxHeight: Math.min(PANEL_MAX_HEIGHT, spaceBelow),
+          zIndex: 1100,
+          visibility: "visible",
+        });
+        return;
+      }
+
       setStyle({
         position: "fixed",
-        top: rect.bottom + gap,
+        bottom: window.innerHeight - rect.top + gap,
         left,
         width,
-        maxHeight: Math.min(PANEL_MAX_HEIGHT, spaceBelow),
+        maxHeight: Math.min(PANEL_MAX_HEIGHT, spaceAbove),
         zIndex: 1100,
         visibility: "visible",
       });
-      return;
-    }
-
-    setStyle({
-      position: "fixed",
-      bottom: window.innerHeight - rect.top + gap,
-      left,
-      width,
-      maxHeight: Math.min(PANEL_MAX_HEIGHT, spaceAbove),
-      zIndex: 1100,
-      visibility: "visible",
-    });
-  }, [anchorRef, gap, inset.left, inset.right, placement]);
+    },
+    [anchorRef, gap, inset.left, inset.right, placement]
+  );
 
   useLayoutEffect(() => {
-    updatePosition();
-    window.addEventListener("resize", updatePosition);
-    window.addEventListener("scroll", updatePosition, true);
+    lockedLeftRef.current = null;
+    lockedWidthRef.current = null;
+    updatePosition(true);
+    const onResize = () => updatePosition(true);
+    const onScroll = () => updatePosition(false);
+    window.addEventListener("resize", onResize);
+    window.addEventListener("scroll", onScroll, true);
     return () => {
-      window.removeEventListener("resize", updatePosition);
-      window.removeEventListener("scroll", updatePosition, true);
+      window.removeEventListener("resize", onResize);
+      window.removeEventListener("scroll", onScroll, true);
     };
   }, [updatePosition]);
 
