@@ -45,6 +45,8 @@ export function TabContent({
   const [addSearch, setAddSearch] = useState("");
   const [addOpen, setAddOpen] = useState(false);
   const controlsWrapRef = useRef<HTMLDivElement>(null);
+  const emptyAddWrapRef = useRef<HTMLDivElement>(null);
+  const addPanelRef = useRef<HTMLDivElement>(null);
   const [dragIdx, setDragIdx] = useState<number | null>(null);
   // insertIdx = 0..n — the gap before item[0], between items, or after last item
   const [insertIdx, setInsertIdx] = useState<number | null>(null);
@@ -66,9 +68,11 @@ export function TabContent({
   useEffect(() => {
     if (!addOpen) return;
     function handleOutside(e: MouseEvent) {
-      if (controlsWrapRef.current && !controlsWrapRef.current.contains(e.target as Node)) {
-        setAddOpen(false);
-      }
+      const target = e.target as Node;
+      if (controlsWrapRef.current?.contains(target)) return;
+      if (emptyAddWrapRef.current?.contains(target)) return;
+      if (addPanelRef.current?.contains(target)) return;
+      setAddOpen(false);
     }
     document.addEventListener("mousedown", handleOutside);
     return () => document.removeEventListener("mousedown", handleOutside);
@@ -152,6 +156,7 @@ export function TabContent({
 
   const addDropdown = addOpen ? (
     <AddDropdown
+      ref={addPanelRef}
       tab={tab}
       pages={pages}
       actions={actions}
@@ -165,6 +170,9 @@ export function TabContent({
       onSearchChange={setAddSearch}
       onAdd={handleAdd}
       onClose={() => setAddOpen(false)}
+      anchorRef={isEmpty ? emptyAddWrapRef : controlsWrapRef}
+      anchorInset={isEmpty ? { left: -24, right: -24 } : { left: 12, right: 12 }}
+      anchorGap={isEmpty ? 8 : 4}
     />
   ) : null;
 
@@ -180,18 +188,7 @@ export function TabContent({
               onSearchClear={() => setSearch("")}
               addOpen={addOpen}
               onToggleAdd={() => setAddOpen((v) => !v)}
-              pages={pages}
-              actions={actions}
-              workflows={workflows}
-              blueprints={blueprints}
-              alreadyAdded={alreadyAdded}
-              portToken={portToken}
-              portApiBaseUrl={portApiBaseUrl}
-              addSearch={addSearch}
-              onAddSearchReset={() => setAddSearch("")}
-              onAddSearchChange={setAddSearch}
-              onAdd={handleAdd}
-              onCloseAdd={() => setAddOpen(false)}
+              addPanel={addDropdown}
             />
           </div>
           <div className="fav-list-separator" aria-hidden />
@@ -201,7 +198,11 @@ export function TabContent({
       <div className={`fav-list-wrap${isEmpty ? " fav-list-wrap--empty" : ""}`}>
         {isEmpty ? (
           <div className="empty-state-wrap" ref={controlsWrapRef}>
-            <EmptyState tab={tab} onAddClick={() => setAddOpen((v) => !v)}>
+            <EmptyState
+              tab={tab}
+              onAddClick={() => setAddOpen((v) => !v)}
+              addWrapRef={emptyAddWrapRef}
+            >
               {addDropdown}
             </EmptyState>
           </div>

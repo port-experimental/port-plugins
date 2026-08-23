@@ -1,15 +1,6 @@
 import { PlusIcon, SearchIcon, XIcon } from "lucide-react";
-import { AddDropdown } from "../AddDropdown";
-import type {
-  TabKey,
-  FavoritePage,
-  FavoriteAction,
-  FavoriteEntity,
-  PortPage,
-  PortAction,
-  PortBlueprint,
-} from "../../types";
-import type { SelfServiceWorkflowPickerItem } from "../../api/workflows";
+import type { ReactNode } from "react";
+import type { TabKey } from "../../types";
 
 const TAB_ADD_LABEL: Record<TabKey, string> = {
   pages: "Page",
@@ -30,18 +21,7 @@ type Props = {
   onSearchClear: () => void;
   addOpen: boolean;
   onToggleAdd: () => void;
-  pages: PortPage[];
-  actions: PortAction[];
-  workflows: SelfServiceWorkflowPickerItem[];
-  blueprints: PortBlueprint[];
-  alreadyAdded: Set<string>;
-  portToken: string;
-  portApiBaseUrl: string;
-  addSearch: string;
-  onAddSearchReset: () => void;
-  onAddSearchChange: (value: string) => void;
-  onAdd: (item: FavoritePage | FavoriteAction | FavoriteEntity) => void;
-  onCloseAdd: () => void;
+  addPanel?: ReactNode;
 };
 
 export function FavoriteControls({
@@ -51,18 +31,7 @@ export function FavoriteControls({
   onSearchClear,
   addOpen,
   onToggleAdd,
-  pages,
-  actions,
-  workflows,
-  blueprints,
-  alreadyAdded,
-  portToken,
-  portApiBaseUrl,
-  addSearch,
-  onAddSearchReset,
-  onAddSearchChange,
-  onAdd,
-  onCloseAdd,
+  addPanel,
 }: Props) {
   return (
     <>
@@ -97,23 +66,7 @@ export function FavoriteControls({
           {TAB_ADD_LABEL[tab]}
         </button>
       </div>
-      {addOpen && (
-        <AddDropdown
-          tab={tab}
-          pages={pages}
-          actions={actions}
-          workflows={workflows}
-          blueprints={blueprints}
-          alreadyAdded={alreadyAdded}
-          portToken={portToken}
-          portApiBaseUrl={portApiBaseUrl}
-          search={addSearch}
-          onSearchReset={onAddSearchReset}
-          onSearchChange={onAddSearchChange}
-          onAdd={onAdd}
-          onClose={onCloseAdd}
-        />
-      )}
+      {addPanel}
     </>
   );
 }

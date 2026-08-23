@@ -1,5 +1,5 @@
 import { PlusIcon, StarIcon } from "lucide-react";
-import type { ReactNode } from "react";
+import type { ReactNode, RefObject } from "react";
 import type { TabKey } from "../types";
 
 const MESSAGES: Record<
@@ -26,17 +26,18 @@ const MESSAGES: Record<
 type Props = {
   tab: TabKey;
   onAddClick: () => void;
+  addWrapRef?: RefObject<HTMLDivElement | null>;
   children?: ReactNode;
 };
 
-export function EmptyState({ tab, onAddClick, children }: Props) {
+export function EmptyState({ tab, onAddClick, addWrapRef, children }: Props) {
   const { heading, hint, buttonLabel } = MESSAGES[tab];
   return (
     <div className="empty-state">
       <StarIcon size={44} className="empty-state-icon" strokeWidth={1.5} aria-hidden />
       <p className="empty-state-title">{heading}</p>
       <p className="empty-state-hint">{hint}</p>
-      <div className="empty-state-add-wrap">
+      <div className="empty-state-add-wrap" ref={addWrapRef}>
         <button type="button" className="empty-state-add-btn" onClick={onAddClick}>
           <PlusIcon size={20} aria-hidden />
           {buttonLabel}

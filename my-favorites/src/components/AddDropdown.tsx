@@ -1,3 +1,12 @@
+import {
+  forwardRef,
+  useCallback,
+  useLayoutEffect,
+  useState,
+  type CSSProperties,
+  type RefObject,
+} from "react";
+import { createPortal } from "react-dom";
 import { SearchIcon, CheckIcon } from "lucide-react";
 import { useQueries } from "@tanstack/react-query";
 import { fetchEntitiesForBlueprint } from "../api/entities";
@@ -33,7 +42,84 @@ type Props = {
   onSearchChange: (value: string) => void;
   onAdd: (item: FavoritePage | FavoriteAction | FavoriteEntity) => void;
   onClose: () => void;
+  anchorRef: RefObject<HTMLElement | null>;
+  placement?: "auto" | "above" | "below";
+  anchorInset?: { left: number; right: number };
+  anchorGap?: number;
 };
+
+const PANEL_MAX_HEIGHT = 240;
+
+function resolvePlacement(
+  rect: DOMRect,
+  gap: number,
+  preferred: "auto" | "above" | "below"
+): "above" | "below" {
+  if (preferred !== "auto") return preferred;
+
+  const spaceBelow = window.innerHeight - rect.bottom - gap;
+  const spaceAbove = rect.top - gap;
+
+  if (spaceBelow >= PANEL_MAX_HEIGHT) return "below";
+  if (spaceAbove >= PANEL_MAX_HEIGHT) return "above";
+  return spaceBelow >= spaceAbove ? "below" : "above";
+}
+
+function useFloatingPanelStyle(
+  anchorRef: RefObject<HTMLElement | null>,
+  placement: "auto" | "above" | "below",
+  inset: { left: number; right: number },
+  gap: number
+): CSSProperties {
+  const [style, setStyle] = useState<CSSProperties>({ visibility: "hidden" });
+
+  const updatePosition = useCallback(() => {
+    const anchor = anchorRef.current;
+    if (!anchor) return;
+
+    const rect = anchor.getBoundingClientRect();
+    const left = rect.left + inset.left;
+    const width = rect.width - inset.left - inset.right;
+    const spaceBelow = window.innerHeight - rect.bottom - gap;
+    const spaceAbove = rect.top - gap;
+    const resolvedPlacement = resolvePlacement(rect, gap, placement);
+
+    if (resolvedPlacement === "below") {
+      setStyle({
+        position: "fixed",
+        top: rect.bottom + gap,
+        left,
+        width,
+        maxHeight: Math.min(PANEL_MAX_HEIGHT, spaceBelow),
+        zIndex: 1100,
+        visibility: "visible",
+      });
+      return;
+    }
+
+    setStyle({
+      position: "fixed",
+      bottom: window.innerHeight - rect.top + gap,
+      left,
+      width,
+      maxHeight: Math.min(PANEL_MAX_HEIGHT, spaceAbove),
+      zIndex: 1100,
+      visibility: "visible",
+    });
+  }, [anchorRef, gap, inset.left, inset.right, placement]);
+
+  useLayoutEffect(() => {
+    updatePosition();
+    window.addEventListener("resize", updatePosition);
+    window.addEventListener("scroll", updatePosition, true);
+    return () => {
+      window.removeEventListener("resize", updatePosition);
+      window.removeEventListener("scroll", updatePosition, true);
+    };
+  }, [updatePosition]);
+
+  return style;
+}
 
 type ListItem = {
   key: string;
@@ -126,19 +212,32 @@ function selfServiceItemMatchesSearch(item: ListItem, query: string): boolean {
   return fields.some((value) => (value ?? "").toLowerCase().includes(query));
 }
 
-export function AddDropdown({
-  tab,
-  pages,
-  actions,
-  workflows,
-  blueprints,
-  alreadyAdded,
-  portToken,
-  portApiBaseUrl,
-  search,
-  onSearchChange,
-  onAdd,
-}: Props) {
+export const AddDropdown = forwardRef<HTMLDivElement, Props>(function AddDropdown(
+  {
+    tab,
+    pages,
+    actions,
+    workflows,
+    blueprints,
+    alreadyAdded,
+    portToken,
+    portApiBaseUrl,
+    search,
+    onSearchChange,
+    onAdd,
+    anchorRef,
+    placement = "auto",
+    anchorInset = { left: 12, right: 12 },
+    anchorGap = 8,
+  },
+  ref
+) {
+  const floatingStyle = useFloatingPanelStyle(
+    anchorRef,
+    placement,
+    anchorInset,
+    anchorGap
+  );
   const entityQueries = useQueries({
     queries: blueprints.map((bp) => ({
       queryKey: ["entities", bp.identifier, portToken],
@@ -307,8 +406,8 @@ export function AddDropdown({
       ? filteredSelfServiceItemCount === 0
       : !isEntityLoading && entityGroupCount === 0;
 
-  return (
-    <div className="add-panel">
+  return createPortal(
+    <div ref={ref} className="add-panel add-panel--floating" style={floatingStyle}>
       <div className="add-panel-search">
         <div className="add-search-shell">
           <SearchIcon size={15} className="add-search-icon" aria-hidden />
@@ -455,6 +554,7 @@ export function AddDropdown({
           ])
         )}
       </ul>
-    </div>
+    </div>,
+    document.body
   );
-}
+});
