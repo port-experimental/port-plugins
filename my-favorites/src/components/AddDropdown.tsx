@@ -29,6 +29,7 @@ import type {
 } from "../types";
 import type { SelfServiceWorkflowPickerItem } from "../api/workflows";
 import { selfServiceFavoriteKey } from "../api/workflows";
+import { entityMatchesSearch } from "../utils/entitySearch";
 
 type Props = {
   tab: TabKey;
@@ -202,21 +203,6 @@ type EntityGroup = {
   blueprint: PortBlueprint;
   entities: PortEntity[];
 };
-
-function entityMatchesSearch(
-  blueprint: PortBlueprint,
-  entity: PortEntity,
-  query: string
-) {
-  if (!query) return true;
-  const fields = [
-    entity.title,
-    entity.identifier,
-    blueprint.title,
-    blueprint.identifier,
-  ];
-  return fields.some((value) => (value ?? "").toLowerCase().includes(query));
-}
 
 function entityFavoriteKey(blueprintId: string, entityId: string) {
   return `${blueprintId}:${entityId}`;
