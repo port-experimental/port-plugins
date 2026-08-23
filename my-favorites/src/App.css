@@ -577,8 +577,8 @@ body {
   height: 40px;
   flex-shrink: 0;
   border-radius: 10px;
-  background: #ffffff;
-  border: 1px solid #e3e3e3;
+  background: var(--bg);
+  border: 1px solid var(--border);
   box-shadow: 0 2.5px 2.5px rgba(0, 0, 0, 0.05);
   color: var(--muted);
   transition: background 0.12s;
@@ -816,7 +816,7 @@ body {
   max-height: 240px;
   border: 1px solid var(--border);
   border-radius: 14px;
-  background: #ffffff;
+  background: var(--bg);
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
   animation: panel-in 0.12s ease-out;
@@ -896,7 +896,7 @@ body {
   padding: 10px;
   border-bottom: 1px solid color-mix(in srgb, var(--border) 38%, transparent);
   flex-shrink: 0;
-  background: #ffffff;
+  background: var(--bg)
 }
 
 .add-search-shell {
