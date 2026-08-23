@@ -1,5 +1,5 @@
 import { PlusIcon, SearchIcon, XIcon } from "lucide-react";
-import type { ReactNode } from "react";
+import type { ReactNode, RefObject } from "react";
 import type { TabKey } from "../../types";
 
 const TAB_ADD_LABEL: Record<TabKey, string> = {
@@ -21,7 +21,10 @@ type Props = {
   onSearchClear: () => void;
   addOpen: boolean;
   onToggleAdd: () => void;
+  onOpenAdd: () => void;
   addPanel?: ReactNode;
+  addButtonRef?: RefObject<HTMLButtonElement | null>;
+  addPanelId?: string;
 };
 
 export function FavoriteControls({
@@ -31,7 +34,10 @@ export function FavoriteControls({
   onSearchClear,
   addOpen,
   onToggleAdd,
+  onOpenAdd,
   addPanel,
+  addButtonRef,
+  addPanelId,
 }: Props) {
   return (
     <>
@@ -58,9 +64,18 @@ export function FavoriteControls({
         </label>
         <button
           type="button"
+          ref={addButtonRef}
           className="fav-list-add-btn"
           onClick={onToggleAdd}
+          onKeyDown={(e) => {
+            if (addOpen) return;
+            if (e.key !== "Enter" && e.key !== " ") return;
+            e.preventDefault();
+            onOpenAdd();
+          }}
+          aria-haspopup="dialog"
           aria-expanded={addOpen}
+          aria-controls={addOpen ? addPanelId : undefined}
         >
           <PlusIcon size={20} aria-hidden />
           {TAB_ADD_LABEL[tab]}

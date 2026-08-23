@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useLayoutEffect, useRef, useId, useCallback } from "react";
 import { type AnyFavorite } from "./FavoriteItem";
 import { EmptyState } from "./EmptyState";
 import { AddDropdown } from "./AddDropdown";
@@ -47,6 +47,9 @@ export function TabContent({
   const controlsWrapRef = useRef<HTMLDivElement>(null);
   const emptyAddWrapRef = useRef<HTMLDivElement>(null);
   const addPanelRef = useRef<HTMLDivElement>(null);
+  const addButtonRef = useRef<HTMLButtonElement>(null);
+  const emptyAddButtonRef = useRef<HTMLButtonElement>(null);
+  const addPanelId = useId();
   const [dragIdx, setDragIdx] = useState<number | null>(null);
   // insertIdx = 0..n — the gap before item[0], between items, or after last item
   const [insertIdx, setInsertIdx] = useState<number | null>(null);
@@ -65,6 +68,47 @@ export function TabContent({
 
   const isEmpty = items.length === 0;
 
+  const closeAddDropdown = useCallback(() => {
+    setAddOpen(false);
+    setAddSearch("");
+    requestAnimationFrame(() => {
+      if (addButtonRef.current) {
+        addButtonRef.current.focus();
+      } else {
+        emptyAddButtonRef.current?.focus();
+      }
+    });
+  }, []);
+
+  const openAddDropdown = useCallback(() => {
+    setAddOpen(true);
+    addButtonRef.current?.blur();
+    emptyAddButtonRef.current?.blur();
+  }, []);
+
+  const toggleAddDropdown = useCallback(() => {
+    setAddOpen((open) => {
+      if (open) return false;
+      requestAnimationFrame(() => {
+        addButtonRef.current?.blur();
+        emptyAddButtonRef.current?.blur();
+      });
+      return true;
+    });
+  }, []);
+
+  useLayoutEffect(() => {
+    if (!addOpen) return;
+    const focusSearch = () => {
+      addPanelRef.current
+        ?.querySelector<HTMLInputElement>(".add-search-input")
+        ?.focus({ preventScroll: true });
+    };
+    focusSearch();
+    const raf = requestAnimationFrame(focusSearch);
+    return () => cancelAnimationFrame(raf);
+  }, [addOpen]);
+
   useEffect(() => {
     if (!addOpen) return;
     function handleOutside(e: MouseEvent) {
@@ -72,11 +116,11 @@ export function TabContent({
       if (controlsWrapRef.current?.contains(target)) return;
       if (emptyAddWrapRef.current?.contains(target)) return;
       if (addPanelRef.current?.contains(target)) return;
-      setAddOpen(false);
+      closeAddDropdown();
     }
     document.addEventListener("mousedown", handleOutside);
     return () => document.removeEventListener("mousedown", handleOutside);
-  }, [addOpen]);
+  }, [addOpen, closeAddDropdown]);
 
   function patch(newItems: AnyFavorite[]) {
     if (tab === "pages") {
@@ -94,8 +138,7 @@ export function TabContent({
 
   function handleAdd(item: FavoritePage | FavoriteAction | FavoriteEntity) {
     patch([...items, item as AnyFavorite]);
-    setAddOpen(false);
-    setAddSearch("");
+    closeAddDropdown();
   }
 
   function handleDragStart(idx: number) {
@@ -169,7 +212,8 @@ export function TabContent({
       onSearchReset={() => setAddSearch("")}
       onSearchChange={setAddSearch}
       onAdd={handleAdd}
-      onClose={() => setAddOpen(false)}
+      onClose={closeAddDropdown}
+      panelId={addPanelId}
       anchorRef={isEmpty ? emptyAddWrapRef : controlsWrapRef}
       anchorInset={isEmpty ? { left: -24, right: -24 } : { left: 12, right: 12 }}
       anchorGap={isEmpty ? 8 : 4}
@@ -187,8 +231,11 @@ export function TabContent({
               onSearchChange={setSearch}
               onSearchClear={() => setSearch("")}
               addOpen={addOpen}
-              onToggleAdd={() => setAddOpen((v) => !v)}
+              onToggleAdd={toggleAddDropdown}
+              onOpenAdd={openAddDropdown}
               addPanel={addDropdown}
+              addButtonRef={addButtonRef}
+              addPanelId={addPanelId}
             />
           </div>
           <div className="fav-list-separator" aria-hidden />
@@ -200,8 +247,12 @@ export function TabContent({
           <div className="empty-state-wrap" ref={controlsWrapRef}>
             <EmptyState
               tab={tab}
-              onAddClick={() => setAddOpen((v) => !v)}
+              onAddClick={toggleAddDropdown}
+              onOpenAdd={openAddDropdown}
               addWrapRef={emptyAddWrapRef}
+              addButtonRef={emptyAddButtonRef}
+              addOpen={addOpen}
+              addPanelId={addPanelId}
             >
               {addDropdown}
             </EmptyState>

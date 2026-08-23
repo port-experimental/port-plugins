@@ -26,11 +26,24 @@ const MESSAGES: Record<
 type Props = {
   tab: TabKey;
   onAddClick: () => void;
+  onOpenAdd: () => void;
   addWrapRef?: RefObject<HTMLDivElement | null>;
+  addButtonRef?: RefObject<HTMLButtonElement | null>;
+  addOpen?: boolean;
+  addPanelId?: string;
   children?: ReactNode;
 };
 
-export function EmptyState({ tab, onAddClick, addWrapRef, children }: Props) {
+export function EmptyState({
+  tab,
+  onAddClick,
+  onOpenAdd,
+  addWrapRef,
+  addButtonRef,
+  addOpen = false,
+  addPanelId,
+  children,
+}: Props) {
   const { heading, hint, buttonLabel } = MESSAGES[tab];
   return (
     <div className="empty-state">
@@ -38,7 +51,21 @@ export function EmptyState({ tab, onAddClick, addWrapRef, children }: Props) {
       <p className="empty-state-title">{heading}</p>
       <p className="empty-state-hint">{hint}</p>
       <div className="empty-state-add-wrap" ref={addWrapRef}>
-        <button type="button" className="empty-state-add-btn" onClick={onAddClick}>
+        <button
+          type="button"
+          ref={addButtonRef}
+          className="empty-state-add-btn"
+          onClick={onAddClick}
+          onKeyDown={(e) => {
+            if (addOpen) return;
+            if (e.key !== "Enter" && e.key !== " ") return;
+            e.preventDefault();
+            onOpenAdd();
+          }}
+          aria-haspopup="dialog"
+          aria-expanded={addOpen}
+          aria-controls={addOpen ? addPanelId : undefined}
+        >
           <PlusIcon size={20} aria-hidden />
           {buttonLabel}
         </button>

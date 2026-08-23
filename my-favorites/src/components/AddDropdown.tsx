@@ -1,6 +1,7 @@
 import {
   forwardRef,
   useCallback,
+  useEffect,
   useLayoutEffect,
   useRef,
   useState,
@@ -43,6 +44,7 @@ type Props = {
   onSearchChange: (value: string) => void;
   onAdd: (item: FavoritePage | FavoriteAction | FavoriteEntity) => void;
   onClose: () => void;
+  panelId: string;
   anchorRef: RefObject<HTMLElement | null>;
   placement?: "auto" | "above" | "below";
   anchorInset?: { left: number; right: number };
@@ -50,6 +52,20 @@ type Props = {
 };
 
 const PANEL_MAX_HEIGHT = 240;
+
+const ADD_DIALOG_LABEL: Record<TabKey, string> = {
+  pages: "Add page to favorites",
+  entities: "Add entity to favorites",
+  selfService: "Add action or workflow to favorites",
+};
+
+function getFocusableElements(container: HTMLElement): HTMLElement[] {
+  return Array.from(
+    container.querySelectorAll<HTMLElement>(
+      'button:not(:disabled), input:not(:disabled), [href], select:not(:disabled), textarea:not(:disabled), [tabindex]:not([tabindex="-1"])'
+    )
+  );
+}
 
 function resolvePlacement(
   rect: DOMRect,
@@ -70,16 +86,25 @@ function useFloatingPanelStyle(
   anchorRef: RefObject<HTMLElement | null>,
   placement: "auto" | "above" | "below",
   inset: { left: number; right: number },
-  gap: number
+  gap: number,
+  onPositioned?: () => void
 ): CSSProperties {
-  const [style, setStyle] = useState<CSSProperties>({ visibility: "hidden" });
+  const [style, setStyle] = useState<CSSProperties>({
+    position: "fixed",
+    left: -9999,
+    top: 0,
+    opacity: 0,
+    pointerEvents: "none",
+  });
   const lockedLeftRef = useRef<number | null>(null);
   const lockedWidthRef = useRef<number | null>(null);
+  const onPositionedRef = useRef(onPositioned);
+  onPositionedRef.current = onPositioned;
 
   const updatePosition = useCallback(
-    (remeasureHorizontal = false) => {
+    (remeasureHorizontal = false): boolean => {
       const anchor = anchorRef.current;
-      if (!anchor) return;
+      if (!anchor) return false;
 
       const rect = anchor.getBoundingClientRect();
       const measuredLeft = rect.left + inset.left;
@@ -104,9 +129,10 @@ function useFloatingPanelStyle(
           width,
           maxHeight: Math.min(PANEL_MAX_HEIGHT, spaceBelow),
           zIndex: 1100,
-          visibility: "visible",
+          opacity: 1,
+          pointerEvents: "auto",
         });
-        return;
+        return true;
       }
 
       setStyle({
@@ -116,8 +142,10 @@ function useFloatingPanelStyle(
         width,
         maxHeight: Math.min(PANEL_MAX_HEIGHT, spaceAbove),
         zIndex: 1100,
-        visibility: "visible",
+        opacity: 1,
+        pointerEvents: "auto",
       });
+      return true;
     },
     [anchorRef, gap, inset.left, inset.right, placement]
   );
@@ -125,12 +153,28 @@ function useFloatingPanelStyle(
   useLayoutEffect(() => {
     lockedLeftRef.current = null;
     lockedWidthRef.current = null;
-    updatePosition(true);
-    const onResize = () => updatePosition(true);
+
+    const run = () => {
+      if (updatePosition(true)) {
+        onPositionedRef.current?.();
+      }
+    };
+
+    run();
+    const raf = requestAnimationFrame(run);
+    const raf2 = requestAnimationFrame(() => requestAnimationFrame(run));
+
+    const onResize = () => {
+      if (updatePosition(true)) {
+        onPositionedRef.current?.();
+      }
+    };
     const onScroll = () => updatePosition(false);
     window.addEventListener("resize", onResize);
     window.addEventListener("scroll", onScroll, true);
     return () => {
+      cancelAnimationFrame(raf);
+      cancelAnimationFrame(raf2);
       window.removeEventListener("resize", onResize);
       window.removeEventListener("scroll", onScroll, true);
     };
@@ -243,6 +287,8 @@ export const AddDropdown = forwardRef<HTMLDivElement, Props>(function AddDropdow
     search,
     onSearchChange,
     onAdd,
+    onClose,
+    panelId,
     anchorRef,
     placement = "auto",
     anchorInset = { left: 12, right: 12 },
@@ -250,12 +296,73 @@ export const AddDropdown = forwardRef<HTMLDivElement, Props>(function AddDropdow
   },
   ref
 ) {
+  const panelRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  const focusSearchInput = useCallback(() => {
+    const input = searchInputRef.current;
+    if (!input) return;
+    input.focus({ preventScroll: true });
+    requestAnimationFrame(() => {
+      input.focus({ preventScroll: true });
+    });
+  }, []);
+
+  const setPanelRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      panelRef.current = node;
+      if (typeof ref === "function") ref(node);
+      else if (ref) ref.current = node;
+    },
+    [ref]
+  );
+
   const floatingStyle = useFloatingPanelStyle(
     anchorRef,
     placement,
     anchorInset,
-    anchorGap
+    anchorGap,
+    focusSearchInput
   );
+
+  useLayoutEffect(() => {
+    focusSearchInput();
+  }, [focusSearchInput]);
+
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        event.stopPropagation();
+        onClose();
+        return;
+      }
+
+      if (event.key !== "Tab") return;
+
+      const panel = panelRef.current;
+      if (!panel || !panel.contains(document.activeElement)) return;
+
+      const focusable = getFocusableElements(panel);
+      if (focusable.length === 0) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active = document.activeElement;
+
+      if (event.shiftKey && active === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && active === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+
+    document.addEventListener("keydown", handleKeyDown, true);
+    return () => document.removeEventListener("keydown", handleKeyDown, true);
+  }, [onClose]);
+
   const entityQueries = useQueries({
     queries: blueprints.map((bp) => ({
       queryKey: ["entities", bp.identifier, portToken],
@@ -425,13 +532,23 @@ export const AddDropdown = forwardRef<HTMLDivElement, Props>(function AddDropdow
       : !isEntityLoading && entityGroupCount === 0;
 
   return createPortal(
-    <div ref={ref} className="add-panel add-panel--floating" style={floatingStyle}>
+    <div
+      ref={setPanelRef}
+      id={panelId}
+      className="add-panel add-panel--floating"
+      style={floatingStyle}
+      role="dialog"
+      aria-modal="true"
+      aria-label={ADD_DIALOG_LABEL[tab]}
+    >
       <div className="add-panel-search">
         <div className="add-search-shell">
           <SearchIcon size={15} className="add-search-icon" aria-hidden />
           <input
+            ref={searchInputRef}
             type="text"
             className="add-search-input"
+            autoFocus
             placeholder={
               tab === "pages"
                 ? "Search pages"

@@ -40,6 +40,9 @@
   --red-bg: var(--color-red-100, #fef2f2);
   --green: #16a34a;
   --green-bg: #f0fdf4;
+
+  /* Keyboard focus — inner ring matches surface, outer ring is high-contrast */
+  --focus-ring: 0 0 0 2px var(--card), 0 0 0 4px var(--blue);
 }
 
 *,
@@ -415,8 +418,8 @@ body {
 }
 
 .fav-list-add-btn:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--blue) 35%, transparent);
-  outline-offset: 1px;
+  outline: none;
+  box-shadow: var(--focus-ring);
 }
 
 .fav-list-separator {
@@ -429,7 +432,7 @@ body {
 .fav-list-wrap {
   flex: 1;
   overflow-y: auto;
-  padding: 6px 8px;
+  padding: 6px 12px;
   scrollbar-width: thin;
   scrollbar-color: var(--text-faint) transparent;
 }
@@ -658,10 +661,13 @@ body {
 
 .fav-item:hover .fav-item-actions,
 .fav-item:focus-within .fav-item-actions {
-  max-width: 90px;
+  max-width: 98px;
   margin-left: 12px;
   opacity: 1;
   pointer-events: auto;
+  overflow: visible;
+  padding: 4px;
+  margin-right: -4px;
 }
 
 .fav-item-action-btn {
@@ -676,17 +682,18 @@ body {
   background: none;
   color: var(--muted);
   cursor: pointer;
-  transition: color 0.12s, background 0.12s;
+  transition: color 0.12s, background 0.12s, box-shadow 0.12s;
 }
 
 .fav-item-action-btn:hover {
-  background: #e6e7e7ab;
+  background: color-mix(in srgb, var(--text-high, #000) 8%, transparent);
   color: var(--text);
 }
 
 .fav-item-action-btn:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--blue) 35%, transparent);
-  outline-offset: 1px;
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--blue);
+  background: color-mix(in srgb, var(--blue) 14%, transparent);
 }
 
 .fav-item-action-btn--star {
@@ -1165,8 +1172,8 @@ body {
 }
 
 .empty-state-add-btn:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--blue) 35%, transparent);
-  outline-offset: 1px;
+  outline: none;
+  box-shadow: var(--focus-ring);
 }
 
 /* ═══════════════════════════════════════════
