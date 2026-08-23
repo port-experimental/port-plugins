@@ -43,6 +43,19 @@
 
   /* Keyboard focus — inner ring matches surface, outer ring is high-contrast */
   --focus-ring: 0 0 0 2px var(--card), 0 0 0 4px var(--blue);
+
+  /* Tooltips — solid inverted surfaces (no theme alphas) */
+  --tooltip-bg: #2f2f2f;
+  --tooltip-text: #ffffff;
+  --tooltip-desc: #e5e7eb;
+  --tooltip-shadow: 0 4px 14px rgba(0, 0, 0, 0.16);
+}
+
+:root[data-theme="dark"] {
+  --tooltip-bg: #e8eaed;
+  --tooltip-text: #14171c;
+  --tooltip-desc: #4b5563;
+  --tooltip-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
 }
 
 *,
@@ -711,13 +724,14 @@ body {
   transform: translateY(calc(-100% - 12px));
   padding: 6px 10px;
   border-radius: 8px;
-  background: #2f2f2f;
-  color: #ffffff;
+  background-color: var(--tooltip-bg);
+  color: var(--tooltip-text);
   font-size: 12px;
   font-weight: 500;
   line-height: 1.2;
   white-space: nowrap;
   pointer-events: none;
+  box-shadow: var(--tooltip-shadow);
 }
 
 .fav-action-tooltip::after {
@@ -727,7 +741,7 @@ body {
   right: 11px;
   left: auto;
   border: 5px solid transparent;
-  border-top-color: #2f2f2f;
+  border-top-color: var(--tooltip-bg);
 }
 
 .fav-text-tooltip {
@@ -741,12 +755,12 @@ body {
 .fav-text-tooltip-body {
   padding: 8px 10px;
   border-radius: 8px;
-  background: #2f2f2f;
-  color: #ffffff;
+  background-color: var(--tooltip-bg);
+  color: var(--tooltip-text);
   font-size: 12px;
   font-weight: 400;
   line-height: 1.35;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--tooltip-shadow);
 }
 
 .fav-text-tooltip-arrow {
@@ -756,7 +770,7 @@ body {
   margin-left: 16px;
   border-left: 6px solid transparent;
   border-right: 6px solid transparent;
-  border-top: 6px solid #2f2f2f;
+  border-top: 6px solid var(--tooltip-bg);
 }
 
 .fav-text-tooltip-line {
@@ -770,7 +784,7 @@ body {
 .fav-text-tooltip-line--description {
   margin-top: 4px;
   font-weight: 400;
-  opacity: 0.92;
+  color: var(--tooltip-desc);
 }
 
 .fav-text-tooltip-line--title + .fav-text-tooltip-line--description {
