@@ -1,10 +1,12 @@
 import { Link2Icon, StarIcon } from "lucide-react";
+import { useRef } from "react";
 import { showRunActionDialog, showRunWorkflowDialog } from "@port-labs/plugins-sdk";
 import type { TabKey, FavoritePage, FavoriteAction, FavoriteEntity } from "../types";
 import { DEV_MOCK } from "../hooks/usePostMessageData";
 import { TabTypeIcon } from "./TabTypeIcon";
 import { BlueprintLabel } from "./BlueprintLabel";
 import { ActionTooltip } from "./ActionTooltip";
+import { FavoriteItemText, type FavoriteItemTextHandle } from "./FavoriteItemText";
 import {
   buildPageUrl,
   buildEntityPageUrl,
@@ -73,6 +75,8 @@ export function FavoriteItem({
   onDragEnd,
   onRemove,
 }: Props) {
+  const itemTextRef = useRef<FavoriteItemTextHandle>(null);
+
   function handleDragStart(e: React.DragEvent) {
     e.dataTransfer.effectAllowed = "move";
 
@@ -118,22 +122,21 @@ export function FavoriteItem({
       <button
         type="button"
         className="fav-item-btn"
-        title={tab === "selfService" ? `Run ${item.title}` : `Open ${item.title}`}
+        onFocus={() => itemTextRef.current?.showTooltip()}
+        onBlur={() => itemTextRef.current?.hideTooltip()}
       >
         {/* Type icon */}
         <span className="fav-item-icon" aria-hidden>
           <TabTypeIcon tab={tab} size={24} />
         </span>
 
-        {/* Title + optional description */}
-        <span className="fav-item-text">
-          <span className="fav-item-title">{item.title}</span>
-          {tab === "selfService" && (item as FavoriteAction).description ? (
-            <span className="fav-item-description">
-              {(item as FavoriteAction).description}
-            </span>
-          ) : null}
-        </span>
+        <FavoriteItemText
+          ref={itemTextRef}
+          title={item.title}
+          description={
+            tab === "selfService" ? (item as FavoriteAction).description : undefined
+          }
+        />
 
         {tab === "entities" && (
           <BlueprintLabel
