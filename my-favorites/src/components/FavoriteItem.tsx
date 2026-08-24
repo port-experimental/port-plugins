@@ -13,6 +13,7 @@ import {
   buildSelfServiceActionUrl,
   buildWorkflowSelfServeUrl,
 } from "../utils/portalUrl";
+import { copyText } from "../utils/copyText";
 
 export type AnyFavorite = FavoritePage | FavoriteAction | FavoriteEntity;
 
@@ -154,15 +155,11 @@ export function FavoriteItem({
             type="button"
             className="fav-item-action-btn"
             aria-label={`Copy link for ${item.title}`}
-            onClick={async (e) => {
+            onClick={(e) => {
               e.stopPropagation();
               const url = getItemUrl(tab, item);
               if (!url) return;
-              try {
-                await navigator.clipboard.writeText(url);
-              } catch {
-                // Ignore clipboard errors silently to avoid breaking click flow.
-              }
+              void copyText(url);
             }}
           >
             <Link2Icon size={18} aria-hidden />
