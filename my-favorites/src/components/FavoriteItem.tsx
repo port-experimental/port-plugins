@@ -1,5 +1,5 @@
-import { Link2Icon, StarIcon } from "lucide-react";
-import { useRef } from "react";
+import { CheckIcon, Link2Icon, StarIcon } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { showRunActionDialog, showRunWorkflowDialog } from "@port-labs/plugins-sdk";
 import type { TabKey, FavoritePage, FavoriteAction, FavoriteEntity } from "../types";
 import { DEV_MOCK } from "../hooks/usePostMessageData";
@@ -65,6 +65,8 @@ function handleItemClick(tab: TabKey, item: AnyFavorite) {
   window.open(url, "_top");
 }
 
+const COPY_SUCCESS_MS = 1500;
+
 export function FavoriteItem({
   item,
   tab,
@@ -77,6 +79,30 @@ export function FavoriteItem({
   onRemove,
 }: Props) {
   const itemTextRef = useRef<FavoriteItemTextHandle>(null);
+  const [linkCopied, setLinkCopied] = useState(false);
+  const copyResetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (copyResetTimer.current) clearTimeout(copyResetTimer.current);
+    };
+  }, []);
+
+  async function handleCopyLink(e: React.MouseEvent<HTMLButtonElement>) {
+    e.stopPropagation();
+    const url = getItemUrl(tab, item);
+    if (!url) return;
+
+    const copied = await copyText(url);
+    if (!copied) return;
+
+    setLinkCopied(true);
+    if (copyResetTimer.current) clearTimeout(copyResetTimer.current);
+    copyResetTimer.current = setTimeout(() => {
+      setLinkCopied(false);
+      copyResetTimer.current = null;
+    }, COPY_SUCCESS_MS);
+  }
 
   function handleDragStart(e: React.DragEvent) {
     e.dataTransfer.effectAllowed = "move";
@@ -150,19 +176,34 @@ export function FavoriteItem({
       </button>
 
       <div className="fav-item-actions">
-        <ActionTooltip label="Copy link">
+        <ActionTooltip label={linkCopied ? "Copied" : "Copy link"}>
           <button
             type="button"
-            className="fav-item-action-btn"
-            aria-label={`Copy link for ${item.title}`}
-            onClick={(e) => {
-              e.stopPropagation();
-              const url = getItemUrl(tab, item);
-              if (!url) return;
-              void copyText(url);
-            }}
+            className={[
+              "fav-item-action-btn",
+              linkCopied ? "fav-item-action-btn--copied" : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
+            aria-label={
+              linkCopied ? "Link copied" : `Copy link for ${item.title}`
+            }
+            onClick={(e) => void handleCopyLink(e)}
           >
-            <Link2Icon size={18} aria-hidden />
+            <span
+              className={`fav-item-action-btn__icon${linkCopied ? " fav-item-action-btn__icon--copied" : ""}`}
+              aria-hidden
+            >
+              {linkCopied ? (
+                <span className="fav-item-action-btn__copy-success">
+                  <span className="fav-item-action-btn__copy-success-mark">
+                    <CheckIcon size={10} strokeWidth={3} />
+                  </span>
+                </span>
+              ) : (
+                <Link2Icon size={18} />
+              )}
+            </span>
           </button>
         </ActionTooltip>
         <ActionTooltip label="Remove from favorites">

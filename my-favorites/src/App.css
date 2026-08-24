@@ -38,8 +38,7 @@
   --red: var(--color-red-300, #f87171);
   --red-dark: var(--color-red-600, #dc2626);
   --red-bg: var(--color-red-100, #fef2f2);
-  --green: #16a34a;
-  --green-bg: #f0fdf4;
+  --green: var(--color-green-300, #16a34a);
 
   /* Keyboard focus — inner ring matches surface, outer ring is high-contrast */
   --focus-ring: 0 0 0 2px var(--card), 0 0 0 4px var(--blue);
@@ -675,6 +674,55 @@ body {
   outline: none;
   box-shadow: inset 0 0 0 2px var(--blue);
   background: color-mix(in srgb, var(--blue) 14%, transparent);
+}
+
+.fav-item-action-btn--copied {
+  background: var(--card, #fff);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--border) 65%, transparent);
+  pointer-events: none;
+}
+
+.fav-item-action-btn__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.18s ease, opacity 0.18s ease;
+}
+
+.fav-item-action-btn__icon--copied {
+  animation: fav-copy-pop 0.2s ease;
+}
+
+.fav-item-action-btn__copy-success {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+}
+
+.fav-item-action-btn__copy-success-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--green);
+  color: #fff;
+}
+
+@keyframes fav-copy-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .fav-item-action-btn--star {
@@ -1417,7 +1465,6 @@ body {
 }
 
 .save-toast--success {
-  background: var(--green-bg);
   color: var(--green);
   border: 1px solid #bbf7d0;
 }
