@@ -1,18 +1,20 @@
 # My Favorites
 
-Bookmark and quick-access your most-used Port Pages, Actions, and Entities from a single [Port](https://app.getport.io) dashboard widget. Each user's favorites are persisted on their own `_user` entity, so bookmarks survive across browsers and devices.
+Bookmark and quick-access your most-used Port Pages, Self service actions/workflows, and Entities from a single [Port](https://app.getport.io) dashboard widget. Each user's favorites are persisted on their own `_user` entity, so bookmarks survive across browsers and devices.
 
 <img width="900" height="540" alt="My Favorites widget showing Pages, Actions, and Entities tabs with drag-to-reorder items" src="https://github.com/port-experimental/port-plugins/blob/main/my-favorites/assets/preview.png" />
 
 ## Features
 
-- Three tabs — **Pages**, **Actions**, **Entities** — each with an item count badge
-- Click any item row to navigate to it in Port (or open the action modal for Actions)
+- Three tabs — **Pages**, **Self service**, **Entities** — each with an item count badge
+- Click any item row to navigate to it in Port (or open the action/workflow dialog for Self service)
 - **Drag-to-reorder** items within a tab and **drag-to-reorder** tabs themselves; order persists per user
-- **Trash** icon to remove an item (appears on row hover)
-- **Refresh** button to sync with the latest Port data
-- **Add** modal per tab with real-time search/filter by title, identifier, or description
-  - Entities tab: first picks a blueprint, then lists entities within it
+- **Copy link** on row hover (with copied confirmation); **Remove** via star icon
+- **Auto-sync on load** — reconciles favorites against Port (drops deleted pages/actions/entities) and saves if anything changed
+- **Add** centered modal per tab with search across titles, identifiers, and descriptions
+  - Entities tab: entities grouped by blueprint in one searchable list
+- **Setup screen** when the required `favorites` property is missing on `_user` (admin users see setup instructions; others are prompted to contact an admin)
+- Optional **`favorites_identifiers`** mirror for catalog/widget filtering (see Prerequisites)
 - Favorites **persist per user** via the `_user` blueprint's `favorites` property
 - Follows Port dark/light theme via `applyThemeCss()`
 
@@ -102,7 +104,9 @@ npm install
 npm run dev   # http://localhost:9000
 ```
 
-The dev server opens with a `DEV_MOCK` guard that shows a "Waiting for Port context" message by default. To preview the full UI, add small mock favorites to `src/hooks/usePostMessageData.ts` or enable Port's **Local development** toggle after uploading.
+The dev server runs outside Port's iframe by default (`DEV_MOCK`). The mock user includes `roles: ["Admin"]` so you can preview the admin setup screen. Set `roles: []` in `usePostMessageData.ts` to preview the non-admin setup copy.
+
+To preview the full favorites UI locally, ensure `MOCK_USER_BLUEPRINT` in `src/dev/mockData.ts` includes the `favorites` schema property, or enable Port's **Local development** toggle after uploading.
 
 > **Note:** Portal navigation links (page, action, and entity URLs) built from mock identifiers do not resolve outside Port's iframe. Validate navigation by enabling **Local development** mode in Port's widget settings after uploading.
 
@@ -147,28 +151,54 @@ port-plugins upload \
 
 ```
 my-favorites/
+├── assets/
+│   └── preview.png              # README screenshot
+├── dist/
+│   └── index.html               # Committed upload artifact (rebuild after version bumps)
 ├── src/
 │   ├── api/
-│   │   └── user.ts              # GET/PATCH _user entity properties
-│   ├── utils/
-│   │   └── favoritesIdentifiers.ts  # Optional favorites_identifiers sync helpers
+│   │   ├── actions.ts           # Self-service actions
+│   │   ├── blueprints.ts        # Blueprint list + _user schema fetch
+│   │   ├── entities.ts          # Entity search / fetch by blueprint
+│   │   ├── pages.ts             # Port pages
+│   │   ├── user.ts              # GET/PATCH _user entity properties
+│   │   └── workflows.ts         # Self-service workflow triggers
 │   ├── components/
-│   │   ├── AddModal.tsx         # Centered add-favorites modal
-│   │   ├── ErrorBanner.tsx      # Query error display
-│   │   ├── FavoriteItem.tsx     # Single draggable row
-│   │   ├── LoadingState.tsx     # Skeleton / spinner
-│   │   └── TabContent.tsx       # Per-tab list + drop indicators
+│   │   ├── tab-content/
+│   │   │   ├── DraggableFavoritesList.tsx
+│   │   │   └── FavoriteControls.tsx   # Search + “+ Favorite” button
+│   │   ├── ActionTooltip.tsx
+│   │   ├── AddModal.tsx           # Centered add-favorites modal
+│   │   ├── BlueprintLabel.tsx
+│   │   ├── EmptyState.tsx
+│   │   ├── ErrorBanner.tsx
+│   │   ├── FavoriteItem.tsx
+│   │   ├── FavoriteItemText.tsx
+│   │   ├── LoadingState.tsx
+│   │   ├── MissingFavoritesProperty.tsx
+│   │   ├── SearchNoResults.tsx
+│   │   ├── TabContent.tsx
+│   │   └── TabTypeIcon.tsx
+│   ├── dev/
+│   │   └── mockData.ts            # Local mock favorites, _user blueprint, entities
 │   ├── hooks/
-│   │   ├── useFavoriteData.ts   # TanStack Query fetches + saveMutation
-│   │   └── usePostMessageData.ts # SDK bridge; applyThemeCss; data-theme stamp
-│   ├── App.tsx                  # Root component — tabs, drag-reorder, refresh
-│   ├── App.css                  # All styles (Port CSS variable tokens)
-│   ├── index.tsx                # React root mount
-│   ├── index.html               # Webpack HTML template
-│   └── types.ts                 # Shared TypeScript types
-├── dist/
-│   └── index.html               # ✅ Committed upload artifact
-├── upload-params.json           # Empty — no params required
+│   │   ├── useFavoriteData.ts     # Queries, save mutation, load reconcile
+│   │   └── usePostMessageData.ts  # SDK bridge, theme, DEV_MOCK
+│   ├── utils/
+│   │   ├── config.ts
+│   │   ├── copyText.ts            # iframe-safe clipboard copy
+│   │   ├── entitySearch.ts        # Entity modal search helpers
+│   │   ├── favoritesIdentifiers.ts
+│   │   ├── portalUrl.ts           # Page / entity / self-service URLs
+│   │   ├── portUser.ts            # Admin detection via user.roles
+│   │   └── reconcileFavorites.ts  # Refresh stale favorites against Port
+│   ├── App.tsx
+│   ├── App.css
+│   ├── global.d.ts
+│   ├── index.html
+│   ├── index.tsx
+│   └── types.ts
+├── upload-params.json
 ├── package.json
 ├── tsconfig.json
 └── webpack.config.js
@@ -178,9 +208,11 @@ my-favorites/
 
 | Symptom | Cause | Fix |
 |---------|-------|-----|
-| "User profile not found" | `_user` entity for your email does not exist or `favorites` property not added | Add the required `favorites` property per Prerequisites above |
+| "Setup required" screen | `favorites` property missing on `_user` blueprint schema | Admins: follow **Prerequisites → Catalog** (link in widget). Others: ask a Port admin to add the property |
+| "User profile not found" | No `_user` entity for your email | Ensure your Port account has a matching `_user` entity |
 | Favorites not persisting | `PATCH /v1/blueprints/_user/entities/{id}` fails | Check Port token permissions; ensure the user has write access to their own `_user` entity |
 | `favorites_identifiers` stays empty | Optional property not on `_user` blueprint schema, or save never ran after adding it | Add `favorites_identifiers` per Prerequisites above, then add/remove an entity favorite to trigger a save |
+| Copy link does nothing | Clipboard blocked in iframe | The plugin uses an iframe-safe copy path; if it still fails, copy the URL from the opened page manually |
 | Navigation links don't open | Running outside Port iframe | Use Port's **Local development** toggle or upload and test in a dashboard |
-| Add modal shows no items | Pages / Actions API returned empty | Verify your Port organization has pages/actions defined |
+| Add modal shows no items | Pages / actions / entities API returned empty | Verify your Port organization has catalog content and the user has read access |
 | Theme looks wrong | `applyThemeCss()` not applied | Ensure the widget is loaded inside Port's iframe; CSS fallbacks cover local dev |

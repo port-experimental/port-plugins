@@ -1,6 +1,6 @@
 {
   "name": "port-my-favorites-plugin",
-  "version": "0.2.0",
+  "version": "0.1.0",
   "private": true,
   "description": "Bookmark and quick-access Pages, Actions, and Entities — Port custom widget",
   "engines": {
