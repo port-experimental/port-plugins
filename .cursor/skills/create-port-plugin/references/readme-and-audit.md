@@ -112,7 +112,7 @@ Do **not** commit other `dist/` files (source maps, chunks, etc.) — only `inde
 - [ ] **Layout:** Responsive behaviour verified; root fills iframe space; no duplicate plugin title, description, or icon (see [scaffolding-and-implementation.md](scaffolding-and-implementation.md)).
 - [ ] **Portal links:** User-facing URLs use **`document.referrer`** origin with **`https://app.port.io`** fallback; entity pages use **`{origin}/{blueprint}Entity?identifier={entityId}`**; not `portApiBaseUrl` and not a hardcoded region unless documented.
 - [ ] **Catalog over params:** README **Prerequisites** document blueprints, properties, **Relations**, and any other required Port instances (automations, SSA, integrations, …) before the widget-parameters table; no relation-key `string` params unless explicitly documented as last-resort overrides.
-- [ ] **Params:** Every `upload-params.json` entry has **`type`**, **`isRequired`**, and **`label`**; labels are short; README **Widget parameters** holds defaults, examples, and operator-facing detail.
+- [ ] **Params:** Every `upload-params.json` entry has **`type`**, **`isRequired`**, and **`label`**; labels are short; optional **`description`** for Port UI tooltips when the label alone is unclear; README **Widget parameters** holds defaults, examples, and operator-facing detail.
 - [ ] **Params vs API:** Catalog shape from Port API + host context; `upload-params.json` minimal — **no** params for blueprint lists, relations, entities, or schemas the API returns; **relations** from catalog + **`PLUGIN_DATA.entity`** + **`relatedTo` / `entities/search`**; subject blueprint param omitted when entity page + design default suffice.
 - [ ] **UX/UI:** Loading, empty, and error states; theme applied; responsive iframe layout; no duplicate plugin title/description/icon; no emoji — use **`<i>`** or an icon library for icons when needed.
 - [ ] **CSS:** `:root` = surfaces/text/borders only; optional palette at **300**; pills/badges use **`--{hue}-bg`** + **`--{hue}-text`** (not `color-mix` into `--card` for labels) — [Optional palette and shade variants](scaffolding-and-implementation.md#optional-palette-and-shade-variants-root); decorations otherwise use **class-local** vars — not shared `--accent` / `--primary` ([Surface vs decoration colors](scaffolding-and-implementation.md#surface-vs-decoration-colors)).
@@ -124,7 +124,7 @@ Do **not** commit other `dist/` files (source maps, chunks, etc.) — only `inde
 
 Each **plugin directory must** include a `README.md` that follows **this section order**. The repo-level widgets table (step 7) is only an index (widget link, **Version** from `package.json`, short description); the per-plugin README is the **authoritative** operator and maintainer guide. If a section does not apply don't include it
 
-1. **`#` Title + summary** — Human title; one paragraph describing behaviour, a link to [Port](https://app.getport.io), and which catalog concepts apply (blueprints, relations, dashboard vs entity page).
+1. **`#` Title + summary** — Human title; one paragraph describing behaviour, a link to [Port](https://app.port.io), and which catalog concepts apply (blueprints, relations, dashboard vs entity page).
 
 2. **Preview image** — At least **one** screenshot or short GIF of the widget running inside Port (dashboard and/or entity page, whichever the widget supports). **Commit** the file under `assets/preview.png` (additional screenshots: `assets/preview-*.png`) and reference it with a **full GitHub blob URL** — not a relative path, not `user-attachments`, not `raw.githubusercontent.com`.
 
@@ -142,7 +142,7 @@ Each **plugin directory must** include a `README.md` that follows **this section
 
    When the screenshot changes, update **both** the committed PNG and the README `width` / `height` if dimensions changed.
 
-3. **Badges (optional)** — e.g. widget surface (dashboard / entity), React and TypeScript versions; link to [Plugins](https://docs.getport.io/customize-pages-dashboards-and-plugins/plugins) where helpful.
+3. **Badges (optional)** — e.g. widget surface (dashboard / entity), React and TypeScript versions; link to [Plugins](https://docs.port.io/customize-pages-dashboards-and-plugins/plugins) where helpful.
 
 4. **Features** — Bullet list of user-visible capabilities.
 
@@ -162,7 +162,7 @@ Each **plugin directory must** include a `README.md` that follows **this section
 
    For each **new** instance the widget introduces (blueprint, relation, automation, SSA, etc.), include enough detail (identifiers, fields, links) that an admin can create it in Port without reading source code. State the **Node.js** range from `package.json` `engines` (and align with the [port-plugins-cli](https://www.npmjs.com/package/@port-labs/port-plugins-cli) Node requirement if operators run the CLI from the same machine).
 
-6. **Widget parameters** — Table mirroring **`upload-params.json`**: key, type, required, default, description (use the same types Port expects, including `blueprint`). This table is the **authoritative** place for defaults, examples, and “when to override” guidance — **`upload-params.json` `label` fields stay short** (see [scaffolding-and-implementation.md](scaffolding-and-implementation.md) (**Param labels**)). Should be **minimal** — if a row duplicates catalog data (relation keys, fixed subject blueprint on entity pages), remove the param and document the catalog/default in **Prerequisites** instead. Place this **after** Prerequisites and **before** deploy steps.
+6. **Widget parameters** — Table mirroring **`upload-params.json`**: key, type, required, default, description (use the same types Port expects, including `blueprint`). This table is the **authoritative** place for defaults, examples, and “when to override” guidance — **`upload-params.json` `label` fields stay short**; add optional JSON **`description`** for Port configuration tooltips when labels are ambiguous (see [params-and-relations.md](params-and-relations.md) (**Optional `description`**)). Should be **minimal** — if a row duplicates catalog data (relation keys, fixed subject blueprint on entity pages), remove the param and document the catalog/default in **Prerequisites** instead. Place this **after** Prerequisites and **before** deploy steps.
 
 7. **Local development** — `npm run dev`, dev server URL, **small mock data** (`usePostMessageData.ts` for host context; `src/dev/mockData.ts` or `api/` early returns when `DEV_MOCK`); which files to edit; Port **Local development** toggle. Document the inner loop **before** production upload so contributors do not have to scroll past release steps.
 
@@ -190,7 +190,7 @@ Each **plugin directory must** include a `README.md` that follows **this section
 
      When auditing, confirm the README’s `--identifier` matches the folder name and satisfies this regex.
 
-     Do **not** duplicate the full CLI tutorial here. For install, `port-plugins config`, tokens vs client credentials, and `--port-api-base-url` / region, link once to [@port-labs/port-plugins-cli on npm](https://www.npmjs.com/package/@port-labs/port-plugins-cli) (and [Port Plugins](https://docs.getport.io/customize-pages-dashboards-and-plugins/plugins) where relevant).
+     Do **not** duplicate the full CLI tutorial here. For install, `port-plugins config`, tokens vs client credentials, and `--port-api-base-url` / region, link once to [@port-labs/port-plugins-cli on npm](https://www.npmjs.com/package/@port-labs/port-plugins-cli) (and [Port Plugins](https://docs.port.io/customize-pages-dashboards-and-plugins/plugins) where relevant).
 
    - **Add in Port** — Short steps: custom widget → pick plugin → params defaults vs overrides (cross-reference **Widget parameters** above).
    - **Entity-page behaviour** — When behaviour differs from dashboards: blueprints, relations, any **Get entity** (or other) calls required because host `PLUGIN_DATA` is incomplete.

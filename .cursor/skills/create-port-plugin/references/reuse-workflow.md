@@ -143,7 +143,7 @@ User request
 - [ ] README **Prerequisites** drafted before params table
 
 **Params**
-- [ ] Minimal `upload-params.json`; short labels
+- [ ] Minimal `upload-params.json`; short labels; optional `description` tooltips when labels are ambiguous
 - [ ] No API-fetchable data in params
 - [ ] UX + safe rendering planned — [ui-and-styling.md](ui-and-styling.md), [guidelines.md](guidelines.md)
 
@@ -182,4 +182,4 @@ Never substitute MCP or static catalog snapshots for live entity reads in plugin
 - [scaffolding.md](scaffolding.md) — templates
 - [implementation.md](implementation.md) — API, portal links, mocks
 - [plugin-architecture.md](plugin-architecture.md) — host bridge, build
-- [Port Plugins docs](https://docs.getport.io/customize-pages-dashboards-and-plugins/plugins)
+- [Port Plugins docs](https://docs.port.io/customize-pages-dashboards-and-plugins/plugins)

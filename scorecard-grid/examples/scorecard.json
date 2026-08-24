@@ -1,0 +1,57 @@
+{
+  "identifier": "production_readiness",
+  "title": "Production readiness",
+  "blueprint": "service",
+  "levels": [
+    { "title": "Critical", "color": "red" },
+    { "title": "Bronze", "color": "bronze" },
+    { "title": "Silver", "color": "silver" },
+    { "title": "Gold", "color": "gold" }
+  ],
+  "rules": [
+    {
+      "identifier": "no_open_bugs",
+      "title": "No open bugs",
+      "level": "Gold",
+      "query": {
+        "combinator": "and",
+        "conditions": [
+          {
+            "property": "open_bug_count",
+            "operator": "=",
+            "value": 0
+          }
+        ]
+      }
+    },
+    {
+      "identifier": "low_vulnerabilities",
+      "title": "Fewer than 3 open vulnerabilities",
+      "level": "Silver",
+      "query": {
+        "combinator": "and",
+        "conditions": [
+          {
+            "property": "open_vulnerability_count",
+            "operator": "<",
+            "value": 3
+          }
+        ]
+      }
+    },
+    {
+      "identifier": "has_owner",
+      "title": "Has an owner team",
+      "level": "Bronze",
+      "query": {
+        "combinator": "and",
+        "conditions": [
+          {
+            "relation": "team",
+            "operator": "isNotEmpty"
+          }
+        ]
+      }
+    }
+  ]
+}

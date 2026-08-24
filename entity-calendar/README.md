@@ -1,6 +1,6 @@
 # Entity Calendar
 
-A [Port](https://app.getport.io) custom widget that shows a month calendar for a chosen blueprint. Days with at least one entity are highlighted using each entity’s creation date. Click a marked day to open a modal listing **title** and **identifier**, with a link to the entity page in Port.
+A [Port](https://app.port.io) custom widget that shows a month calendar for a chosen blueprint. Days with at least one entity are highlighted using each entity’s creation date. Click a marked day to open a modal listing **title** and **identifier**, with a link to the entity page in Port.
 
 Designed for **dashboard** pages (not entity-scoped).
 
@@ -10,7 +10,7 @@ Designed for **dashboard** pages (not entity-scoped).
 
 ## Badges
 
-Dashboard · React 19 · TypeScript · [Port Plugins](https://docs.getport.io/customize-pages-dashboards-and-plugins/plugins)
+Dashboard · React 19 · TypeScript · [Port Plugins](https://docs.port.io/customize-pages-dashboards-and-plugins/plugins)
 
 ## Features
 

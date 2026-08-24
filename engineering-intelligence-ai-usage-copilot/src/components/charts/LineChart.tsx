@@ -52,7 +52,8 @@ export function LineChart({
     ? compareData!.flatMap((d) => series.map((s) => Number(d[s.key] ?? 0)))
     : [];
   const rawMax = Math.max(1, ...values, ...compareValues);
-  const max = maxOverride ?? niceMax(rawMax);
+  // Never below the data: an out-of-range point must stay inside the plot area.
+  const max = Math.max(maxOverride ?? 0, niceMax(rawMax));
 
   const innerW = W - PAD.left - PAD.right;
   const innerH = H - PAD.top - PAD.bottom;
