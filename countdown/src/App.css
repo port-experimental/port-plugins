@@ -1,0 +1,328 @@
+/* Theme: Port host tokens via plugins-sdk (applyThemeCss) + data-theme from themeMode.ts */
+:root {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Roboto,
+    Oxygen, Ubuntu, sans-serif;
+  font-size: 14px;
+
+  --bg: var(--background-primary, #ffffff);
+  --card: var(--background-dim, #ffffff);
+  --digit-bg: var(--color-gray-200, #eceef1);
+  --text: var(--text-high, #1f2937);
+  --muted: var(--text-medium, #6b7280);
+  --text-faint: var(--text-low, #9ca3af);
+  --radius-digit: 10px;
+}
+
+:root[data-theme="dark"] {
+  --digit-bg: var(--background-dim-transparent, rgba(255, 255, 255, 0.1));
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#plugin-root {
+  height: 100%;
+  min-height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+#plugin-root {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.shell {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  width: 100%;
+  min-height: 160px;
+  padding: clamp(12px, 2vw, 20px);
+  overflow-x: auto;
+  overflow-y: auto;
+}
+
+.shell--message {
+  justify-content: center;
+  align-items: center;
+}
+
+.main {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.setup-panel {
+  width: 100%;
+  max-width: 560px;
+  background: var(--card);
+  border: 1px solid var(--border-medium, rgba(0, 0, 0, 0.08));
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.setup-panel__title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.setup-panel__text {
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.setup-panel__text code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.9em;
+  color: var(--text);
+}
+
+.format-hint {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  background: var(--digit-bg);
+  border-radius: 10px;
+}
+
+.format-hint__lead {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.format-hint__list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.format-hint__list li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.format-hint__list code,
+.format-hint__received code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.85rem;
+  color: var(--text);
+  background: var(--card);
+  border-radius: 6px;
+  padding: 4px 8px;
+  width: fit-content;
+}
+
+.format-hint__note {
+  font-size: 0.8rem;
+  color: var(--text-faint);
+}
+
+.format-hint__received {
+  font-size: 0.85rem;
+  color: var(--muted);
+  padding-top: 4px;
+}
+
+.countdown-card {
+  flex: 1;
+  width: 100%;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(16px, 3vw, 28px);
+  padding: clamp(8px, 2vw, 16px) 0;
+}
+
+.countdown-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+}
+
+.countdown-title {
+  font-size: clamp(1.1rem, 2vw, 1.5rem);
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.countdown-target {
+  font-size: clamp(0.8rem, 1.4vw, 0.95rem);
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.countdown-display {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.countdown-display__row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  flex-wrap: nowrap;
+  gap: clamp(6px, 1.2vw, 14px);
+  max-width: 100%;
+}
+
+.digit-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(8px, 1.5vw, 12px);
+  flex-shrink: 0;
+}
+
+.digit-pair {
+  display: flex;
+  gap: clamp(4px, 0.8vw, 8px);
+}
+
+.digit-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(36px, 7vw, 56px);
+  height: clamp(56px, 12vw, 88px);
+  background: var(--digit-bg);
+  border-radius: var(--radius-digit);
+}
+
+.digit-slot__value {
+  font-size: clamp(1.75rem, 6vw, 3rem);
+  font-weight: 300;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.digit-group__label {
+  font-size: clamp(0.6rem, 1.1vw, 0.72rem);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.countdown-colon {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(8px, 1.5vw, 12px);
+  height: clamp(56px, 12vw, 88px);
+  padding: 0 clamp(2px, 0.5vw, 4px);
+  flex-shrink: 0;
+}
+
+.countdown-colon span {
+  width: clamp(4px, 0.8vw, 6px);
+  height: clamp(4px, 0.8vw, 6px);
+  border-radius: 50%;
+  background: var(--muted);
+}
+
+.countdown-expired {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(12px, 2vw, 20px);
+  width: 100%;
+}
+
+.countdown-expired .digit-slot__value {
+  color: var(--muted);
+}
+
+.countdown-expired__label {
+  font-size: clamp(1rem, 2vw, 1.35rem);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+:root[data-theme="light"] .countdown-expired__label {
+  color: var(--text-high, #111827);
+}
+
+:root[data-theme="dark"] .countdown-expired__label {
+  color: var(--text-high, #f9fafb);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 520px) {
+  .countdown-display__row {
+    gap: 4px;
+  }
+
+  .digit-group__label {
+    font-size: 0.55rem;
+    letter-spacing: 0.04em;
+  }
+}
+
+@media (max-width: 400px) {
+  .shell {
+    padding: 8px;
+  }
+
+  .digit-slot {
+    width: clamp(30px, 8vw, 40px);
+    height: clamp(48px, 14vw, 64px);
+    border-radius: 8px;
+  }
+
+  .countdown-colon {
+    height: clamp(48px, 14vw, 64px);
+  }
+}

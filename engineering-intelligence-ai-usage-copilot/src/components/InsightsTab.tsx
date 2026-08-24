@@ -492,7 +492,7 @@ export function InsightsTab({
   };
 
   const portalOrigin = (() => {
-    try { return new URL(document.referrer).origin; } catch { return "https://app.getport.io"; }
+    try { return new URL(document.referrer).origin; } catch { return "https://app.port.io"; }
   })();
 
   const workflowUrl = workflowId

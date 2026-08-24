@@ -62,7 +62,7 @@ No new blueprints required. Configure the plugin with blueprints that already ex
 
 ## Plugin parameters
 
-<!-- Mirror upload-params.json exactly. This table is authoritative for defaults, examples, and when to override. Keep upload-params.json labels short. Remove rows that duplicate catalog data (relation keys, subject blueprint on entity pages). -->
+<!-- Mirror upload-params.json exactly. This table is authoritative for defaults, examples, and when to override. Keep upload-params.json labels short; use optional text description for Port UI tooltips when labels are ambiguous. Remove rows that duplicate catalog data (relation keys, subject blueprint on entity pages). -->
 
 | Key | Type | Required | Default | Description |
 |-----|------|----------|---------|-------------|

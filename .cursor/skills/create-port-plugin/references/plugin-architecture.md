@@ -121,7 +121,7 @@ useQuery({
 | `string`, `number`, `boolean`, `object`, `array` | Scalar / JSON |
 | `blueprint` | Blueprint picker (object at runtime) |
 
-Every param: **`type`**, **`isRequired`**, **`label`**. Detail in README — [params-and-relations.md](params-and-relations.md).
+Every param: **`type`**, **`isRequired`**, **`label`**. Optional **`description`** — Port shows it as tooltip/helper text when a short label is not enough ([params-and-relations.md](params-and-relations.md) (**Optional `description`**)). Full operator detail in README.
 
 ## Theming
 

@@ -6,7 +6,7 @@ import type { Entity, Page, Params, User } from "../types";
 export const DEV_MOCK =
   process.env.NODE_ENV === "development" && window.parent === window;
 
-const MOCK_BASE_URL = "https://api.getport.io";
+const MOCK_BASE_URL = "https://api.port.io";
 const MOCK_TOKEN = "dev-mock-token";
 
 export const usePostMessageData = () => {

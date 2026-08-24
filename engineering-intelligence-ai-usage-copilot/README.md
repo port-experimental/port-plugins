@@ -1,6 +1,6 @@
 # Github Copilot AI Adoption and Usage
 
-Custom [Port](https://app.port.io) plugin that turns raw GitHub Copilot organization metrics into an interactive engineering intelligence dashboard. Tracks active users, acceptance rates, lines of code, PR activity, and (optionally) generates AI insight reports about your Copilot usage. See the [setup guide](https://docs.port.io/guides/all/create-github-copilot-ai-usage-dashboard).
+Custom [Port](https://app.port.io) plugin that turns raw GitHub Copilot organization metrics into an interactive engineering intelligence dashboard. Tracks active users, acceptance rates, lines of code, PR activity, and (optionally) generates AI insight reports about your Copilot usage. See the [setup guide](https://docs.port.io/guides/all/create-github-copilot-ai-usage-dashboard-custom-plugin).
 
 ## Preview image
 
@@ -27,7 +27,7 @@ Custom [Port](https://app.port.io) plugin that turns raw GitHub Copilot organiza
 
 ### Blueprints and properties
 
-Port's native [GitHub Copilot integration](https://docs.port.io/context-lake/ingestion/ingest-data-into-port/native-integrations/ai-usage-metrics/github-copilot/github-copilot) creates the `githubCopilotOrganizationUsage` blueprint and populates it with one entity per organization per day. That blueprint identifier is what you pass as `copilotOrgUsageBlueprint` when configuring the widget.
+Port's native [GitHub Copilot integration](https://docs.port.io/context-lake/ingestion/ingest-data-into-port/native-integrations/ai-usage-metrics/github-copilot/) creates the `githubCopilotOrganizationUsage` blueprint and populates it with one entity per organization per day. That blueprint identifier is what you pass as `copilotOrgUsageBlueprint` when configuring the widget.
 
 The plugin reads the `record_date` property (ISO date-time string) to identify which day each entity belongs to.
 

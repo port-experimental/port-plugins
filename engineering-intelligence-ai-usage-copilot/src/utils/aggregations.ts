@@ -6,6 +6,7 @@ import type {
   BreakdownRow,
   DailyMetric,
   DateRange,
+  FeatureTotals,
   Granularity,
   MetricTotals,
   Series,
@@ -154,6 +155,56 @@ export function reduceStock(
   return Math.round(mean(vals));
 }
 
+// ── Acceptance-rate inputs ────────────────────────────────────────────────────
+
+/**
+ * Agent and chat edits write into the file directly, so they report
+ * `loc_added_sum` but never `loc_suggested_to_add_sum`. Including them makes the
+ * ratio exceed 100%, so acceptance rates count completion rows only.
+ */
+const COMPLETION_FEATURE = "code_completion";
+
+type RateTotals = {
+  generated: number;
+  accepted: number;
+  locSuggested: number;
+  locAdded: number;
+};
+
+/**
+ * Rows the developer could accept or reject inline. Any row reporting suggested
+ * lines qualifies, so a new suggestion feature counts without a code change.
+ */
+function isSuggestionRow(r: FeatureTotals): boolean {
+  return r.feature === COMPLETION_FEATURE || r.locSuggestedToAddSum > 0;
+}
+
+/** Records with no feature breakdown fall back to day-level totals. */
+function rateTotals(m: DailyMetric): RateTotals {
+  if (m.totalsByFeature.length === 0) {
+    return {
+      generated: m.codeGenerationActivityCount,
+      accepted: m.codeAcceptanceActivityCount,
+      locSuggested: m.locSuggestedToAddSum,
+      locAdded: m.locAddedSum,
+    };
+  }
+  const out: RateTotals = { generated: 0, accepted: 0, locSuggested: 0, locAdded: 0 };
+  for (const r of m.totalsByFeature) {
+    if (!isSuggestionRow(r)) continue;
+    out.generated += r.codeGenerationActivityCount;
+    out.accepted += r.codeAcceptanceActivityCount;
+    out.locSuggested += r.locSuggestedToAddSum;
+    out.locAdded += r.locAddedSum;
+  }
+  return out;
+}
+
+/** Percentage, rounded; 0 when the denominator is empty. */
+function pct(numerator: number, denominator: number): number {
+  return denominator > 0 ? Math.round((numerator / denominator) * 100) : 0;
+}
+
 // ── Headline KPI totals ───────────────────────────────────────────────────────
 
 export function computeTotals(
@@ -238,28 +289,27 @@ export function acceptanceRateSeries(
   return bucketize(metrics, g).map((b) => {
     if (agg === "avg") {
       // Weighted average across bucket: best represents true acceptance over the period.
-      const gen = sum(b.items, (m) => m.codeGenerationActivityCount);
-      const acc = sum(b.items, (m) => m.codeAcceptanceActivityCount);
-      const locSug = sum(b.items, (m) => m.locSuggestedToAddSum);
-      const locAdd = sum(b.items, (m) => m.locAddedSum);
+      const t = b.items.map(rateTotals).reduce(
+        (a, x) => ({
+          generated: a.generated + x.generated,
+          accepted: a.accepted + x.accepted,
+          locSuggested: a.locSuggested + x.locSuggested,
+          locAdded: a.locAdded + x.locAdded,
+        }),
+        { generated: 0, accepted: 0, locSuggested: 0, locAdded: 0 }
+      );
       return {
         label: b.label, date: b.date,
-        activity: gen > 0 ? Math.round((acc / gen) * 100) : 0,
-        loc: locSug > 0 ? Math.round((locAdd / locSug) * 100) : 0,
+        activity: pct(t.accepted, t.generated),
+        loc: pct(t.locAdded, t.locSuggested),
       };
     }
     // For latest/median/peak: compute per-day rates then reduce.
-    const sorted = [...b.items].sort((a, b) => a.day.localeCompare(b.day));
-    const dayActivity = sorted.map((m) =>
-      m.codeGenerationActivityCount > 0
-        ? (m.codeAcceptanceActivityCount / m.codeGenerationActivityCount) * 100
-        : 0
-    );
-    const dayLoc = sorted.map((m) =>
-      m.locSuggestedToAddSum > 0
-        ? (m.locAddedSum / m.locSuggestedToAddSum) * 100
-        : 0
-    );
+    const sorted = [...b.items]
+      .sort((x, y) => x.day.localeCompare(y.day))
+      .map(rateTotals);
+    const dayActivity = sorted.map((t) => pct(t.accepted, t.generated));
+    const dayLoc = sorted.map((t) => pct(t.locAdded, t.locSuggested));
     const reduceRates = (vals: number[]): number => {
       if (vals.length === 0) return 0;
       if (agg === "latest") return vals[vals.length - 1];
