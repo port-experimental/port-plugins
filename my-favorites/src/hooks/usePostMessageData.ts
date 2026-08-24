@@ -29,7 +29,12 @@ export const usePostMessageData = () => {
   const [mockPage] = useState<Page | undefined>();
   const [mockUser] = useState<User | undefined>(
     DEV_MOCK
-      ? { email: MOCK_USER_EMAIL, firstName: "Dev", lastName: "User" }
+      ? {
+          email: MOCK_USER_EMAIL,
+          firstName: "Dev",
+          lastName: "User",
+          roles: ["Admin"],
+        }
       : undefined
   );
   const [mockEntity_] = useState<Entity | undefined>(mockEntity);

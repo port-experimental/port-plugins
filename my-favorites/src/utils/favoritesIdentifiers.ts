@@ -1,5 +1,12 @@
 import type { FavoriteEntity, FavoritesData, PortBlueprint } from "../types";
 
+export function userBlueprintHasFavorites(
+  blueprint: PortBlueprint | null | undefined
+): boolean {
+  const property = blueprint?.schema?.properties?.favorites;
+  return property?.type === "object";
+}
+
 export function userBlueprintHasFavoritesIdentifiers(
   blueprint: PortBlueprint | null | undefined
 ): boolean {

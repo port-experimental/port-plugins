@@ -5,11 +5,17 @@ export type Page = {
   pageFilters?: unknown;
 };
 
+export type UserRole = {
+  name: string;
+  orgId: string;
+};
+
 export type User = {
   firstName?: string;
   lastName?: string;
   email?: string;
   picture?: string;
+  roles?: UserRole[];
 };
 
 export type Entity = {

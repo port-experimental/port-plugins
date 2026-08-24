@@ -7,6 +7,8 @@ import { TabContent } from "./components/TabContent";
 import { TabTypeIcon } from "./components/TabTypeIcon";
 import { LoadingState } from "./components/LoadingState";
 import { ErrorBanner } from "./components/ErrorBanner";
+import { MissingFavoritesProperty } from "./components/MissingFavoritesProperty";
+import { isPortAdmin } from "./utils/portUser";
 import type { TabKey, FavoritesData } from "./types";
 
 const TAB_LABELS: Record<TabKey, string> = {
@@ -44,10 +46,12 @@ export function App() {
 
   const {
     userEntityQuery,
+    userBlueprintQuery,
     pagesQuery,
     actionsQuery,
     workflowsQuery,
     blueprintsQuery,
+    hasFavoritesProperty,
     supportsFavoritesIdentifiers,
     saveMutation,
     refreshFavorites,
@@ -93,7 +97,9 @@ export function App() {
       initialRefreshStarted.current ||
       initialized ||
       !userEntityQuery.isSuccess ||
-      !userEntityQuery.data
+      !userEntityQuery.data ||
+      !userBlueprintQuery.isSuccess ||
+      !hasFavoritesProperty
     ) {
       return;
     }
@@ -107,7 +113,15 @@ export function App() {
       }
       setInitialized(true);
     })();
-  }, [initialized, userEntityQuery.isSuccess, userEntityQuery.data, runRefresh, applyFavorites]);
+  }, [
+    initialized,
+    userEntityQuery.isSuccess,
+    userEntityQuery.data,
+    userBlueprintQuery.isSuccess,
+    hasFavoritesProperty,
+    runRefresh,
+    applyFavorites,
+  ]);
 
   const updateFavorites = useCallback(
     (next: FavoritesData) => {
@@ -138,8 +152,40 @@ export function App() {
   if (
     userEntityQuery.isPending ||
     userEntityQuery.isLoading ||
-    !initialized
+    userBlueprintQuery.isPending ||
+    userBlueprintQuery.isLoading
   ) {
+    return (
+      <div className="shell">
+        <LoadingState message="Loading your favorites…" />
+      </div>
+    );
+  }
+
+  if (userBlueprintQuery.isError) {
+    return (
+      <div className="shell">
+        <ErrorBanner
+          message="Could not load the _user blueprint."
+          error={userBlueprintQuery.error}
+          onRetry={() => userBlueprintQuery.refetch()}
+        />
+      </div>
+    );
+  }
+
+  if (userBlueprintQuery.isSuccess && !hasFavoritesProperty) {
+    return (
+      <div className="shell shell--message">
+        <MissingFavoritesProperty
+          isAdmin={isPortAdmin(user)}
+          onRetry={() => userBlueprintQuery.refetch()}
+        />
+      </div>
+    );
+  }
+
+  if (!initialized) {
     return (
       <div className="shell">
         <LoadingState message="Loading your favorites…" />
@@ -162,8 +208,8 @@ export function App() {
   if (!userEntityQuery.data) {
     return (
       <ShellMessage>
-        User profile not found. Ensure the _user blueprint has a{" "}
-        <code>favorites</code> property.
+        User profile not found. Ensure your Port account has a matching{" "}
+        <code>_user</code> entity.
       </ShellMessage>
     );
   }

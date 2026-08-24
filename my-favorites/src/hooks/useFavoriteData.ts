@@ -17,6 +17,7 @@ import {
 import type { FavoritesData } from "../types";
 import {
   buildUserFavoritesProperties,
+  userBlueprintHasFavorites,
   userBlueprintHasFavoritesIdentifiers,
 } from "../utils/favoritesIdentifiers";
 
@@ -154,6 +155,8 @@ export function useFavoriteData(
     staleTime: 10 * 60_000,
   });
 
+  const hasFavoritesProperty = userBlueprintHasFavorites(userBlueprintQuery.data);
+
   const supportsFavoritesIdentifiers = userBlueprintHasFavoritesIdentifiers(
     userBlueprintQuery.data
   );
@@ -222,6 +225,7 @@ export function useFavoriteData(
     workflowsQuery,
     blueprintsQuery,
     userBlueprintQuery,
+    hasFavoritesProperty,
     supportsFavoritesIdentifiers,
     saveMutation,
     refreshFavorites,
