@@ -48,6 +48,7 @@ export function App() {
     actionsQuery,
     workflowsQuery,
     blueprintsQuery,
+    supportsFavoritesIdentifiers,
     saveMutation,
     refreshFavorites,
   } = useFavoriteData(portToken, portApiBaseUrl, user?.email);
@@ -68,6 +69,7 @@ export function App() {
         saveMutation.mutate({
           favorites: reconciled,
           userIdentifier: userEntityQuery.data.identifier,
+          syncIdentifiers: supportsFavoritesIdentifiers,
         });
       }
       return true;
@@ -77,7 +79,13 @@ export function App() {
     } finally {
       setRefreshing(false);
     }
-  }, [refreshFavorites, applyFavorites, userEntityQuery.data, saveMutation]);
+  }, [
+    refreshFavorites,
+    applyFavorites,
+    userEntityQuery.data,
+    saveMutation,
+    supportsFavoritesIdentifiers,
+  ]);
 
   // Sync favorites against Port on initial load
   useEffect(() => {
@@ -108,10 +116,11 @@ export function App() {
         saveMutation.mutate({
           favorites: next,
           userIdentifier: userEntityQuery.data.identifier,
+          syncIdentifiers: supportsFavoritesIdentifiers,
         });
       }
     },
-    [userEntityQuery.data, saveMutation]
+    [userEntityQuery.data, saveMutation, supportsFavoritesIdentifiers]
   );
 
   const handleRefresh = useCallback(async () => {

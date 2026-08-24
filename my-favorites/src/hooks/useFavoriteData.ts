@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
-import { fetchUserEntity, patchUserFavorites } from "../api/user";
+import { fetchUserEntity, patchUserEntityProperties } from "../api/user";
 import { fetchPages, fetchPageByIdentifier } from "../api/pages";
 import { fetchActions, fetchActionByIdentifier } from "../api/actions";
 import {
@@ -15,6 +15,10 @@ import {
   type RefreshFetchResults,
 } from "../utils/reconcileFavorites";
 import type { FavoritesData } from "../types";
+import {
+  buildUserFavoritesProperties,
+  userBlueprintHasFavoritesIdentifiers,
+} from "../utils/favoritesIdentifiers";
 
 const DEFAULT_TAB_ORDER: import("../types").TabKey[] = ["pages", "entities", "selfService"];
 
@@ -143,32 +147,45 @@ export function useFavoriteData(
     staleTime: 10 * 60_000,
   });
 
+  const userBlueprintQuery = useQuery({
+    queryKey: ["userBlueprint", portToken],
+    queryFn: () => fetchBlueprintByIdentifier(portApiBaseUrl!, portToken!, "_user"),
+    enabled,
+    staleTime: 10 * 60_000,
+  });
+
+  const supportsFavoritesIdentifiers = userBlueprintHasFavoritesIdentifiers(
+    userBlueprintQuery.data
+  );
+
   const saveMutation = useMutation({
     mutationFn: ({
       favorites,
       userIdentifier,
+      syncIdentifiers,
     }: {
       favorites: FavoritesData;
       userIdentifier: string;
+      syncIdentifiers: boolean;
     }) =>
-      patchUserFavorites(
+      patchUserEntityProperties(
         portApiBaseUrl!,
         portToken!,
         userIdentifier,
-        favorites          // pass the object directly
+        buildUserFavoritesProperties(favorites, syncIdentifiers)
       ),
-    onSuccess: (_, { favorites, userIdentifier }) => {
+    onSuccess: (_, { favorites, syncIdentifiers }) => {
+      const properties = buildUserFavoritesProperties(favorites, syncIdentifiers);
       qc.setQueryData(["userEntity", userEmail], (prev: unknown) => {
         if (!prev || typeof prev !== "object") return prev;
         return {
           ...(prev as object),
           properties: {
             ...((prev as { properties?: Record<string, unknown> }).properties ?? {}),
-            favorites,      // store as object in the cache too
+            ...properties,
           },
         };
       });
-      void userIdentifier;
     },
   });
 
@@ -204,6 +221,8 @@ export function useFavoriteData(
     actionsQuery,
     workflowsQuery,
     blueprintsQuery,
+    userBlueprintQuery,
+    supportsFavoritesIdentifiers,
     saveMutation,
     refreshFavorites,
   };

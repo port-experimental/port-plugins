@@ -6,6 +6,8 @@ import type {
   PortEntity,
 } from "../types";
 
+import { buildFavoritesIdentifiers } from "../utils/favoritesIdentifiers";
+
 export const MOCK_FAVORITES: FavoritesData = {
   pages: [
     { identifier: "services-page", title: "Services", type: "blueprint-entities" },
@@ -37,7 +39,18 @@ export const MOCK_FAVORITES: FavoritesData = {
   ],
 };
 
-export const MOCK_USER_ENTITY: PortEntity = {
+export const MOCK_USER_BLUEPRINT: PortBlueprint = {
+  identifier: "_user",
+  title: "User",
+  schema: {
+    properties: {
+      favorites: { type: "object" },
+      favorites_identifiers: { type: "array" },
+    },
+  },
+};
+
+let mockUserEntity: PortEntity = {
   identifier: "developer@example.com",
   title: "Dev User",
   blueprint: "_user",
@@ -46,7 +59,24 @@ export const MOCK_USER_ENTITY: PortEntity = {
     status: "Active",
     port_type: "Standard",
     favorites: JSON.stringify(MOCK_FAVORITES),
+    favorites_identifiers: buildFavoritesIdentifiers(MOCK_FAVORITES.entities),
   },
+};
+
+export const MOCK_USER_ENTITY: PortEntity = mockUserEntity;
+
+export function getMockUserEntity(): PortEntity {
+  return mockUserEntity;
+}
+
+export function setMockUserEntityProperties(properties: Record<string, unknown>): void {
+  mockUserEntity = {
+    ...mockUserEntity,
+    properties: {
+      ...mockUserEntity.properties,
+      ...properties,
+    },
+  };
 };
 
 export const MOCK_PAGES: PortPage[] = [

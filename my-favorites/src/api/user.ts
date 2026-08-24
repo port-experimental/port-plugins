@@ -1,5 +1,5 @@
 import { DEV_MOCK } from "../hooks/usePostMessageData";
-import { MOCK_USER_ENTITY } from "../dev/mockData";
+import { getMockUserEntity, setMockUserEntityProperties } from "../dev/mockData";
 import type { PortEntity } from "../types";
 
 export async function fetchUserEntity(
@@ -9,7 +9,7 @@ export async function fetchUserEntity(
 ): Promise<PortEntity | null> {
   if (DEV_MOCK) {
     await new Promise((r) => setTimeout(r, 300));
-    return MOCK_USER_ENTITY;
+    return getMockUserEntity();
   }
   const res = await fetch(
     `${baseUrl}/v1/blueprints/_user/entities/${encodeURIComponent(email)}`,
@@ -26,14 +26,15 @@ export async function fetchUserEntity(
   return (data.entity as PortEntity) ?? null;
 }
 
-export async function patchUserFavorites(
+export async function patchUserEntityProperties(
   baseUrl: string,
   token: string,
   userIdentifier: string,
-  favorites: object
+  properties: Record<string, unknown>
 ): Promise<void> {
   if (DEV_MOCK) {
     await new Promise((r) => setTimeout(r, 150));
+    setMockUserEntityProperties(properties);
     return;
   }
   const res = await fetch(
@@ -44,8 +45,7 @@ export async function patchUserFavorites(
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      // Port expects the property value to be an object, not a serialised string
-      body: JSON.stringify({ properties: { favorites } }),
+      body: JSON.stringify({ properties }),
     }
   );
   if (!res.ok) {

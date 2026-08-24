@@ -20,13 +20,13 @@ Bookmark and quick-access your most-used Port Pages, Actions, and Entities from 
 
 ### Catalog
 
-#### Add a `favorites` property to the `_user` blueprint
+#### Required: `favorites` property on `_user`
 
-The plugin stores each user's favorites as a JSON object in a custom property on the built-in `_user` blueprint.
+The plugin stores each user's favorites as a JSON object in a custom property on the built-in `_user` blueprint. **This property is required** for the plugin to work.
 
 | Property identifier | Type   | Required |
 |---------------------|--------|----------|
-| `favorites`         | object | No       |
+| `favorites`         | object | **Yes**  |
 
 **Port API — PATCH to add the property:**
 
@@ -47,7 +47,44 @@ curl -X PATCH "https://api.getport.io/v1/blueprints/_user" \
   }'
 ```
 
-> **Note:** The `_user` blueprint is managed by Port. Adding a custom property is supported but treat the property as append-only — do not remove Port's built-in properties (`port_role`, `port_type`, `status`, etc.).
+#### Optional: `favorites_identifiers` property on `_user`
+
+If you want to **filter Port widgets by a user's favorite entities**, add an optional array property. The plugin detects this field automatically and keeps it in sync whenever favorites are saved.
+
+| Property identifier       | Type           | Required |
+|---------------------------|----------------|----------|
+| `favorites_identifiers`   | array (string) | No       |
+
+**Purpose:** A denormalized list of favorited **entity identifiers** (not blueprints). Use it in catalog filters — for example, show entity tables or widgets scoped to entities whose `identifier` appears in the current user's `favorites_identifiers`.
+
+**Behavior:**
+- The plugin **never reads** this field on load — `favorites` remains the source of truth.
+- On every save (add/remove entity, refresh reconcile, reorder), the plugin writes `favorites_identifiers` as the list of `identifier` values from `favorites.entities`.
+- If the property is not defined on the `_user` blueprint schema, the plugin skips it entirely.
+
+**Port API — PATCH to add the optional property:**
+
+```bash
+curl -X PATCH "https://api.getport.io/v1/blueprints/_user" \
+  -H "Authorization: Bearer $PORT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "schema": {
+      "properties": {
+        "favorites_identifiers": {
+          "type": "array",
+          "title": "Favorite entity identifiers",
+          "description": "Entity identifiers bookmarked by this user (synced by My Favorites plugin)",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  }'
+```
+
+**Example filter use case:** On an entity page or widget, add a filter rule such as **Identifier** → **is one of** → `{user}.favorites_identifiers` (exact filter syntax depends on your Port page configuration). This lets each user see content scoped to the entities they bookmarked in My Favorites.
+
+> **Note:** The `_user` blueprint is managed by Port. Adding custom properties is supported but treat them as append-only — do not remove Port's built-in properties (`port_role`, `port_type`, `status`, etc.).
 
 ### Access
 
@@ -73,7 +110,7 @@ The dev server opens with a `DEV_MOCK` guard that shows a "Waiting for Port cont
 
 ### 1. Catalog
 
-Add the `favorites` property to the `_user` blueprint as described in **Prerequisites → Catalog** above.
+Add the required `favorites` property to the `_user` blueprint as described in **Prerequisites → Catalog** above. Optionally add `favorites_identifiers` if you need catalog filtering by favorite entity identifiers.
 
 ### 2. Build
 
@@ -112,7 +149,9 @@ port-plugins upload \
 my-favorites/
 ├── src/
 │   ├── api/
-│   │   └── user.ts              # PATCH _user entity favorites property
+│   │   └── user.ts              # GET/PATCH _user entity properties
+│   ├── utils/
+│   │   └── favoritesIdentifiers.ts  # Optional favorites_identifiers sync helpers
 │   ├── components/
 │   │   ├── AddDropdown.tsx      # Search + drill-down add panel
 │   │   ├── ErrorBanner.tsx      # Query error display
@@ -139,8 +178,9 @@ my-favorites/
 
 | Symptom | Cause | Fix |
 |---------|-------|-----|
-| "User profile not found" | `_user` entity for your email does not exist or `favorites` property not added | Add the `favorites` property per Prerequisites above |
+| "User profile not found" | `_user` entity for your email does not exist or `favorites` property not added | Add the required `favorites` property per Prerequisites above |
 | Favorites not persisting | `PATCH /v1/blueprints/_user/entities/{id}` fails | Check Port token permissions; ensure the user has write access to their own `_user` entity |
+| `favorites_identifiers` stays empty | Optional property not on `_user` blueprint schema, or save never ran after adding it | Add `favorites_identifiers` per Prerequisites above, then add/remove an entity favorite to trigger a save |
 | Navigation links don't open | Running outside Port iframe | Use Port's **Local development** toggle or upload and test in a dashboard |
 | Add dropdown shows no items | Pages / Actions API returned empty | Verify your Port organization has pages/actions defined |
 | Theme looks wrong | `applyThemeCss()` not applied | Ensure the widget is loaded inside Port's iframe; CSS fallbacks cover local dev |

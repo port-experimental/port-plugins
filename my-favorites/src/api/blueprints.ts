@@ -1,5 +1,5 @@
 import { DEV_MOCK } from "../hooks/usePostMessageData";
-import { MOCK_BLUEPRINTS } from "../dev/mockData";
+import { MOCK_BLUEPRINTS, MOCK_USER_BLUEPRINT } from "../dev/mockData";
 import type { PortBlueprint } from "../types";
 
 // System blueprint identifiers to exclude from the entity picker.
@@ -37,6 +37,9 @@ export async function fetchBlueprintByIdentifier(
 ): Promise<PortBlueprint | null> {
   if (DEV_MOCK) {
     await new Promise((r) => setTimeout(r, 100));
+    if (blueprintIdentifier === "_user") {
+      return MOCK_USER_BLUEPRINT;
+    }
     return (
       MOCK_BLUEPRINTS.find((bp) => bp.identifier === blueprintIdentifier) ?? null
     );

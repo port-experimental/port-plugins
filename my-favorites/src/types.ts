@@ -86,6 +86,9 @@ export type PortBlueprint = {
   title: string;
   icon?: string;
   description?: string;
+  schema?: {
+    properties?: Record<string, { type?: string }>;
+  };
 };
 
 export type PortEntity = {
