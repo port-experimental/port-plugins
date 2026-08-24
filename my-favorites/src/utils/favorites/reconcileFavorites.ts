@@ -7,8 +7,8 @@ import type {
   PortAction,
   PortBlueprint,
   PortEntity,
-} from "../types";
-import type { SelfServiceWorkflowPickerItem } from "../api/workflows";
+} from "../../types";
+import type { SelfServiceWorkflowPickerItem } from "../../api/workflows";
 
 export type RefreshFetchResults = {
   pages: Map<string, PortPage | null>;

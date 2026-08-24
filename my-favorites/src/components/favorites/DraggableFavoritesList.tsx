@@ -1,4 +1,4 @@
-import { FavoriteItem, type AnyFavorite } from "../FavoriteItem";
+import { FavoriteItem, type AnyFavorite } from "./FavoriteItem";
 import type { TabKey } from "../../types";
 
 type FilteredFavorite = {

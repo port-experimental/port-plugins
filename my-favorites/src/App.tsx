@@ -2,11 +2,11 @@ import { useState, useEffect, useCallback, useRef, type ReactNode } from "react"
 import "./App.css";
 import { usePostMessageData } from "./hooks/usePostMessageData";
 import { useFavoriteData, parseFavorites } from "./hooks/useFavoriteData";
-import { TabContent } from "./components/TabContent";
-import { TabTypeIcon } from "./components/TabTypeIcon";
-import { LoadingState } from "./components/LoadingState";
-import { ErrorBanner } from "./components/ErrorBanner";
-import { MissingFavoritesProperty } from "./components/MissingFavoritesProperty";
+import { TabContent } from "./components/favorites/TabContent";
+import { TabTypeIcon } from "./components/shared/TabTypeIcon";
+import { LoadingState } from "./components/shared/LoadingState";
+import { ErrorBanner } from "./components/shared/ErrorBanner";
+import { MissingFavoritesProperty } from "./components/setup/MissingFavoritesProperty";
 import { isPortAdmin } from "./utils/portUser";
 import type { TabKey, FavoritesData } from "./types";
 

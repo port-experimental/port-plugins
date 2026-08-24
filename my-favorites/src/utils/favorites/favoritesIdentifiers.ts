@@ -1,4 +1,4 @@
-import type { FavoriteEntity, FavoritesData, PortBlueprint } from "../types";
+import type { FavoriteEntity, FavoritesData, PortBlueprint } from "../../types";
 
 export function userBlueprintHasFavorites(
   blueprint: PortBlueprint | null | undefined

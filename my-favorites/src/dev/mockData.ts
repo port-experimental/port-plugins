@@ -6,7 +6,7 @@ import type {
   PortEntity,
 } from "../types";
 
-import { buildFavoritesIdentifiers } from "../utils/favoritesIdentifiers";
+import { buildFavoritesIdentifiers } from "../utils/favorites/favoritesIdentifiers";
 
 export const MOCK_FAVORITES: FavoritesData = {
   pages: [

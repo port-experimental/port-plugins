@@ -1,4 +1,4 @@
-import type { TabKey } from "../types";
+import type { TabKey } from "../../types";
 
 type Props = {
   tab: TabKey;

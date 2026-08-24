@@ -152,46 +152,50 @@ port-plugins upload \
 ```
 my-favorites/
 ├── assets/
-│   └── preview.png              # README screenshot
+│   └── preview.png
 ├── dist/
 │   └── index.html               # Committed upload artifact (rebuild after version bumps)
 ├── src/
-│   ├── api/
-│   │   ├── actions.ts           # Self-service actions
-│   │   ├── blueprints.ts        # Blueprint list + _user schema fetch
-│   │   ├── entities.ts          # Entity search / fetch by blueprint
-│   │   ├── pages.ts             # Port pages
-│   │   ├── user.ts              # GET/PATCH _user entity properties
-│   │   └── workflows.ts         # Self-service workflow triggers
+│   ├── api/                     # Port API clients
+│   │   ├── actions.ts
+│   │   ├── blueprints.ts
+│   │   ├── entities.ts
+│   │   ├── pages.ts
+│   │   ├── user.ts
+│   │   └── workflows.ts
 │   ├── components/
-│   │   ├── tab-content/
-│   │   │   ├── DraggableFavoritesList.tsx
-│   │   │   └── FavoriteControls.tsx   # Search + “+ Favorite” button
-│   │   ├── ActionTooltip.tsx
-│   │   ├── AddModal.tsx           # Centered add-favorites modal
-│   │   ├── BlueprintLabel.tsx
-│   │   ├── EmptyState.tsx
-│   │   ├── ErrorBanner.tsx
-│   │   ├── FavoriteItem.tsx
-│   │   ├── FavoriteItemText.tsx
-│   │   ├── LoadingState.tsx
-│   │   ├── MissingFavoritesProperty.tsx
-│   │   ├── SearchNoResults.tsx
-│   │   ├── TabContent.tsx
-│   │   └── TabTypeIcon.tsx
+│   │   ├── add-modal/
+│   │   │   └── AddModal.tsx     # Centered picker modal
+│   │   ├── favorites/         # List, rows, tab panel
+│   │   │   ├── TabContent.tsx
+│   │   │   ├── FavoriteItem.tsx
+│   │   │   ├── FavoriteItemText.tsx
+│   │   │   ├── FavoriteControls.tsx
+│   │   │   └── DraggableFavoritesList.tsx
+│   │   ├── setup/
+│   │   │   └── MissingFavoritesProperty.tsx
+│   │   └── shared/              # Reusable UI primitives
+│   │       ├── ActionTooltip.tsx
+│   │       ├── BlueprintLabel.tsx
+│   │       ├── EmptyState.tsx
+│   │       ├── ErrorBanner.tsx
+│   │       ├── LoadingState.tsx
+│   │       ├── SearchNoResults.tsx
+│   │       └── TabTypeIcon.tsx
 │   ├── dev/
-│   │   └── mockData.ts            # Local mock favorites, _user blueprint, entities
+│   │   └── mockData.ts
 │   ├── hooks/
-│   │   ├── useFavoriteData.ts     # Queries, save mutation, load reconcile
-│   │   └── usePostMessageData.ts  # SDK bridge, theme, DEV_MOCK
+│   │   ├── useFavoriteData.ts
+│   │   └── usePostMessageData.ts
 │   ├── utils/
+│   │   ├── favorites/           # Favorites domain logic
+│   │   │   ├── favoritesIdentifiers.ts
+│   │   │   └── reconcileFavorites.ts
+│   │   ├── copyText.ts
 │   │   ├── config.ts
-│   │   ├── copyText.ts            # iframe-safe clipboard copy
-│   │   ├── entitySearch.ts        # Entity modal search helpers
-│   │   ├── favoritesIdentifiers.ts
-│   │   ├── portalUrl.ts           # Page / entity / self-service URLs
-│   │   ├── portUser.ts            # Admin detection via user.roles
-│   │   └── reconcileFavorites.ts  # Refresh stale favorites against Port
+│   │   ├── entitySearch.ts
+│   │   ├── portalUrl.ts
+│   │   └── portUser.ts
 │   ├── App.tsx
 │   ├── App.css
 │   ├── global.d.ts

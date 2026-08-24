@@ -1,6 +1,6 @@
 import { PlusIcon, StarIcon } from "lucide-react";
 import type { ReactNode, RefObject } from "react";
-import type { TabKey } from "../types";
+import type { TabKey } from "../../types";
 
 const MESSAGES: Record<TabKey, { heading: string; hint: string }> = {
   pages: {

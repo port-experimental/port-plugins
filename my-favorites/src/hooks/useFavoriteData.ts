@@ -13,13 +13,13 @@ import {
   reconcileFavorites,
   favoritesEqual,
   type RefreshFetchResults,
-} from "../utils/reconcileFavorites";
+} from "../utils/favorites/reconcileFavorites";
 import type { FavoritesData } from "../types";
 import {
   buildUserFavoritesProperties,
   userBlueprintHasFavorites,
   userBlueprintHasFavoritesIdentifiers,
-} from "../utils/favoritesIdentifiers";
+} from "../utils/favorites/favoritesIdentifiers";
 
 const DEFAULT_TAB_ORDER: import("../types").TabKey[] = ["pages", "entities", "selfService"];
 

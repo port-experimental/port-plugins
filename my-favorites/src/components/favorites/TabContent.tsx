@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef, useId, useCallback } from "react";
 import { type AnyFavorite } from "./FavoriteItem";
-import { EmptyState } from "./EmptyState";
-import { AddModal } from "./AddModal";
-import { FavoriteControls } from "./tab-content/FavoriteControls";
-import { DraggableFavoritesList } from "./tab-content/DraggableFavoritesList";
-import { SearchNoResults } from "./SearchNoResults";
+import { EmptyState } from "../shared/EmptyState";
+import { AddModal } from "../add-modal/AddModal";
+import { FavoriteControls } from "./FavoriteControls";
+import { DraggableFavoritesList } from "./DraggableFavoritesList";
+import { SearchNoResults } from "../shared/SearchNoResults";
 import type {
   TabKey,
   FavoritesData,
@@ -14,9 +14,9 @@ import type {
   PortPage,
   PortAction,
   PortBlueprint,
-} from "../types";
-import type { SelfServiceWorkflowPickerItem } from "../api/workflows";
-import { selfServiceFavoriteKey } from "../api/workflows";
+} from "../../types";
+import type { SelfServiceWorkflowPickerItem } from "../../api/workflows";
+import { selfServiceFavoriteKey } from "../../api/workflows";
 
 type Props = {
   tab: TabKey;

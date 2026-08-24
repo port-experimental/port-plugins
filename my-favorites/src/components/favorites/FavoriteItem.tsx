@@ -1,19 +1,19 @@
 import { CheckIcon, Link2Icon, StarIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { showRunActionDialog, showRunWorkflowDialog } from "@port-labs/plugins-sdk";
-import type { TabKey, FavoritePage, FavoriteAction, FavoriteEntity } from "../types";
-import { DEV_MOCK } from "../hooks/usePostMessageData";
-import { TabTypeIcon } from "./TabTypeIcon";
-import { BlueprintLabel } from "./BlueprintLabel";
-import { ActionTooltip } from "./ActionTooltip";
+import type { TabKey, FavoritePage, FavoriteAction, FavoriteEntity } from "../../types";
+import { DEV_MOCK } from "../../hooks/usePostMessageData";
+import { TabTypeIcon } from "../shared/TabTypeIcon";
+import { BlueprintLabel } from "../shared/BlueprintLabel";
+import { ActionTooltip } from "../shared/ActionTooltip";
 import { FavoriteItemText, type FavoriteItemTextHandle } from "./FavoriteItemText";
 import {
   buildPageUrl,
   buildEntityPageUrl,
   buildSelfServiceActionUrl,
   buildWorkflowSelfServeUrl,
-} from "../utils/portalUrl";
-import { copyText } from "../utils/copyText";
+} from "../../utils/portalUrl";
+import { copyText } from "../../utils/copyText";
 
 export type AnyFavorite = FavoritePage | FavoriteAction | FavoriteEntity;
 

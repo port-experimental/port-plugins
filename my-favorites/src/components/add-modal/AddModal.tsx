@@ -8,11 +8,11 @@ import {
 import { createPortal } from "react-dom";
 import { SearchIcon, CheckIcon, XIcon } from "lucide-react";
 import { useQueries } from "@tanstack/react-query";
-import { fetchEntitiesForBlueprint } from "../api/entities";
-import { LoadingDots } from "./LoadingState";
-import { TabTypeIcon } from "./TabTypeIcon";
-import { BlueprintLabel } from "./BlueprintLabel";
-import { SearchNoResults } from "./SearchNoResults";
+import { fetchEntitiesForBlueprint } from "../../api/entities";
+import { LoadingDots } from "../shared/LoadingState";
+import { TabTypeIcon } from "../shared/TabTypeIcon";
+import { BlueprintLabel } from "../shared/BlueprintLabel";
+import { SearchNoResults } from "../shared/SearchNoResults";
 import type {
   TabKey,
   PortPage,
@@ -23,10 +23,10 @@ import type {
   FavoriteAction,
   FavoriteEntity,
   SelfServiceKind,
-} from "../types";
-import type { SelfServiceWorkflowPickerItem } from "../api/workflows";
-import { selfServiceFavoriteKey } from "../api/workflows";
-import { entityMatchesSearch } from "../utils/entitySearch";
+} from "../../types";
+import type { SelfServiceWorkflowPickerItem } from "../../api/workflows";
+import { selfServiceFavoriteKey } from "../../api/workflows";
+import { entityMatchesSearch } from "../../utils/entitySearch";
 
 type Props = {
   tab: TabKey;
