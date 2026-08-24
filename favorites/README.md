@@ -2,7 +2,7 @@
 
 Bookmark and quick-access your most-used Port Pages, Self service actions/workflows, and Entities from a single [Port](https://app.getport.io) dashboard widget. Each user's favorites are persisted on their own `_user` entity, so bookmarks survive across browsers and devices.
 
-<img width="900" height="540" alt="My Favorites widget showing Pages, Actions, and Entities tabs with drag-to-reorder items" src="https://github.com/port-experimental/port-plugins/blob/main/my-favorites/assets/preview.png" />
+<img width="900" height="540" alt="My Favorites widget showing Pages, Actions, and Entities tabs with drag-to-reorder items" src="https://github.com/port-experimental/port-plugins/blob/main/favorites/assets/preview.png" />
 
 ## Features
 
@@ -99,7 +99,7 @@ This plugin requires no upload parameters. All data is fetched at runtime using 
 ## Local development
 
 ```bash
-cd my-favorites
+cd favorites
 npm install
 npm run dev   # http://localhost:9000
 ```
@@ -132,14 +132,14 @@ Install the CLI once if you haven't: see [@port-labs/port-plugins-cli on npm](ht
 ```bash
 port-plugins upload \
   --file dist/index.html \
-  --identifier my-favorites-port-plugin \
-  --title "My Favorites" \
+  --identifier favorites-port-plugin \
+  --title "Favorites" \
   --params "$(cat upload-params.json)" \
   --description "Bookmark and quick-access Pages, Self service, and Entities." \
   --upsert
 ```
 
-> The identifier `my-favorites-port-plugin` satisfies the Port identifier regex `^(?!\.{1,2}$)[A-Za-z0-9@_.+:\\/=-]+$`.
+> The identifier `favorites-port-plugin` satisfies the Port identifier regex `^(?!\.{1,2}$)[A-Za-z0-9@_.+:\\/=-]+$`.
 
 ### 4. Add in Port
 
@@ -150,7 +150,7 @@ port-plugins upload \
 ## Project structure
 
 ```
-my-favorites/
+favorites/
 ├── assets/
 │   └── preview.png
 ├── dist/

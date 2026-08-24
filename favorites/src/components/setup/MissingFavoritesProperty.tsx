@@ -1,7 +1,7 @@
 import { Settings2Icon, RefreshCwIcon } from "lucide-react";
 
 const SETUP_README_URL =
-  "https://github.com/port-experimental/port-plugins/blob/main/my-favorites/README.md#catalog";
+  "https://github.com/port-experimental/port-plugins/blob/main/favorites/README.md#catalog";
 
 type Props = {
   isAdmin: boolean;

@@ -20,7 +20,7 @@ This repository contains plugins contributed by [Port.io](https://www.port.io).
 | [Copilot AI Adoption & Usage](./engineering-intelligence-ai-usage-copilot) | 0.1.1 | Custom Port plugin that turns raw GitHub Copilot organization metrics into an interactive engineering intelligence dashboard |
 | [Countdown](./countdown) | 0.1.0 | Live countdown to a target date and time |
 | [Scorecard Grid](./scorecard-grid) | 0.1.0 | A colour-coded health grid widget for Port dashboards. Displays all entities of a blueprint as sized cubes grouped by their scorecard level, with counters, drill-down panels, and a sticky detail sidebar |
-| [My Favorites](./my-favorites) | 0.2.0 | Bookmark and quick-access Pages, Actions, and Entities with drag-to-reorder and per-user persistence |
+| [My Favorites](./favorites) | 0.1.0 | Bookmark and quick-access Pages, Actions, and Entities with drag-to-reorder and per-user persistence |
 
 ## AI-assisted development - Skills (Cursor & Claude)
 
