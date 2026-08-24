@@ -49,7 +49,7 @@
   --tooltip-desc: #e5e7eb;
   --tooltip-shadow: 0 4px 14px rgba(0, 0, 0, 0.16);
 
-  --modal-overlay: rgba(26, 31, 43, 0.10);
+  --modal-overlay: rgba(26, 31, 43, 0.05);
 }
 
 :root[data-theme="dark"] {
@@ -681,8 +681,8 @@ body {
 }
 
 .fav-item-action-btn--copied {
-  background: var(--card, #fff);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--border) 65%, transparent);
+  background: color-mix(in srgb, var(--text-high, #000) 8%, transparent);
+  color: var(--text);
   pointer-events: none;
 }
 
