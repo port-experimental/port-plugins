@@ -4,12 +4,9 @@ import {
   useEffect,
   useLayoutEffect,
   useRef,
-  useState,
-  type CSSProperties,
-  type RefObject,
 } from "react";
 import { createPortal } from "react-dom";
-import { SearchIcon, CheckIcon } from "lucide-react";
+import { SearchIcon, CheckIcon, XIcon } from "lucide-react";
 import { useQueries } from "@tanstack/react-query";
 import { fetchEntitiesForBlueprint } from "../api/entities";
 import { LoadingDots } from "./LoadingState";
@@ -45,14 +42,8 @@ type Props = {
   onSearchChange: (value: string) => void;
   onAdd: (item: FavoritePage | FavoriteAction | FavoriteEntity) => void;
   onClose: () => void;
-  panelId: string;
-  anchorRef: RefObject<HTMLElement | null>;
-  placement?: "auto" | "above" | "below";
-  anchorInset?: { left: number; right: number };
-  anchorGap?: number;
+  modalId: string;
 };
-
-const PANEL_MAX_HEIGHT = 240;
 
 const ADD_DIALOG_LABEL: Record<TabKey, string> = {
   pages: "Add page to favorites",
@@ -66,122 +57,6 @@ function getFocusableElements(container: HTMLElement): HTMLElement[] {
       'button:not(:disabled), input:not(:disabled), [href], select:not(:disabled), textarea:not(:disabled), [tabindex]:not([tabindex="-1"])'
     )
   );
-}
-
-function resolvePlacement(
-  rect: DOMRect,
-  gap: number,
-  preferred: "auto" | "above" | "below"
-): "above" | "below" {
-  if (preferred !== "auto") return preferred;
-
-  const spaceBelow = window.innerHeight - rect.bottom - gap;
-  const spaceAbove = rect.top - gap;
-
-  if (spaceBelow >= PANEL_MAX_HEIGHT) return "below";
-  if (spaceAbove >= PANEL_MAX_HEIGHT) return "above";
-  return spaceBelow >= spaceAbove ? "below" : "above";
-}
-
-function useFloatingPanelStyle(
-  anchorRef: RefObject<HTMLElement | null>,
-  placement: "auto" | "above" | "below",
-  inset: { left: number; right: number },
-  gap: number,
-  onPositioned?: () => void
-): CSSProperties {
-  const [style, setStyle] = useState<CSSProperties>({
-    position: "fixed",
-    left: -9999,
-    top: 0,
-    opacity: 0,
-    pointerEvents: "none",
-  });
-  const lockedLeftRef = useRef<number | null>(null);
-  const lockedWidthRef = useRef<number | null>(null);
-  const onPositionedRef = useRef(onPositioned);
-  onPositionedRef.current = onPositioned;
-
-  const updatePosition = useCallback(
-    (remeasureHorizontal = false): boolean => {
-      const anchor = anchorRef.current;
-      if (!anchor) return false;
-
-      const rect = anchor.getBoundingClientRect();
-      const measuredLeft = rect.left + inset.left;
-      const measuredWidth = rect.width - inset.left - inset.right;
-
-      if (remeasureHorizontal || lockedWidthRef.current === null) {
-        lockedLeftRef.current = measuredLeft;
-        lockedWidthRef.current = measuredWidth;
-      }
-
-      const left = lockedLeftRef.current ?? measuredLeft;
-      const width = lockedWidthRef.current ?? measuredWidth;
-      const spaceBelow = window.innerHeight - rect.bottom - gap;
-      const spaceAbove = rect.top - gap;
-      const resolvedPlacement = resolvePlacement(rect, gap, placement);
-
-      if (resolvedPlacement === "below") {
-        setStyle({
-          position: "fixed",
-          top: rect.bottom + gap,
-          left,
-          width,
-          maxHeight: Math.min(PANEL_MAX_HEIGHT, spaceBelow),
-          zIndex: 1100,
-          opacity: 1,
-          pointerEvents: "auto",
-        });
-        return true;
-      }
-
-      setStyle({
-        position: "fixed",
-        bottom: window.innerHeight - rect.top + gap,
-        left,
-        width,
-        maxHeight: Math.min(PANEL_MAX_HEIGHT, spaceAbove),
-        zIndex: 1100,
-        opacity: 1,
-        pointerEvents: "auto",
-      });
-      return true;
-    },
-    [anchorRef, gap, inset.left, inset.right, placement]
-  );
-
-  useLayoutEffect(() => {
-    lockedLeftRef.current = null;
-    lockedWidthRef.current = null;
-
-    const run = () => {
-      if (updatePosition(true)) {
-        onPositionedRef.current?.();
-      }
-    };
-
-    run();
-    const raf = requestAnimationFrame(run);
-    const raf2 = requestAnimationFrame(() => requestAnimationFrame(run));
-
-    const onResize = () => {
-      if (updatePosition(true)) {
-        onPositionedRef.current?.();
-      }
-    };
-    const onScroll = () => updatePosition(false);
-    window.addEventListener("resize", onResize);
-    window.addEventListener("scroll", onScroll, true);
-    return () => {
-      cancelAnimationFrame(raf);
-      cancelAnimationFrame(raf2);
-      window.removeEventListener("resize", onResize);
-      window.removeEventListener("scroll", onScroll, true);
-    };
-  }, [updatePosition]);
-
-  return style;
 }
 
 type ListItem = {
@@ -260,7 +135,7 @@ function selfServiceItemMatchesSearch(item: ListItem, query: string): boolean {
   return fields.some((value) => (value ?? "").toLowerCase().includes(query));
 }
 
-export const AddDropdown = forwardRef<HTMLDivElement, Props>(function AddDropdown(
+export const AddModal = forwardRef<HTMLDivElement, Props>(function AddModal(
   {
     tab,
     pages,
@@ -274,16 +149,21 @@ export const AddDropdown = forwardRef<HTMLDivElement, Props>(function AddDropdow
     onSearchChange,
     onAdd,
     onClose,
-    panelId,
-    anchorRef,
-    placement = "auto",
-    anchorInset = { left: 12, right: 12 },
-    anchorGap = 8,
+    modalId,
   },
   ref
 ) {
-  const panelRef = useRef<HTMLDivElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
+
+  const setModalRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      modalRef.current = node;
+      if (typeof ref === "function") ref(node);
+      else if (ref) ref.current = node;
+    },
+    [ref]
+  );
 
   const focusSearchInput = useCallback(() => {
     const input = searchInputRef.current;
@@ -294,26 +174,17 @@ export const AddDropdown = forwardRef<HTMLDivElement, Props>(function AddDropdow
     });
   }, []);
 
-  const setPanelRef = useCallback(
-    (node: HTMLDivElement | null) => {
-      panelRef.current = node;
-      if (typeof ref === "function") ref(node);
-      else if (ref) ref.current = node;
-    },
-    [ref]
-  );
-
-  const floatingStyle = useFloatingPanelStyle(
-    anchorRef,
-    placement,
-    anchorInset,
-    anchorGap,
-    focusSearchInput
-  );
-
   useLayoutEffect(() => {
     focusSearchInput();
   }, [focusSearchInput]);
+
+  useEffect(() => {
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prevOverflow;
+    };
+  }, []);
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
@@ -326,10 +197,10 @@ export const AddDropdown = forwardRef<HTMLDivElement, Props>(function AddDropdow
 
       if (event.key !== "Tab") return;
 
-      const panel = panelRef.current;
-      if (!panel || !panel.contains(document.activeElement)) return;
+      const modal = modalRef.current;
+      if (!modal || !modal.contains(document.activeElement)) return;
 
-      const focusable = getFocusableElements(panel);
+      const focusable = getFocusableElements(modal);
       if (focusable.length === 0) return;
 
       const first = focusable[0];
@@ -417,7 +288,7 @@ export const AddDropdown = forwardRef<HTMLDivElement, Props>(function AddDropdow
     return (
       (item.title ?? "").toLowerCase().includes(q) ||
       (item.identifier ?? "").toLowerCase().includes(q) ||
-      ((item.subtitle ?? "").toLowerCase().includes(q))
+      (item.subtitle ?? "").toLowerCase().includes(q)
     );
   });
 
@@ -518,163 +389,177 @@ export const AddDropdown = forwardRef<HTMLDivElement, Props>(function AddDropdow
       : !isEntityLoading && entityGroupCount === 0;
 
   return createPortal(
-    <div
-      ref={setPanelRef}
-      id={panelId}
-      className="add-panel add-panel--floating"
-      style={floatingStyle}
-      role="dialog"
-      aria-modal="true"
-      aria-label={ADD_DIALOG_LABEL[tab]}
-    >
-      <div className="add-panel-search">
-        <div className="add-search-shell">
-          <SearchIcon size={15} className="add-search-icon" aria-hidden />
-          <input
-            ref={searchInputRef}
-            type="text"
-            className="add-search-input"
-            autoFocus
-            placeholder={
-              tab === "pages"
-                ? "Search pages"
-                : tab === "selfService"
-                ? "Search actions and workflows"
-                : "Search entities"
-            }
-            value={search}
-            onChange={(e) => onSearchChange(e.target.value)}
-            aria-label="Search items to add"
-          />
+    <div className="add-modal-overlay" onClick={onClose}>
+      <div
+        ref={setModalRef}
+        id={modalId}
+        className="add-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-label={ADD_DIALOG_LABEL[tab]}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="add-modal-header">
+          <h2 className="add-modal-title">{ADD_DIALOG_LABEL[tab]}</h2>
+          <button
+            type="button"
+            className="add-modal-close-btn"
+            aria-label="Close"
+            onClick={onClose}
+          >
+            <XIcon size={16} aria-hidden />
+          </button>
         </div>
-      </div>
 
-      <ul className="add-panel-list" role="listbox">
-        {tab === "entities" && isEntityLoading ? (
-          <li className="add-panel-status">
-            <LoadingDots />
-          </li>
-        ) : isEmpty ? (
-          q ? (
-            <li className="add-panel-empty-state" role="status">
-              <SearchNoResults />
+        <div className="add-modal-search">
+          <div className="add-modal-search-shell">
+            <SearchIcon size={15} className="add-modal-search-icon" aria-hidden />
+            <input
+              ref={searchInputRef}
+              type="text"
+              className="add-modal-search-input"
+              autoFocus
+              placeholder={
+                tab === "pages"
+                  ? "Search pages"
+                  : tab === "selfService"
+                  ? "Search actions and workflows"
+                  : "Search entities"
+              }
+              value={search}
+              onChange={(e) => onSearchChange(e.target.value)}
+              aria-label="Search items to add"
+            />
+          </div>
+        </div>
+
+        <ul className="add-modal-list" role="listbox">
+          {tab === "entities" && isEntityLoading ? (
+            <li className="add-modal-status">
+              <LoadingDots />
             </li>
-          ) : (
-            <li className="add-panel-status add-panel-empty">No matching items</li>
-          )
-        ) : tab === "pages" ? (
-          filteredPageItems.map((item) => {
-            const isAdded = alreadyAdded.has(item.identifier);
-            return (
-              <li key={item.identifier} role="option" aria-selected={false}>
-                <button
-                  type="button"
-                  disabled={isAdded}
-                  className={[
-                    "add-panel-item",
-                    isAdded ? "add-panel-item--added" : "",
-                  ]
-                    .filter(Boolean)
-                    .join(" ")}
-                  onClick={() => !isAdded && handlePageSelect(item.identifier)}
-                >
-                  <span className="add-item-icon" aria-hidden>
-                    <TabTypeIcon tab="pages" size={16} />
-                  </span>
-                  <span className="add-item-title">{item.title}</span>
-                  {isAdded ? (
-                    <CheckIcon size={13} className="add-item-check" aria-hidden />
-                  ) : null}
-                </button>
+          ) : isEmpty ? (
+            q ? (
+              <li className="add-modal-empty-state" role="status">
+                <SearchNoResults />
               </li>
-            );
-          })
-        ) : tab === "selfService" ? (
-          filteredSelfServiceGroups.flatMap((group) => [
-            <li
-              key={`header-${group.category}`}
-              className="add-panel-group-header"
-              role="presentation"
-            >
-              {group.category}
-            </li>,
-            ...group.items.map((item) => {
-              const isAdded = alreadyAdded.has(item.key);
+            ) : (
+              <li className="add-modal-status add-modal-empty">No matching items</li>
+            )
+          ) : tab === "pages" ? (
+            filteredPageItems.map((item) => {
+              const isAdded = alreadyAdded.has(item.identifier);
               return (
-                <li key={item.key} role="option" aria-selected={false}>
+                <li key={item.identifier} role="option" aria-selected={false}>
                   <button
                     type="button"
                     disabled={isAdded}
                     className={[
-                      "add-panel-item",
-                      isAdded ? "add-panel-item--added" : "",
+                      "add-modal-item",
+                      isAdded ? "add-modal-item--added" : "",
                     ]
                       .filter(Boolean)
                       .join(" ")}
-                    onClick={() => !isAdded && handleSelfServiceSelect(item)}
+                    onClick={() => !isAdded && handlePageSelect(item.identifier)}
                   >
-                    <span className="add-item-icon" aria-hidden>
-                      <TabTypeIcon tab="selfService" size={16} />
+                    <span className="add-modal-item-icon" aria-hidden>
+                      <TabTypeIcon tab="pages" size={16} />
                     </span>
-                    <span className="add-item-title">{item.title}</span>
+                    <span className="add-modal-item-title">{item.title}</span>
                     {isAdded ? (
-                      <CheckIcon size={13} className="add-item-check" aria-hidden />
+                      <CheckIcon size={13} className="add-modal-item-check" aria-hidden />
                     ) : null}
                   </button>
                 </li>
               );
-            }),
-          ])
-        ) : (
-          filteredEntityGroups.flatMap((group) => [
-            <li
-              key={`header-${group.blueprint.identifier}`}
-              className="add-panel-group-header"
-              role="presentation"
-            >
-              {group.blueprint.title ?? group.blueprint.identifier}
-            </li>,
-            ...group.entities.map((entity) => {
-              const key = entityFavoriteKey(
-                group.blueprint.identifier,
-                entity.identifier
-              );
-              const isAdded = alreadyAdded.has(key);
-              return (
-                <li key={key} role="option" aria-selected={false}>
-                  <button
-                    type="button"
-                    disabled={isAdded}
-                    className={[
-                      "add-panel-item",
-                      isAdded ? "add-panel-item--added" : "",
-                    ]
-                      .filter(Boolean)
-                      .join(" ")}
-                    onClick={() =>
-                      !isAdded && handleEntitySelect(group.blueprint, entity)
-                    }
-                  >
-                    <span className="add-item-icon" aria-hidden>
-                      <TabTypeIcon tab="entities" size={16} />
-                    </span>
-                    <span className="add-item-title">
-                      {entity.title ?? entity.identifier}
-                    </span>
-                    <BlueprintLabel
-                      title={group.blueprint.title}
-                      identifier={group.blueprint.identifier}
-                    />
-                    {isAdded ? (
-                      <CheckIcon size={13} className="add-item-check" aria-hidden />
-                    ) : null}
-                  </button>
-                </li>
-              );
-            }),
-          ])
-        )}
-      </ul>
+            })
+          ) : tab === "selfService" ? (
+            filteredSelfServiceGroups.flatMap((group) => [
+              <li
+                key={`header-${group.category}`}
+                className="add-modal-group-header"
+                role="presentation"
+              >
+                {group.category}
+              </li>,
+              ...group.items.map((item) => {
+                const isAdded = alreadyAdded.has(item.key);
+                return (
+                  <li key={item.key} role="option" aria-selected={false}>
+                    <button
+                      type="button"
+                      disabled={isAdded}
+                      className={[
+                        "add-modal-item",
+                        isAdded ? "add-modal-item--added" : "",
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
+                      onClick={() => !isAdded && handleSelfServiceSelect(item)}
+                    >
+                      <span className="add-modal-item-icon" aria-hidden>
+                        <TabTypeIcon tab="selfService" size={16} />
+                      </span>
+                      <span className="add-modal-item-title">{item.title}</span>
+                      {isAdded ? (
+                        <CheckIcon size={13} className="add-modal-item-check" aria-hidden />
+                      ) : null}
+                    </button>
+                  </li>
+                );
+              }),
+            ])
+          ) : (
+            filteredEntityGroups.flatMap((group) => [
+              <li
+                key={`header-${group.blueprint.identifier}`}
+                className="add-modal-group-header"
+                role="presentation"
+              >
+                {group.blueprint.title ?? group.blueprint.identifier}
+              </li>,
+              ...group.entities.map((entity) => {
+                const key = entityFavoriteKey(
+                  group.blueprint.identifier,
+                  entity.identifier
+                );
+                const isAdded = alreadyAdded.has(key);
+                return (
+                  <li key={key} role="option" aria-selected={false}>
+                    <button
+                      type="button"
+                      disabled={isAdded}
+                      className={[
+                        "add-modal-item",
+                        isAdded ? "add-modal-item--added" : "",
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
+                      onClick={() =>
+                        !isAdded && handleEntitySelect(group.blueprint, entity)
+                      }
+                    >
+                      <span className="add-modal-item-icon" aria-hidden>
+                        <TabTypeIcon tab="entities" size={16} />
+                      </span>
+                      <span className="add-modal-item-title">
+                        {entity.title ?? entity.identifier}
+                      </span>
+                      <BlueprintLabel
+                        title={group.blueprint.title}
+                        identifier={group.blueprint.identifier}
+                      />
+                      {isAdded ? (
+                        <CheckIcon size={13} className="add-modal-item-check" aria-hidden />
+                      ) : null}
+                    </button>
+                  </li>
+                );
+              }),
+            ])
+          )}
+        </ul>
+      </div>
     </div>,
     document.body
   );

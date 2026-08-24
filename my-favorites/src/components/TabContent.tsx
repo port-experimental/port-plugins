@@ -1,7 +1,7 @@
-import { useState, useEffect, useLayoutEffect, useRef, useId, useCallback } from "react";
+import { useState, useEffect, useRef, useId, useCallback } from "react";
 import { type AnyFavorite } from "./FavoriteItem";
 import { EmptyState } from "./EmptyState";
-import { AddDropdown } from "./AddDropdown";
+import { AddModal } from "./AddModal";
 import { FavoriteControls } from "./tab-content/FavoriteControls";
 import { DraggableFavoritesList } from "./tab-content/DraggableFavoritesList";
 import { SearchNoResults } from "./SearchNoResults";
@@ -43,19 +43,18 @@ export function TabContent({
 }: Props) {
   const [search, setSearch] = useState("");
   const [addSearch, setAddSearch] = useState("");
-  const [addOpen, setAddOpen] = useState(false);
+  const [addModalOpen, setAddModalOpen] = useState(false);
   const controlsWrapRef = useRef<HTMLDivElement>(null);
-  const emptyAddWrapRef = useRef<HTMLDivElement>(null);
-  const addPanelRef = useRef<HTMLDivElement>(null);
+  const addModalRef = useRef<HTMLDivElement>(null);
   const addButtonRef = useRef<HTMLButtonElement>(null);
   const emptyAddButtonRef = useRef<HTMLButtonElement>(null);
-  const addPanelId = useId();
+  const addModalId = useId();
   const [dragIdx, setDragIdx] = useState<number | null>(null);
   // insertIdx = 0..n — the gap before item[0], between items, or after last item
   const [insertIdx, setInsertIdx] = useState<number | null>(null);
 
   useEffect(() => {
-    setAddOpen(false);
+    setAddModalOpen(false);
     setAddSearch("");
   }, [tab]);
 
@@ -68,8 +67,8 @@ export function TabContent({
 
   const isEmpty = items.length === 0;
 
-  const closeAddDropdown = useCallback(() => {
-    setAddOpen(false);
+  const closeAddModal = useCallback(() => {
+    setAddModalOpen(false);
     setAddSearch("");
     requestAnimationFrame(() => {
       if (addButtonRef.current) {
@@ -80,14 +79,14 @@ export function TabContent({
     });
   }, []);
 
-  const openAddDropdown = useCallback(() => {
-    setAddOpen(true);
+  const openAddModal = useCallback(() => {
+    setAddModalOpen(true);
     addButtonRef.current?.blur();
     emptyAddButtonRef.current?.blur();
   }, []);
 
-  const toggleAddDropdown = useCallback(() => {
-    setAddOpen((open) => {
+  const toggleAddModal = useCallback(() => {
+    setAddModalOpen((open) => {
       if (open) return false;
       requestAnimationFrame(() => {
         addButtonRef.current?.blur();
@@ -96,31 +95,6 @@ export function TabContent({
       return true;
     });
   }, []);
-
-  useLayoutEffect(() => {
-    if (!addOpen) return;
-    const focusSearch = () => {
-      addPanelRef.current
-        ?.querySelector<HTMLInputElement>(".add-search-input")
-        ?.focus({ preventScroll: true });
-    };
-    focusSearch();
-    const raf = requestAnimationFrame(focusSearch);
-    return () => cancelAnimationFrame(raf);
-  }, [addOpen]);
-
-  useEffect(() => {
-    if (!addOpen) return;
-    function handleOutside(e: MouseEvent) {
-      const target = e.target as Node;
-      if (controlsWrapRef.current?.contains(target)) return;
-      if (emptyAddWrapRef.current?.contains(target)) return;
-      if (addPanelRef.current?.contains(target)) return;
-      closeAddDropdown();
-    }
-    document.addEventListener("mousedown", handleOutside);
-    return () => document.removeEventListener("mousedown", handleOutside);
-  }, [addOpen, closeAddDropdown]);
 
   function patch(newItems: AnyFavorite[]) {
     if (tab === "pages") {
@@ -138,7 +112,7 @@ export function TabContent({
 
   function handleAdd(item: FavoritePage | FavoriteAction | FavoriteEntity) {
     patch([...items, item as AnyFavorite]);
-    closeAddDropdown();
+    closeAddModal();
   }
 
   function handleDragStart(idx: number) {
@@ -197,9 +171,9 @@ export function TabContent({
     })
   );
 
-  const addDropdown = addOpen ? (
-    <AddDropdown
-      ref={addPanelRef}
+  const addModal = addModalOpen ? (
+    <AddModal
+      ref={addModalRef}
       tab={tab}
       pages={pages}
       actions={actions}
@@ -212,11 +186,8 @@ export function TabContent({
       onSearchReset={() => setAddSearch("")}
       onSearchChange={setAddSearch}
       onAdd={handleAdd}
-      onClose={closeAddDropdown}
-      panelId={addPanelId}
-      anchorRef={isEmpty ? emptyAddWrapRef : controlsWrapRef}
-      anchorInset={isEmpty ? { left: -24, right: -24 } : { left: 12, right: 12 }}
-      anchorGap={isEmpty ? 8 : 4}
+      onClose={closeAddModal}
+      modalId={addModalId}
     />
   ) : null;
 
@@ -230,12 +201,12 @@ export function TabContent({
               search={search}
               onSearchChange={setSearch}
               onSearchClear={() => setSearch("")}
-              addOpen={addOpen}
-              onToggleAdd={toggleAddDropdown}
-              onOpenAdd={openAddDropdown}
-              addPanel={addDropdown}
+              addModalOpen={addModalOpen}
+              onToggleAdd={toggleAddModal}
+              onOpenAdd={openAddModal}
+              addModal={addModal}
               addButtonRef={addButtonRef}
-              addPanelId={addPanelId}
+              addModalId={addModalId}
             />
           </div>
           <div className="fav-list-separator" aria-hidden />
@@ -247,14 +218,13 @@ export function TabContent({
           <div className="empty-state-wrap" ref={controlsWrapRef}>
             <EmptyState
               tab={tab}
-              onAddClick={toggleAddDropdown}
-              onOpenAdd={openAddDropdown}
-              addWrapRef={emptyAddWrapRef}
+              onAddClick={toggleAddModal}
+              onOpenAdd={openAddModal}
               addButtonRef={emptyAddButtonRef}
-              addOpen={addOpen}
-              addPanelId={addPanelId}
+              addModalOpen={addModalOpen}
+              addModalId={addModalId}
             >
-              {addDropdown}
+              {addModal}
             </EmptyState>
           </div>
         ) : filteredItems.length === 0 ? (

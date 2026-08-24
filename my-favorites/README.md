@@ -11,7 +11,7 @@ Bookmark and quick-access your most-used Port Pages, Actions, and Entities from 
 - **Drag-to-reorder** items within a tab and **drag-to-reorder** tabs themselves; order persists per user
 - **Trash** icon to remove an item (appears on row hover)
 - **Refresh** button to sync with the latest Port data
-- **Add** dropdown per tab with real-time search/filter by title, identifier, or description
+- **Add** modal per tab with real-time search/filter by title, identifier, or description
   - Entities tab: first picks a blueprint, then lists entities within it
 - Favorites **persist per user** via the `_user` blueprint's `favorites` property
 - Follows Port dark/light theme via `applyThemeCss()`
@@ -153,7 +153,7 @@ my-favorites/
 │   ├── utils/
 │   │   └── favoritesIdentifiers.ts  # Optional favorites_identifiers sync helpers
 │   ├── components/
-│   │   ├── AddDropdown.tsx      # Search + drill-down add panel
+│   │   ├── AddModal.tsx         # Centered add-favorites modal
 │   │   ├── ErrorBanner.tsx      # Query error display
 │   │   ├── FavoriteItem.tsx     # Single draggable row
 │   │   ├── LoadingState.tsx     # Skeleton / spinner
@@ -182,5 +182,5 @@ my-favorites/
 | Favorites not persisting | `PATCH /v1/blueprints/_user/entities/{id}` fails | Check Port token permissions; ensure the user has write access to their own `_user` entity |
 | `favorites_identifiers` stays empty | Optional property not on `_user` blueprint schema, or save never ran after adding it | Add `favorites_identifiers` per Prerequisites above, then add/remove an entity favorite to trigger a save |
 | Navigation links don't open | Running outside Port iframe | Use Port's **Local development** toggle or upload and test in a dashboard |
-| Add dropdown shows no items | Pages / Actions API returned empty | Verify your Port organization has pages/actions defined |
+| Add modal shows no items | Pages / Actions API returned empty | Verify your Port organization has pages/actions defined |
 | Theme looks wrong | `applyThemeCss()` not applied | Ensure the widget is loaded inside Port's iframe; CSS fallbacks cover local dev |

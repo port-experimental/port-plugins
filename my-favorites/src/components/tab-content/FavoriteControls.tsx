@@ -13,12 +13,12 @@ type Props = {
   search: string;
   onSearchChange: (value: string) => void;
   onSearchClear: () => void;
-  addOpen: boolean;
+  addModalOpen: boolean;
   onToggleAdd: () => void;
   onOpenAdd: () => void;
-  addPanel?: ReactNode;
+  addModal?: ReactNode;
   addButtonRef?: RefObject<HTMLButtonElement | null>;
-  addPanelId?: string;
+  addModalId?: string;
 };
 
 export function FavoriteControls({
@@ -26,12 +26,12 @@ export function FavoriteControls({
   search,
   onSearchChange,
   onSearchClear,
-  addOpen,
+  addModalOpen,
   onToggleAdd,
   onOpenAdd,
-  addPanel,
+  addModal,
   addButtonRef,
-  addPanelId,
+  addModalId,
 }: Props) {
   return (
     <>
@@ -62,20 +62,20 @@ export function FavoriteControls({
           className="fav-list-add-btn"
           onClick={onToggleAdd}
           onKeyDown={(e) => {
-            if (addOpen) return;
+            if (addModalOpen) return;
             if (e.key !== "Enter" && e.key !== " ") return;
             e.preventDefault();
             onOpenAdd();
           }}
           aria-haspopup="dialog"
-          aria-expanded={addOpen}
-          aria-controls={addOpen ? addPanelId : undefined}
+          aria-expanded={addModalOpen}
+          aria-controls={addModalOpen ? addModalId : undefined}
         >
           <PlusIcon size={20} aria-hidden />
           Favorite
         </button>
       </div>
-      {addPanel}
+      {addModal}
     </>
   );
 }
