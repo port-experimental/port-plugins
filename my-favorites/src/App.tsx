@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback, useRef, type ReactNode } from "react";
-import { RefreshCwIcon } from "lucide-react";
 import "./App.css";
 import { usePostMessageData } from "./hooks/usePostMessageData";
 import { useFavoriteData, parseFavorites } from "./hooks/useFavoriteData";
@@ -31,7 +30,6 @@ function ShellMessage({ children }: { children: ReactNode }) {
 export function App() {
   const [favorites, setFavorites] = useState<FavoritesData>(EMPTY_FAVORITES);
   const [initialized, setInitialized] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
   const initialRefreshStarted = useRef(false);
 
   // Tab drag state
@@ -65,7 +63,6 @@ export function App() {
   }, []);
 
   const runRefresh = useCallback(async () => {
-    setRefreshing(true);
     try {
       const { reconciled, changed } = await refreshFavorites();
       applyFavorites(reconciled);
@@ -80,8 +77,6 @@ export function App() {
     } catch (error) {
       console.error("Failed to refresh favorites:", error);
       return false;
-    } finally {
-      setRefreshing(false);
     }
   }, [
     refreshFavorites,
@@ -136,10 +131,6 @@ export function App() {
     },
     [userEntityQuery.data, saveMutation, supportsFavoritesIdentifiers]
   );
-
-  const handleRefresh = useCallback(async () => {
-    await runRefresh();
-  }, [runRefresh]);
 
   if (!portApiBaseUrl || !portToken) {
     return (
@@ -275,15 +266,6 @@ export function App() {
             </div>
           ))}
         </div>
-        <button
-          type="button"
-          className={`fav-refresh-btn${refreshing ? " fav-refresh-btn--spinning" : ""}`}
-          aria-label="Refresh favorites"
-          disabled={refreshing || saveMutation.isPending}
-          onClick={() => void handleRefresh()}
-        >
-          <RefreshCwIcon size={16} aria-hidden />
-        </button>
       </div>
 
       {/* Tab panels */}
