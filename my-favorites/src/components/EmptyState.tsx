@@ -2,24 +2,18 @@ import { PlusIcon, StarIcon } from "lucide-react";
 import type { ReactNode, RefObject } from "react";
 import type { TabKey } from "../types";
 
-const MESSAGES: Record<
-  TabKey,
-  { heading: string; hint: string; buttonLabel: string }
-> = {
+const MESSAGES: Record<TabKey, { heading: string; hint: string }> = {
   pages: {
     heading: "There are no favorite pages",
     hint: "Add a page as a favorite to display it here",
-    buttonLabel: "Page",
   },
   entities: {
     heading: "There are no favorite entities",
     hint: "Add an entity as a favorite to display it here",
-    buttonLabel: "Entity",
   },
   selfService: {
     heading: "There are no favorite actions or workflows",
     hint: "Add an action or workflow as a favorite to display it here",
-    buttonLabel: "Self service",
   },
 };
 
@@ -44,7 +38,7 @@ export function EmptyState({
   addPanelId,
   children,
 }: Props) {
-  const { heading, hint, buttonLabel } = MESSAGES[tab];
+  const { heading, hint } = MESSAGES[tab];
   return (
     <div className="empty-state">
       <StarIcon size={44} className="empty-state-icon" strokeWidth={1.5} aria-hidden />
@@ -67,7 +61,7 @@ export function EmptyState({
           aria-controls={addOpen ? addPanelId : undefined}
         >
           <PlusIcon size={20} aria-hidden />
-          {buttonLabel}
+          Favorite
         </button>
         {children}
       </div>

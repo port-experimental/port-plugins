@@ -2,12 +2,6 @@ import { PlusIcon, SearchIcon, XIcon } from "lucide-react";
 import type { ReactNode, RefObject } from "react";
 import type { TabKey } from "../../types";
 
-const TAB_ADD_LABEL: Record<TabKey, string> = {
-  pages: "Page",
-  selfService: "Self service",
-  entities: "Entity",
-};
-
 const TAB_FILTER_PLACEHOLDER: Record<TabKey, string> = {
   pages: "Search favorite pages",
   selfService: "Search favorite actions or workflows",
@@ -78,7 +72,7 @@ export function FavoriteControls({
           aria-controls={addOpen ? addPanelId : undefined}
         >
           <PlusIcon size={20} aria-hidden />
-          {TAB_ADD_LABEL[tab]}
+          Favorite
         </button>
       </div>
       {addPanel}
