@@ -164,7 +164,7 @@ favorites/
 │   ├── components/
 │   │   ├── add-modal/
 │   │   │   └── AddModal.tsx     # Centered picker modal
-│   │   ├── favorites/         # List, rows, tab panel
+│   │   ├── favorites/           # List, rows, tab panel
 │   │   │   ├── TabContent.tsx
 │   │   │   ├── FavoriteItem.tsx
 │   │   │   ├── FavoriteItemText.tsx
@@ -183,6 +183,13 @@ favorites/
 │   ├── dev/
 │   │   └── mockData.ts
 │   ├── hooks/
+│   │   ├── catalog/             # Add-modal catalog queries
+│   │   │   ├── constants.ts
+│   │   │   ├── useActionsCatalogQuery.ts
+│   │   │   ├── useBlueprintsCatalogQuery.ts
+│   │   │   ├── useEntityCatalogQueries.ts
+│   │   │   ├── usePagesCatalogQuery.ts
+│   │   │   └── useWorkflowsCatalogQuery.ts
 │   │   ├── useFavoriteData.ts
 │   │   └── usePostMessageData.ts
 │   ├── utils/
