@@ -919,7 +919,7 @@ body {
   height: min(480px, calc(100vh - 60px));
   border: 1px solid var(--border);
   border-radius: 16px;
-  background: var(--card);
+  background: var(--bg);
   overflow: hidden;
   box-shadow: var(--shadow-md);
   animation: add-modal-in 0.18s ease-out;
@@ -992,7 +992,7 @@ body {
   padding: 10px;
   border-bottom: 1px solid color-mix(in srgb, var(--border) 38%, transparent);
   flex-shrink: 0;
-  background: var(--card);
+  background: var(--bg);
 }
 
 .add-modal-search-shell {

@@ -3,9 +3,9 @@ import type { ReactNode, RefObject } from "react";
 import type { TabKey } from "../../types";
 
 const TAB_FILTER_PLACEHOLDER: Record<TabKey, string> = {
-  pages: "Search favorite pages",
-  selfService: "Search favorite actions or workflows",
-  entities: "Search favorite entities",
+  pages: "Search your favorite pages",
+  selfService: "Search your favorite actions or workflows",
+  entities: "Search your favorite entities",
 };
 
 type Props = {
