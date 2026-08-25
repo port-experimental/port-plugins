@@ -4,7 +4,7 @@ Bookmark your most-used Port Pages, self-service actions, and entities, and acce
 
 ## Preview image
 
-<img width="1004" height="234" alt="My Favorites widget showing Pages, Actions, and Entities tabs with drag-to-reorder items" src="https://github.com/port-experimental/port-plugins/blob/main/favorites/assets/preview.png" />
+<img width="751" height="282" alt="My Favorites widget showing Pages, Actions, and Entities tabs with drag-to-reorder items" src="https://github.com/port-experimental/port-plugins/blob/main/favorites/assets/preview.png" />
 
 ## Features
 
