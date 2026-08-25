@@ -2,6 +2,8 @@
 
 Bookmark your most-used Port Pages, self-service actions, and entities, and access them instantly from the widget on any dashboard where it's added. Favorites are persisted on your _user entity, so they follow you across browsers and devices.
 
+## Preview image
+
 <img width="1004" height="234" alt="My Favorites widget showing Pages, Actions, and Entities tabs with drag-to-reorder items" src="https://github.com/port-experimental/port-plugins/blob/main/favorites/assets/preview.png" />
 
 ## Features
