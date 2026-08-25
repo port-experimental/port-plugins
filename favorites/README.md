@@ -1,6 +1,6 @@
 # My Favorites
 
-Bookmark and quick-access your most-used Port Pages, Self service actions/workflows, and Entities from a single [Port](https://app.getport.io) dashboard widget. Each user's favorites are persisted on their own `_user` entity, so bookmarks survive across browsers and devices.
+Bookmark your most-used Port Pages, self-service actions, and entities, and access them instantly from the widget on any dashboard where it's added. Favorites are persisted on your _user entity, so they follow you across browsers and devices.
 
 <img width="900" height="540" alt="My Favorites widget showing Pages, Actions, and Entities tabs with drag-to-reorder items" src="https://github.com/port-experimental/port-plugins/blob/main/favorites/assets/preview.png" />
 
@@ -14,9 +14,9 @@ Bookmark and quick-access your most-used Port Pages, Self service actions/workfl
 - **Add** centered modal per tab with search across titles, identifiers, and descriptions
   - Entities tab: entities grouped by blueprint in one searchable list
 - **Setup screen** when the required `favorites` property is missing on `_user` (admin users see setup instructions; others are prompted to contact an admin)
-- Optional **`favorites_identifiers`** mirror for catalog/widget filtering (see Prerequisites)
+Optional: favorites_identifiers field on the _user entity, kept in sync with your favorites, so you can filter a dashboard page to show only favorite entities (see Prerequisites).
 - Favorites **persist per user** via the `_user` blueprint's `favorites` property
-- Follows Port dark/light theme via `applyThemeCss()`
+- Follows Port dark/light theme`
 
 ## Prerequisites
 
@@ -51,7 +51,7 @@ curl -X PATCH "https://api.getport.io/v1/blueprints/_user" \
 
 #### Optional: `favorites_identifiers` property on `_user`
 
-If you want to **filter Port widgets by a user's favorite entities**, add an optional array property. The plugin detects this field automatically and keeps it in sync whenever favorites are saved.
+If you want to **filter a dashboard page by a user's favorite entities**, add an optional array property. The plugin detects this field automatically and keeps it in sync whenever favorites are saved.
 
 | Property identifier       | Type           | Required |
 |---------------------------|----------------|----------|
@@ -84,7 +84,7 @@ curl -X PATCH "https://api.getport.io/v1/blueprints/_user" \
   }'
 ```
 
-**Example filter use case:** On an entity page or widget, add a filter rule such as **Identifier** → **is one of** → `{user}.favorites_identifiers` (exact filter syntax depends on your Port page configuration). This lets each user see content scoped to the entities they bookmarked in My Favorites.
+Example filter use case: To scope entities to a user's favorites, set an initial filter rule on the widget, such as Identifier → is in → User → favorites_identifiers. Since filters are applied at the widget level, filtering an entire dashboard page requires adding this filter to each widget on that page.
 
 > **Note:** The `_user` blueprint is managed by Port. Adding custom properties is supported but treat them as append-only — do not remove Port's built-in properties (`port_role`, `port_type`, `status`, etc.).
 
