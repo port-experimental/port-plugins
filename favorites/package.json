@@ -2,7 +2,7 @@
   "name": "port-favorites-plugin",
   "version": "0.1.0",
   "private": true,
-  "description": "Bookmark and quick-access Pages, Actions, and Entities — Port custom widget",
+  "description": "Bookmark your most-used Port Pages, self-service actions, and entities — Port custom widget",
   "engines": {
     "node": ">=20.0.0"
   },
@@ -11,7 +11,7 @@
     "dev": "webpack serve --mode development"
   },
   "dependencies": {
-    "@port-labs/plugins-sdk": "^0.3.0",
+    "@port-labs/plugins-sdk": "^0.4.0",
     "@tanstack/react-query": "^5.95.0",
     "lucide-react": "^1.0.0",
     "react": "^19.0.0",
