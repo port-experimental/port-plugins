@@ -140,15 +140,10 @@ export function App() {
     );
   }
 
-  if (
-    userEntityQuery.isPending ||
-    userEntityQuery.isLoading ||
-    userBlueprintQuery.isPending ||
-    userBlueprintQuery.isLoading
-  ) {
+  if (userEntityQuery.isLoading || userBlueprintQuery.isLoading) {
     return (
-      <div className="shell">
-        <LoadingState message="Loading your favorites…" />
+      <div className="shell shell--loading">
+        <LoadingState />
       </div>
     );
   }
@@ -178,8 +173,8 @@ export function App() {
 
   if (!initialized) {
     return (
-      <div className="shell">
-        <LoadingState message="Loading your favorites…" />
+      <div className="shell shell--loading">
+        <LoadingState />
       </div>
     );
   }

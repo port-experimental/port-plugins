@@ -100,7 +100,7 @@ npm install
 npm run dev   # http://localhost:9000
 ```
 
-The dev server runs outside Port's iframe by default (`DEV_MOCK`). The mock user includes `roles: ["Admin"]` so you can preview the admin setup screen. Set `roles: []` in `usePostMessageData.ts` to preview the non-admin setup copy.
+The dev server runs outside Port's iframe by default (`DEV_MOCK`). The mock user includes `roles: [{ name: "Admin", orgId: "..." }]` so you can preview the admin setup screen. Set `roles: []` in `usePostMessageData.ts` to preview the non-admin setup copy.
 
 To preview the full favorites UI locally, ensure `MOCK_USER_BLUEPRINT` in `src/dev/mockData.ts` includes the `favorites` schema property, or enable Port's **Local development** toggle after uploading.
 

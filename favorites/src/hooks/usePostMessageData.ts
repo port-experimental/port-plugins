@@ -33,7 +33,7 @@ export const usePostMessageData = () => {
           email: MOCK_USER_EMAIL,
           firstName: "Dev",
           lastName: "User",
-          roles: ["Admin"],
+          roles: [{ name: "Admin", orgId: "dev-mock-org" }],
         }
       : undefined
   );

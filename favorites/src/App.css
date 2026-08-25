@@ -85,7 +85,12 @@ body {
 #plugin-root {
   display: flex;
   flex-direction: column;
-  min-height: 0;
+  min-height: 100%;
+}
+
+.shell--loading {
+  flex: 1;
+  min-height: 100%;
 }
 
 /* ═══════════════════════════════════════════
@@ -1329,20 +1334,33 @@ body {
 .loading-state {
   display: flex;
   flex-direction: column;
+  flex: 1;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  padding: 48px 16px;
-  flex: 1;
+  gap: 16px;
+  min-height: 160px;
+  padding: 24px 16px;
 }
 
-.loading-spinner {
-  width: 20px;
-  height: 20px;
-  border: 2px solid var(--border-strong);
-  border-top-color: var(--blue);
-  border-radius: 50%;
-  animation: spin 0.65s linear infinite;
+.loading-state__message {
+  color: var(--muted);
+  font-size: 0.875rem;
+  line-height: 1.55;
+  text-align: center;
+}
+
+.port-loader {
+  display: block;
+  flex-shrink: 0;
+  animation: spin 0.8s linear infinite;
+}
+
+.port-loader__arc {
+  stroke: var(--text);
+}
+
+.port-loader__dots {
+  stroke: var(--text);
 }
 
 @keyframes spin {
