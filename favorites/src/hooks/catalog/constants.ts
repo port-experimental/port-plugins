@@ -1,0 +1,2 @@
+export const CATALOG_STALE_TIME_MS = 5 * 60_000;
+export const ENTITY_CATALOG_STALE_TIME_MS = 60_000;
