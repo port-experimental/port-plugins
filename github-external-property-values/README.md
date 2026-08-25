@@ -4,8 +4,6 @@ Lists every entity (and current property value) that a GitHub External Property 
 
 ## Preview image
 
-<!-- TODO: capture assets/preview.png from Port after uploading (see "Add in Port" below), then commit it and update this <img> to the full GitHub blob URL, per readme-and-audit.md. -->
-
 <img width="820" height="420" alt="GitHub External Property Values plugin" src="https://github.com/port-experimental/port-plugins/blob/main/github-external-property-values/assets/preview.png" />
 
 ## Features
