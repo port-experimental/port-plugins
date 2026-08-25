@@ -1,4 +1,4 @@
-# My Favorites
+# Favorites
 
 Bookmark your most-used Port Pages, self-service actions, and entities, and access them instantly from the widget on any dashboard where it's added. Favorites are persisted on your _user entity, so they follow you across browsers and devices.
 
