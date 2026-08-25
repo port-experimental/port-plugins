@@ -15,7 +15,7 @@ Bookmark your most-used Port Pages, self-service actions, and entities, and acce
   - Entities tab: entities grouped by blueprint in one searchable list
 - **Setup screen** when the required `favorites` property is missing on `_user` (admin users see setup instructions; others are prompted to contact an admin)
 - Favorites **persist per user** via the `_user` blueprint's `favorites` property
-  - Optional: favorites_identifiers field on the _user entity, kept in sync with your favorites, so you can filter a dashboard page to show only favorite entities (see Prerequisites).
+- Optional: favorites_identifiers field on the _user entity, kept in sync with your favorites, so you can filter a dashboard page to show only favorite entities (see Prerequisites).
 - Follows Port dark/light theme`
 
 ## Prerequisites
