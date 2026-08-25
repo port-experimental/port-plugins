@@ -12,7 +12,7 @@ metadata:
 
 Platform rules (CSP, upload limits, param metadata), SDK APIs, and CLI behavior are defined by Port. **Treat Port docs and npm readmes as authoritative**; keep dependency versions current.
 
-- [Plugins — Port Docs](https://docs.getport.io/customize-pages-dashboards-and-plugins/plugins)
+- [Plugins — Port Docs](https://docs.port.io/customize-pages-dashboards-and-plugins/plugins)
 - [`@port-labs/plugins-sdk`](https://www.npmjs.com/package/@port-labs/plugins-sdk) — host bridge, `usePortPluginData`, theming, `mergePageFilters`
 - [`@port-labs/port-plugins-cli`](https://www.npmjs.com/package/@port-labs/port-plugins-cli) — upload, list, update, delete, metadata
 - Starter: [port-plugin-sample](https://github.com/port-labs/port-plugin-sample)
@@ -146,8 +146,8 @@ Before `upload-params.json`:
 | Relations | Schema-first MCP; catalog + README; no relation string params by default |
 | Local dev | Port **9000**; small mocks; document mock portal link limits in README |
 | Subject blueprint | `PLUGIN_DATA.entity.blueprint` on entity pages when design default suffices |
-| Param schema | Every param: `type`, `isRequired`, `label` |
-| Param labels | Short in JSON; detail in README **Plugin parameters** |
+| Param schema | Every param: `type`, `isRequired`, `label`; optional `description` for Port UI tooltips |
+| Param labels | Short in JSON; use optional `description` when label alone is unclear; full detail in README **Plugin parameters** |
 | README | Prerequisites tables before params — [readme-and-audit.md](references/readme-and-audit.md) |
 | Preview image | Commit `assets/preview.png`; README uses full `github.com/.../blob/{branch}/{plugin}/assets/preview.png` — [readme-and-audit.md](references/readme-and-audit.md) (**Preview image**) |
 | Search | Nested `query`; not top-level `combinator`/`rules` |

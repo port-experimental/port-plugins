@@ -31,7 +31,7 @@ Default property keys follow Port's standard DORA integration schema. Override t
 
 ### Integrations
 
-Port's [DORA Metrics](https://docs.getport.io/guides/all/create-and-track-dora-metrics) Ocean integration or a custom ingestion pipeline must be populating the four blueprints with metric entities before the widget will show data.
+Port's [DORA Metrics](https://docs.port.io/guides/all/setup-dora-metrics) Ocean integration or a custom ingestion pipeline must be populating the four blueprints with metric entities before the widget will show data.
 
 ## Widget parameters
 

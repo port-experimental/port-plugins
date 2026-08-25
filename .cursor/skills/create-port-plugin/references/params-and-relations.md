@@ -7,6 +7,7 @@ Define `upload-params.json` **after** [reuse-workflow.md](reuse-workflow.md) Ste
 - [Parameters and relations](#parameters-and-relations)
 - [Catalog over plugin params](#catalog-over-plugin-params)
 - [Required fields per param](#required-fields-per-param)
+- [Optional `description` (tooltips)](#optional-description-tooltips)
 - [Param labels](#param-labels)
 - [Blueprint params](#blueprint-params)
 - [Subject blueprint](#subject-blueprint)
@@ -49,14 +50,27 @@ Every param needs **`type`**, **`isRequired`**, **`label`**:
 }
 ```
 
+## Optional `description` (tooltips)
+
+Port shows an optional **`description`** on each param as **tooltip / helper text** in the widget configuration UI. Add it when a short **`label`** cannot convey what the field does or what value to enter.
+
+| Use `description` | Skip `description` |
+|-------------------|--------------------|
+| Default behaviour when blank (e.g. falls back to `createdAt`) | Self-explanatory labels (`Blueprint`, `Week starts on Monday`) |
+| Property key semantics (`datetime` property name vs display label) | Detail that belongs only in README prerequisites |
+| Non-obvious override purpose | Duplicating the README params table verbatim |
+
+Keep **`label`** short; put tooltip-sized guidance in **`description`** — not in **`label`**. README **Plugin parameters** remains authoritative for defaults, examples, and operator setup.
+
 ## Param labels
 
-| In `label` (short) | In README **Plugin parameters** |
-|--------------------|----------------------------------|
-| `Comment blueprint` | Required properties, relations, defaults |
-| `Due date property` | Default key, when to override |
+| In `label` (short) | In optional `description` (tooltip) | In README **Plugin parameters** |
+|--------------------|-----------------------------------|----------------------------------|
+| `Comment blueprint` | — | Required properties, relations, defaults |
+| `Due date property` | Default key when blank | Default key, when to override |
+| `Datetime property` | Which `datetime` property to read; default | Schema requirements, examples |
 
-Do not put defaults or setup instructions in `label`.
+Do not put defaults or setup instructions in `label`. Use **`description`** for brief in-UI hints; use README for full operator detail.
 
 ## Blueprint params
 
@@ -146,7 +160,14 @@ Single blueprint type on entity pages:
 Optional **`string`** param per date role when widget reads a `datetime` property:
 
 ```json
-{ "dueDateProperty": { "type": "string", "isRequired": false, "label": "Due date property" } }
+{
+  "dueDateProperty": {
+    "type": "string",
+    "isRequired": false,
+    "label": "Due date property",
+    "description": "Blueprint datetime property key. Defaults to dueDate when empty."
+  }
+}
 ```
 
 ```typescript

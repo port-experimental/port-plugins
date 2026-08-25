@@ -3,5 +3,11 @@
     "type": "string",
     "isRequired": true,
     "label": "Example parameter"
+  },
+  "optionalOverride": {
+    "type": "string",
+    "isRequired": false,
+    "label": "Override property",
+    "description": "Optional blueprint property key. Defaults to the conventional key in code when empty."
   }
 }

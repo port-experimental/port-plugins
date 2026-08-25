@@ -1,6 +1,6 @@
 # Scorecard Goals
 
-A [Port](https://app.getport.io) custom widget for **dashboard** pages. Choose a blueprint, then see a progress bar for each scorecard on that blueprint showing what share of entities **passed every rule** in that scorecard.
+A [Port](https://app.port.io) custom widget for **dashboard** pages. Choose a blueprint, then see a progress bar for each scorecard on that blueprint showing what share of entities **passed every rule** in that scorecard.
 
 Compliance is computed from entity search results: for each entity, every rule on the scorecard must have a passing status (for example `Passed`). Dashboard **page filters** are merged into the entity search when present.
 
