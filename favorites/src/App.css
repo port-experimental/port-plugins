@@ -912,8 +912,8 @@ body {
   justify-content: center;
   padding: 24px 16px;
   background: var(--modal-overlay);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
   animation: add-modal-overlay-in 0.16s ease-out;
 }
 
@@ -1072,6 +1072,14 @@ body {
 
 .add-modal-empty {
   color: var(--text-faint);
+}
+
+.add-modal-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 28px 20px;
+  line-height: 1.55;
 }
 
 .add-modal-empty-state {

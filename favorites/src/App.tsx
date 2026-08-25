@@ -45,10 +45,6 @@ export function App() {
   const {
     userEntityQuery,
     userBlueprintQuery,
-    pagesQuery,
-    actionsQuery,
-    workflowsQuery,
-    blueprintsQuery,
     hasFavoritesProperty,
     supportsFavoritesIdentifiers,
     saveMutation,
@@ -276,10 +272,6 @@ export function App() {
           <TabContent
             tab={tab}
             favorites={favorites}
-            pages={pagesQuery.data ?? []}
-            actions={actionsQuery.data ?? []}
-            workflows={workflowsQuery.data ?? []}
-            blueprints={blueprintsQuery.data ?? []}
             portToken={portToken}
             portApiBaseUrl={portApiBaseUrl}
             onUpdate={updateFavorites}

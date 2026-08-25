@@ -7,8 +7,11 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { SearchIcon, CheckIcon, XIcon } from "lucide-react";
-import { useQueries } from "@tanstack/react-query";
-import { fetchEntitiesForBlueprint } from "../../api/entities";
+import { usePagesCatalogQuery } from "../../hooks/catalog/usePagesCatalogQuery";
+import { useActionsCatalogQuery } from "../../hooks/catalog/useActionsCatalogQuery";
+import { useWorkflowsCatalogQuery } from "../../hooks/catalog/useWorkflowsCatalogQuery";
+import { useBlueprintsCatalogQuery } from "../../hooks/catalog/useBlueprintsCatalogQuery";
+import { useEntityCatalogQueries } from "../../hooks/catalog/useEntityCatalogQueries";
 import { LoadingDots } from "../shared/LoadingState";
 import { TabTypeIcon } from "../shared/TabTypeIcon";
 import { BlueprintLabel } from "../shared/BlueprintLabel";
@@ -30,10 +33,6 @@ import { entityMatchesSearch } from "../../utils/entitySearch";
 
 type Props = {
   tab: TabKey;
-  pages: PortPage[];
-  actions: PortAction[];
-  workflows: SelfServiceWorkflowPickerItem[];
-  blueprints: PortBlueprint[];
   alreadyAdded: Set<string>;
   portToken: string;
   portApiBaseUrl: string;
@@ -44,6 +43,9 @@ type Props = {
   onClose: () => void;
   modalId: string;
 };
+
+const CATALOG_LOAD_ERROR_MESSAGE =
+  "Couldn't load items. Try refreshing the page or contact support.";
 
 const ADD_DIALOG_LABEL: Record<TabKey, string> = {
   pages: "Add page to favorites",
@@ -138,10 +140,6 @@ function selfServiceItemMatchesSearch(item: ListItem, query: string): boolean {
 export const AddModal = forwardRef<HTMLDivElement, Props>(function AddModal(
   {
     tab,
-    pages,
-    actions,
-    workflows,
-    blueprints,
     alreadyAdded,
     portToken,
     portApiBaseUrl,
@@ -220,15 +218,41 @@ export const AddModal = forwardRef<HTMLDivElement, Props>(function AddModal(
     return () => document.removeEventListener("keydown", handleKeyDown, true);
   }, [onClose]);
 
-  const entityQueries = useQueries({
-    queries: blueprints.map((bp) => ({
-      queryKey: ["entities", bp.identifier, portToken],
-      queryFn: () =>
-        fetchEntitiesForBlueprint(portApiBaseUrl, portToken, bp.identifier),
-      enabled: tab === "entities",
-      staleTime: 60_000,
-    })),
-  });
+  const pagesQuery = usePagesCatalogQuery(
+    portApiBaseUrl,
+    portToken,
+    tab === "pages"
+  );
+
+  const actionsQuery = useActionsCatalogQuery(
+    portApiBaseUrl,
+    portToken,
+    tab === "selfService"
+  );
+
+  const workflowsQuery = useWorkflowsCatalogQuery(
+    portApiBaseUrl,
+    portToken,
+    tab === "selfService"
+  );
+
+  const blueprintsQuery = useBlueprintsCatalogQuery(
+    portApiBaseUrl,
+    portToken,
+    tab === "entities"
+  );
+
+  const pages = pagesQuery.data ?? [];
+  const actions = actionsQuery.data ?? [];
+  const workflows = workflowsQuery.data ?? [];
+  const blueprints = blueprintsQuery.data ?? [];
+
+  const entityQueries = useEntityCatalogQueries(
+    portApiBaseUrl,
+    portToken,
+    blueprints,
+    tab === "entities"
+  );
 
   function buildPageItems(): ListItem[] {
     return pages
@@ -374,12 +398,30 @@ export const AddModal = forwardRef<HTMLDivElement, Props>(function AddModal(
 
   const isEntityLoading =
     tab === "entities" &&
+    blueprints.length > 0 &&
     entityQueries.some((query) => query.isPending || query.isLoading);
+
+  const isCatalogLoading =
+    tab === "pages"
+      ? pagesQuery.isLoading
+      : tab === "selfService"
+      ? actionsQuery.isLoading || workflowsQuery.isLoading
+      : blueprintsQuery.isLoading;
 
   const entityGroupCount = filteredEntityGroups.reduce(
     (count, group) => count + group.entities.length,
     0
   );
+
+  const entityQueriesFailed =
+    entityQueries.length > 0 && entityQueries.every((query) => query.isError);
+
+  const catalogLoadFailed =
+    tab === "pages"
+      ? pagesQuery.isError
+      : tab === "selfService"
+      ? actionsQuery.isError || workflowsQuery.isError
+      : blueprintsQuery.isError || entityQueriesFailed;
 
   const isEmpty =
     tab === "pages"
@@ -387,6 +429,8 @@ export const AddModal = forwardRef<HTMLDivElement, Props>(function AddModal(
       : tab === "selfService"
       ? filteredSelfServiceItemCount === 0
       : !isEntityLoading && entityGroupCount === 0;
+
+  const showCatalogError = !q && catalogLoadFailed && isEmpty;
 
   return createPortal(
     <div className="add-modal-overlay" onClick={onClose}>
@@ -434,9 +478,13 @@ export const AddModal = forwardRef<HTMLDivElement, Props>(function AddModal(
         </div>
 
         <ul className="add-modal-list" role="listbox">
-          {tab === "entities" && isEntityLoading ? (
+          {isCatalogLoading || isEntityLoading ? (
             <li className="add-modal-status">
               <LoadingDots />
+            </li>
+          ) : showCatalogError ? (
+            <li className="add-modal-status add-modal-error" role="status">
+              <p>{CATALOG_LOAD_ERROR_MESSAGE}</p>
             </li>
           ) : isEmpty ? (
             q ? (

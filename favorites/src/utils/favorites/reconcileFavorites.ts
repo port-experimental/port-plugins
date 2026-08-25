@@ -53,7 +53,7 @@ function reconcileSelfService(
   actions: Map<string, PortAction | null>,
   workflows: Map<string, SelfServiceWorkflowPickerItem | null>
 ): FavoriteAction[] {
-  return favorites.flatMap((favorite) => {
+  return favorites.flatMap((favorite): FavoriteAction[] => {
     if (favorite.type === "workflow") {
       const workflow = workflows.get(favorite.identifier);
       if (!workflow) return [];

@@ -11,20 +11,12 @@ import type {
   FavoritePage,
   FavoriteAction,
   FavoriteEntity,
-  PortPage,
-  PortAction,
-  PortBlueprint,
 } from "../../types";
-import type { SelfServiceWorkflowPickerItem } from "../../api/workflows";
 import { selfServiceFavoriteKey } from "../../api/workflows";
 
 type Props = {
   tab: TabKey;
   favorites: FavoritesData;
-  pages: PortPage[];
-  actions: PortAction[];
-  workflows: SelfServiceWorkflowPickerItem[];
-  blueprints: PortBlueprint[];
   portToken: string;
   portApiBaseUrl: string;
   onUpdate: (next: FavoritesData) => void;
@@ -33,10 +25,6 @@ type Props = {
 export function TabContent({
   tab,
   favorites,
-  pages,
-  actions,
-  workflows,
-  blueprints,
   portToken,
   portApiBaseUrl,
   onUpdate,
@@ -175,10 +163,6 @@ export function TabContent({
     <AddModal
       ref={addModalRef}
       tab={tab}
-      pages={pages}
-      actions={actions}
-      workflows={workflows}
-      blueprints={blueprints}
       alreadyAdded={alreadyAdded}
       portToken={portToken}
       portApiBaseUrl={portApiBaseUrl}

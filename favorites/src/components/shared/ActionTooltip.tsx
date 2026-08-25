@@ -13,9 +13,17 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 
+type TooltipChildProps = {
+  onMouseEnter?: (e: MouseEvent<HTMLElement>) => void;
+  onMouseLeave?: (e: MouseEvent<HTMLElement>) => void;
+  onFocus?: (e: FocusEvent<HTMLElement>) => void;
+  onBlur?: (e: FocusEvent<HTMLElement>) => void;
+  ref?: Ref<HTMLElement>;
+};
+
 type Props = {
   label: string;
-  children: ReactElement;
+  children: ReactElement<TooltipChildProps>;
 };
 
 export function ActionTooltip({ label, children }: Props) {
@@ -41,14 +49,12 @@ export function ActionTooltip({ label, children }: Props) {
     return () => window.removeEventListener("scroll", onScroll, true);
   }, [coords, hide]);
 
-  if (!isValidElement(children)) return children;
+  if (!isValidElement<TooltipChildProps>(children)) return children;
 
-  const child = cloneElement(children, {
+  const child = cloneElement<TooltipChildProps>(children, {
     ref: (node: HTMLElement | null) => {
       anchorRef.current = node;
-      const { ref } = children as ReactElement & {
-        ref?: Ref<HTMLElement>;
-      };
+      const { ref } = children.props;
       if (typeof ref === "function") ref(node);
       else if (ref && typeof ref === "object") {
         (ref as MutableRefObject<HTMLElement | null>).current = node;

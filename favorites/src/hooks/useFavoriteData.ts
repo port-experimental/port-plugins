@@ -1,13 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 import { fetchUserEntity, patchUserEntityProperties } from "../api/user";
-import { fetchPages, fetchPageByIdentifier } from "../api/pages";
-import { fetchActions, fetchActionByIdentifier } from "../api/actions";
+import { fetchPageByIdentifier } from "../api/pages";
+import { fetchActionByIdentifier } from "../api/actions";
 import {
-  fetchSelfServiceWorkflowTriggers,
   fetchWorkflowByIdentifier,
 } from "../api/workflows";
-import { fetchBlueprints, fetchBlueprintByIdentifier } from "../api/blueprints";
+import { fetchBlueprintByIdentifier } from "../api/blueprints";
 import { fetchEntityByIdentifier } from "../api/entities";
 import {
   reconcileFavorites,
@@ -120,34 +119,6 @@ export function useFavoriteData(
     staleTime: 5 * 60_000,
   });
 
-  const pagesQuery = useQuery({
-    queryKey: ["pages", portToken],
-    queryFn: () => fetchPages(portApiBaseUrl!, portToken!),
-    enabled,
-    staleTime: 10 * 60_000,
-  });
-
-  const actionsQuery = useQuery({
-    queryKey: ["actions", portToken],
-    queryFn: () => fetchActions(portApiBaseUrl!, portToken!),
-    enabled,
-    staleTime: 10 * 60_000,
-  });
-
-  const workflowsQuery = useQuery({
-    queryKey: ["workflows", portToken],
-    queryFn: () => fetchSelfServiceWorkflowTriggers(portApiBaseUrl!, portToken!),
-    enabled,
-    staleTime: 10 * 60_000,
-  });
-
-  const blueprintsQuery = useQuery({
-    queryKey: ["blueprints", portToken],
-    queryFn: () => fetchBlueprints(portApiBaseUrl!, portToken!),
-    enabled,
-    staleTime: 10 * 60_000,
-  });
-
   const userBlueprintQuery = useQuery({
     queryKey: ["userBlueprint", portToken],
     queryFn: () => fetchBlueprintByIdentifier(portApiBaseUrl!, portToken!, "_user"),
@@ -220,10 +191,6 @@ export function useFavoriteData(
 
   return {
     userEntityQuery,
-    pagesQuery,
-    actionsQuery,
-    workflowsQuery,
-    blueprintsQuery,
     userBlueprintQuery,
     hasFavoritesProperty,
     supportsFavoritesIdentifiers,
