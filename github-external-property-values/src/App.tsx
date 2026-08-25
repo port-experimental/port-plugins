@@ -84,7 +84,7 @@ export function App() {
               targetBlueprintTitle={query.data.targetBlueprintTitle}
               propertyTitle={query.data.propertyTitle}
               propertyEnumColors={query.data.propertyEnumColors}
-              showRunColumn={!!fields.syncWorkflowIdentifier}
+              showRunColumn
             />
           </>
         )}

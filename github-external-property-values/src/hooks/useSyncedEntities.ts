@@ -1,14 +1,28 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchBlueprint } from "../api/blueprints";
 import { searchSyncedEntities } from "../api/entities";
-import { resolveLatestRunsForEntities } from "../api/workflowRuns";
+import {
+  resolveLatestBulkSyncRun,
+  resolveLatestRunsForEntities,
+} from "../api/workflowRuns";
 import { resolveOrgFilterStrategy } from "../utils/orgFilterStrategy";
 import type {
   Entity,
   GithubExternalPropertyFields,
   OrgFilterStrategy,
   SyncedEntityRow,
+  WorkflowRunSummary,
 } from "../types";
+
+/** Whichever run is more recent — the row's own sync, or a bulk sync of the property. */
+function pickLatestRun(
+  a: WorkflowRunSummary | undefined,
+  b: WorkflowRunSummary | undefined
+): WorkflowRunSummary | undefined {
+  if (!a) return b;
+  if (!b) return a;
+  return new Date(b.createdAt) > new Date(a.createdAt) ? b : a;
+}
 
 export type SyncedEntitiesResult = {
   rows: SyncedEntityRow[];
@@ -34,6 +48,7 @@ function readOrganizationValue(
 async function loadSyncedEntities(
   token: string,
   portApiBaseUrl: string | null,
+  hostIdentifier: string,
   fields: GithubExternalPropertyFields
 ): Promise<SyncedEntitiesResult> {
   const targetBlueprint = await fetchBlueprint(
@@ -69,15 +84,21 @@ async function loadSyncedEntities(
     organizationValue: readOrganizationValue(entity, strategy),
   }));
 
-  if (fields.syncWorkflowIdentifier && rows.length > 0) {
-    const latestRuns = await resolveLatestRunsForEntities(
-      token,
-      portApiBaseUrl,
-      fields.syncWorkflowIdentifier,
-      rows.map((row) => row.identifier)
-    );
+  if (rows.length > 0) {
+    const [latestRuns, bulkRun] = await Promise.all([
+      fields.syncWorkflowIdentifier
+        ? resolveLatestRunsForEntities(
+            token,
+            portApiBaseUrl,
+            fields.syncWorkflowIdentifier,
+            rows.map((row) => row.identifier),
+            "entity"
+          )
+        : Promise.resolve(new Map<string, WorkflowRunSummary>()),
+      resolveLatestBulkSyncRun(token, portApiBaseUrl, hostIdentifier),
+    ]);
     for (const row of rows) {
-      row.latestRun = latestRuns.get(row.identifier);
+      row.latestRun = pickLatestRun(latestRuns.get(row.identifier), bulkRun);
     }
   }
 
@@ -98,8 +119,9 @@ export function useSyncedEntities(
 ) {
   return useQuery({
     queryKey: ["synced-entities", hostIdentifier, fields],
-    queryFn: () => loadSyncedEntities(token!, portApiBaseUrl, fields!),
-    enabled: !!token && !!portApiBaseUrl && !!fields,
+    queryFn: () =>
+      loadSyncedEntities(token!, portApiBaseUrl, hostIdentifier!, fields!),
+    enabled: !!token && !!portApiBaseUrl && !!hostIdentifier && !!fields,
     staleTime: 5 * 60 * 1000,
   });
 }

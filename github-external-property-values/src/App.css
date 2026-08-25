@@ -226,3 +226,7 @@ body {
 .run-dot--cancelled { background: var(--gray-text); }
 .run-dot--in-progress { background: var(--blue-text); }
 .run-dot--unknown { background: var(--text-faint); }
+
+.run-status-link__source {
+  color: var(--muted);
+}

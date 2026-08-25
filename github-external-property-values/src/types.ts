@@ -96,12 +96,18 @@ export type WorkflowRunListItem = {
 };
 
 export type WorkflowNodeRun = {
+  /**
+   * Event-trigger runs store `diff` here; self-service-trigger runs instead
+   * store each user input directly under its own key (e.g.
+   * `github_external_custom_property`) — so this allows arbitrary keys
+   * alongside the typed `diff` shape.
+   */
   output?: {
     diff?: {
       before?: { identifier?: string } | null;
       after?: { identifier?: string } | null;
     };
-  };
+  } & Record<string, unknown>;
 };
 
 export type WorkflowRunDetail = {
@@ -109,10 +115,14 @@ export type WorkflowRunDetail = {
   nodeRuns: WorkflowNodeRun[];
 };
 
+/** Which workflow relationship produced a `WorkflowRunSummary`. */
+export type WorkflowRunSource = "entity" | "bulk";
+
 /** Resolved "latest run" info attached to a table row. */
 export type WorkflowRunSummary = {
   runId: string;
   status: WorkflowRunListItem["status"];
   result: WorkflowRunListItem["result"];
   createdAt: string;
+  source: WorkflowRunSource;
 };

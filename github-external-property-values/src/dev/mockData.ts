@@ -133,6 +133,30 @@ export const MOCK_WORKFLOW_RUNS: Record<string, WorkflowRunListItem[]> = {
       workflowVersion: { workflow: { identifier: "sync_port_custom_attr" } },
     },
   ],
+  /**
+   * The global bulk-sync workflow (see README "How 'Latest sync run' is
+   * resolved"). `wfr_mock_20` postdates `wfr_mock_3` — the per-entity run
+   * for `deep-copy-entities` — so the merge logic in `useSyncedEntities`
+   * should pick this newer, bulk-sourced run for that row instead.
+   * `wfr_mock_21` exercises the manual self-service "Bulk Sync" trigger,
+   * whose entity id arrives as a plain output field, not a `diff`.
+   */
+  manage_sync_workflows: [
+    {
+      identifier: "wfr_mock_21",
+      status: "COMPLETED",
+      result: "SUCCESS",
+      createdAt: "2026-07-14T10:00:00.000Z",
+      workflowVersion: { workflow: { identifier: "manage_sync_workflows" } },
+    },
+    {
+      identifier: "wfr_mock_20",
+      status: "COMPLETED",
+      result: "SUCCESS",
+      createdAt: "2026-07-13T16:45:00.000Z",
+      workflowVersion: { workflow: { identifier: "manage_sync_workflows" } },
+    },
+  ],
 };
 
 export const MOCK_WORKFLOW_RUN_DETAILS: Record<string, WorkflowRunDetail> = {
@@ -155,6 +179,24 @@ export const MOCK_WORKFLOW_RUN_DETAILS: Record<string, WorkflowRunDetail> = {
     nodeRuns: [
       { output: { diff: { before: null, after: { identifier: "port-plugins" } } } },
       { output: { new_value: "hello-world", old_value: null } },
+    ],
+  },
+  // Triggered by an update of the `Port.lifecycle_attr` host property entity.
+  wfr_mock_20: {
+    identifier: "wfr_mock_20",
+    nodeRuns: [
+      {
+        output: {
+          diff: { before: { identifier: "Port.lifecycle_attr" }, after: { identifier: "Port.lifecycle_attr" } },
+        },
+      },
+    ],
+  },
+  // Triggered manually via the "Bulk Sync GitHub External Property" self-service trigger.
+  wfr_mock_21: {
+    identifier: "wfr_mock_21",
+    nodeRuns: [
+      { output: { github_external_custom_property: "Port.lifecycle_attr" } },
     ],
   },
 };

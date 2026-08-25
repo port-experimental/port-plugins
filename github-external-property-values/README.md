@@ -13,7 +13,7 @@ Lists every entity (and current property value) that a GitHub External Property 
 - Reads a `githubExternalCustomProperty` entity's sync rule (`blueprint_name`, `property_name`, `github_org`) and lists every entity of `blueprint_name` that belongs to `github_org` — i.e. every entity that will trigger this rule's sync workflow
 - Resolves the org filter generically from the target blueprint's schema at runtime (no hardcoded blueprint names): a direct/mirror `github_org` property, or a relation to `githubOrganization`
 - Shows the resolved org filter once above the table (dot-path to it, e.g. `github_repository.organization.$identifier` or `organization.$identifier`, and the org value) — it's the same for every row, since that's what all rows were filtered by
-- Table columns: entity (linked, header = target blueprint's title), `property_name`'s current value (colorized as a pill when the property is an enum with `enumColors`), and — when the host entity has an `entity_update_sync_workflow` relation — a "Latest sync run" link per row to that entity's most recent sync workflow run
+- Table columns: entity (linked, header = target blueprint's title), `property_name`'s current value (colorized as a pill when the property is an enum with `enumColors`), and a "Latest sync run" link per row — the most recent of that entity's own sync workflow run (via `entity_update_sync_workflow`, if set) and any bulk sync of the property itself (see below), whichever is newer
 - Loading, empty, and error states; light/dark theme support via Port SDK
 
 ## Prerequisites
@@ -48,13 +48,20 @@ Both flows are exercised by real data in this catalog: `service` (property flow,
 
 ### How "Latest sync run" is resolved
 
-When the host `githubExternalCustomProperty` entity has an `entity_update_sync_workflow` relation, each row links to the most recent run of that workflow triggered by that specific entity:
+Each row's "Latest sync run" is the newer of two independently-resolved runs:
 
-1. `GET /v1/workflows/runs?workflowIdentifiers=<id>` — scoped server-side to just this workflow (confirmed working filter; most other query params on this endpoint, e.g. `workflowIdentifier` singular or any entity-level filter, are silently ignored).
-2. That list doesn't say which entity triggered each run, so the plugin walks it newest-first, fetching run detail (`GET /v1/workflows/runs/:identifier`) in small batches, reading the trigger node's `output.diff.after.identifier` (or `.before.identifier`), until every visible row is resolved or the workflow's run history is exhausted.
-3. Rows with no matching run show "No recent run found".
+**1. The entity's own sync workflow run.** When the host `githubExternalCustomProperty` entity has an `entity_update_sync_workflow` relation, the plugin looks for the most recent run of that workflow triggered by that specific target entity:
 
-This relies on the run history containing a match — see **Known limitations**.
+- `GET /v1/workflows/runs?workflowIdentifiers=<id>` — scoped server-side to just this workflow (confirmed working filter; most other query params on this endpoint, e.g. `workflowIdentifier` singular or any entity-level filter, are silently ignored).
+- That list doesn't say which entity triggered each run, so the plugin walks it newest-first, fetching run detail (`GET /v1/workflows/runs/:identifier`) in small batches, reading the trigger node's `output.diff.after.identifier` (or `.before.identifier`), until every visible row is resolved or the workflow's run history is exhausted.
+
+**2. A bulk sync of the property itself.** Creating/updating a `githubExternalCustomProperty` entity (or manually re-running "Bulk Sync GitHub External Property") triggers the org-wide `manage_sync_workflows` workflow, whose `bulk_update` step pushes the property to *every* matching target entity in one run — not per target entity. The plugin resolves the latest such run triggered by the **host** property entity (same run history walk as above, against `manage_sync_workflows`), recognizing both:
+  - an event-trigger run (create/update), where the entity id is in `output.diff.after/before.identifier`, same as above;
+  - a manual self-service-trigger run, where — per Port's [data flow docs](https://docs.port.io/workflows/build-workflows/data-flow/) — self-service triggers store user inputs directly as outputs, so the entity id is `output.github_external_custom_property` instead.
+
+  Since one bulk run covers every row, it's applied identically to all of them wherever it's newer than a row's own per-entity run — shown with a "(bulk sync)" suffix so it's clear the row itself wasn't individually triggered.
+
+Rows with neither kind of run show "No recent run found". This is a best-effort search relying on the run history containing a match — see **Known limitations**.
 
 ## Plugin parameters
 
@@ -155,5 +162,6 @@ github-external-property-values/
 ## Known limitations
 
 - No pagination on the entity list: if a target blueprint has a very large number of entities matching the org, only the first page returned by `/v1/blueprints/{id}/entities/search` is shown.
-- "Latest sync run" resolution is best-effort: `GET /v1/workflows/runs` has no entity-level filter and no pagination cursor beyond its `limit=1000` cap, so the search walks that one page of the workflow's own run history. An entity whose last matching run isn't in that page shows "No recent run found" rather than searching further.
+- "Latest sync run" resolution is best-effort for both the per-entity and bulk lookups: `GET /v1/workflows/runs` has no entity-level filter and no pagination cursor beyond its `limit=1000` cap, so each search walks that one page of the respective workflow's own run history. A run that isn't in that page is missed rather than searched for further.
+- The bulk-sync lookup assumes the org-wide workflow is identified as `manage_sync_workflows` (see `BULK_SYNC_WORKFLOW_IDENTIFIER` in `src/api/workflowRuns.ts`) — if your org's managed workflow uses a different identifier, update that constant.
 - The workflow-run link (`{portalBase}/organization/workflow-run?runId=...`) uses a URL pattern confirmed against this org but not documented by Port; if your org's routing differs, update `buildWorkflowRunUrl()` in `src/utils/portalUrl.ts`.

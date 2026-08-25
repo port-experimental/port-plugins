@@ -1,6 +1,7 @@
 import type {
   WorkflowRunDetail,
   WorkflowRunListItem,
+  WorkflowRunSource,
   WorkflowRunSummary,
 } from "../types";
 import { DEV_MOCK } from "../hooks/usePostMessageData";
@@ -87,22 +88,59 @@ export function extractTriggerEntityIdentifier(
   return undefined;
 }
 
+/** Identifier of the "GitHub External Property" org-wide bulk-sync workflow (see README). */
+export const BULK_SYNC_WORKFLOW_IDENTIFIER = "manage_sync_workflows";
+
+/**
+ * The self-service trigger node on `manage_sync_workflows` ("Bulk Sync
+ * GitHub External Property") that lets a user manually re-run the bulk sync
+ * for one property; its user input key holding the chosen entity.
+ */
+const MANUAL_BULK_SYNC_INPUT_KEY = "github_external_custom_property";
+
+/**
+ * Same as `extractTriggerEntityIdentifier`, but also recognizes
+ * `manage_sync_workflows`' manual self-service trigger, whose node stores
+ * the chosen `githubExternalCustomProperty` entity directly as an output
+ * (self-service triggers store user inputs as outputs, not as an event
+ * `diff`) rather than via the event-trigger `diff` shape.
+ */
+export function extractBulkSyncTriggerEntityIdentifier(
+  detail: WorkflowRunDetail
+): string | undefined {
+  for (const nodeRun of detail.nodeRuns) {
+    const diff = nodeRun.output?.diff;
+    if (diff) {
+      return diff.after?.identifier ?? diff.before?.identifier ?? undefined;
+    }
+    const manualInput = nodeRun.output?.[MANUAL_BULK_SYNC_INPUT_KEY];
+    if (typeof manualInput === "string" && manualInput.trim()) {
+      return manualInput.trim();
+    }
+  }
+  return undefined;
+}
+
 const DETAIL_FETCH_CONCURRENCY = 5;
 
 /**
  * Resolves, for each of `targetIdentifiers`, the latest run of
- * `workflowIdentifier` that was triggered by that entity. There's no
- * entity-level filter on the runs-list endpoint, so this walks the
- * workflow's own run history newest-first, fetching run detail in small
- * batches, stopping once every target is resolved or the history is
- * exhausted. Entities with no matching run are simply absent from the
- * returned map ("no recent run found").
+ * `workflowIdentifier` that was triggered by that entity (per
+ * `extractEntityId`). There's no entity-level filter on the runs-list
+ * endpoint, so this walks the workflow's own run history newest-first,
+ * fetching run detail in small batches, stopping once every target is
+ * resolved or the history is exhausted. Entities with no matching run are
+ * simply absent from the returned map ("no recent run found").
  */
 export async function resolveLatestRunsForEntities(
   token: string,
   portApiBaseUrl: string | null,
   workflowIdentifier: string,
-  targetIdentifiers: string[]
+  targetIdentifiers: string[],
+  source: WorkflowRunSource,
+  extractEntityId: (
+    detail: WorkflowRunDetail
+  ) => string | undefined = extractTriggerEntityIdentifier
 ): Promise<Map<string, WorkflowRunSummary>> {
   const runs = await fetchWorkflowRuns(token, portApiBaseUrl, workflowIdentifier);
   const remaining = new Set(targetIdentifiers);
@@ -122,7 +160,7 @@ export async function resolveLatestRunsForEntities(
             portApiBaseUrl,
             run.identifier
           );
-          return { run, entityId: extractTriggerEntityIdentifier(detail) };
+          return { run, entityId: extractEntityId(detail) };
         } catch {
           return { run, entityId: undefined };
         }
@@ -135,6 +173,7 @@ export async function resolveLatestRunsForEntities(
           status: run.status,
           result: run.result,
           createdAt: run.createdAt,
+          source,
         });
         remaining.delete(entityId);
       }
@@ -142,4 +181,28 @@ export async function resolveLatestRunsForEntities(
   }
 
   return resolved;
+}
+
+/**
+ * Resolves the latest `manage_sync_workflows` run triggered by the host
+ * `githubExternalCustomProperty` entity itself — either by a create/update
+ * of that entity (event trigger) or a manual "Bulk Sync" run against it
+ * (self-service trigger). That workflow's `bulk_update` step pushes the
+ * property to every matching target entity in one run, so this single
+ * result applies to every row for this property, not just one.
+ */
+export async function resolveLatestBulkSyncRun(
+  token: string,
+  portApiBaseUrl: string | null,
+  hostEntityIdentifier: string
+): Promise<WorkflowRunSummary | undefined> {
+  const resolved = await resolveLatestRunsForEntities(
+    token,
+    portApiBaseUrl,
+    BULK_SYNC_WORKFLOW_IDENTIFIER,
+    [hostEntityIdentifier],
+    "bulk",
+    extractBulkSyncTriggerEntityIdentifier
+  );
+  return resolved.get(hostEntityIdentifier);
 }

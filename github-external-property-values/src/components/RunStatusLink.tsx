@@ -30,9 +30,17 @@ export function RunStatusLink({ run }: { run?: WorkflowRunSummary }) {
       href={buildWorkflowRunUrl(run.runId)}
       target="_blank"
       rel="noopener noreferrer"
+      title={
+        run.source === "bulk"
+          ? "Triggered by a bulk sync of this property (create/update or manual re-sync)"
+          : undefined
+      }
     >
       <span className={`run-dot ${dotClass}`} aria-hidden="true" />
       {formatRunDate(run.createdAt)}
+      {run.source === "bulk" && (
+        <span className="run-status-link__source"> (bulk sync)</span>
+      )}
     </a>
   );
 }
