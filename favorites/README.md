@@ -14,8 +14,8 @@ Bookmark your most-used Port Pages, self-service actions, and entities, and acce
 - **Add** centered modal per tab with search across titles, identifiers, and descriptions
   - Entities tab: entities grouped by blueprint in one searchable list
 - **Setup screen** when the required `favorites` property is missing on `_user` (admin users see setup instructions; others are prompted to contact an admin)
-Optional: favorites_identifiers field on the _user entity, kept in sync with your favorites, so you can filter a dashboard page to show only favorite entities (see Prerequisites).
 - Favorites **persist per user** via the `_user` blueprint's `favorites` property
+  - Optional: favorites_identifiers field on the _user entity, kept in sync with your favorites, so you can filter a dashboard page to show only favorite entities (see Prerequisites).
 - Follows Port dark/light theme`
 
 ## Prerequisites
@@ -42,7 +42,7 @@ curl -X PATCH "https://api.getport.io/v1/blueprints/_user" \
         "favorites": {
           "type": "object",
           "title": "My Favorites",
-          "description": "Bookmarked pages, actions, and entities for this user"
+          "description": "Bookmarked pages, actions, and entities for user"
         }
       }
     }
@@ -75,8 +75,8 @@ curl -X PATCH "https://api.getport.io/v1/blueprints/_user" \
       "properties": {
         "favorites_identifiers": {
           "type": "array",
-          "title": "Favorite entity identifiers",
-          "description": "Entity identifiers bookmarked by this user (synced by My Favorites plugin)",
+          "title": "Favorites identifiers",
+          "description": "Entity identifiers bookmarked by this user (synced by Favorites plugin)",
           "items": { "type": "string" }
         }
       }
@@ -91,10 +91,6 @@ Example filter use case: To scope entities to a user's favorites, set an initial
 ### Access
 
 The authenticated user must have **read** access to pages and actions in their Port organization, and **write** access to their own `_user` entity (to persist favorites).
-
-## Plugin parameters
-
-This plugin requires no upload parameters. All data is fetched at runtime using the authenticated Port token from the iframe host context.
 
 ## Local development
 
@@ -115,6 +111,8 @@ To preview the full favorites UI locally, ensure `MOCK_USER_BLUEPRINT` in `src/d
 ### 1. Catalog
 
 Add the required `favorites` property to the `_user` blueprint as described in **Prerequisites → Catalog** above. Optionally add `favorites_identifiers` if you need catalog filtering by favorite entity identifiers.
+
+> **Note:** If you do not need to modify the plugin, install it from Port and skip **Build** and **Upload** (steps 2 and 3) below. Go to **Plugins** → **Plugin library**, search for **Favorites**, and click **Install**. You can manage it under **Plugin manager**, then continue to step 4.
 
 ### 2. Build
 
@@ -143,8 +141,8 @@ port-plugins upload \
 
 ### 4. Add in Port
 
-1. Go to your Port dashboard → **Edit** → **Add widget** → **Custom widget**.
-2. Select the **My Favorites** plugin.
+1. Go to your Port dashboard → **Add widget** → **Custom widget**.
+2. Select the **Favorites** plugin.
 3. No parameters are required — save and reload.
 
 ## Project structure
