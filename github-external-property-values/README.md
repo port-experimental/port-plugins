@@ -4,7 +4,7 @@ Lists every entity (and current property value) that a GitHub External Property 
 
 ## Preview image
 
-<img width="820" height="420" alt="GitHub External Property Values plugin" src="https://github.com/port-experimental/port-plugins/blob/main/github-external-property-values/assets/preview.png" />
+<img width="820" height="420" alt="GitHub External Property Values plugin" src="https://raw.githubusercontent.com/port-experimental/port-plugins/main/github-external-property-values/assets/preview.png" />
 
 ## Features
 
