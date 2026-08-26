@@ -21,6 +21,7 @@ This repository contains plugins contributed by [Port.io](https://www.port.io).
 | [Countdown](./countdown) | 0.1.0 | Live countdown to a target date and time |
 | [Scorecard Grid](./scorecard-grid) | 0.1.0 | A colour-coded health grid widget for Port dashboards. Displays all entities of a blueprint as sized cubes grouped by their scorecard level, with counters, drill-down panels, and a sticky detail sidebar |
 | [My Favorites](./favorites) | 0.1.0 | Bookmark your most-used Port Pages, self-service actions, and entities; instant access from the widget on any dashboard |
+| [AI Invocation Viewer](./ai-invocation-viewer) | 0.1.0 | Overview and execution-log chat for `_ai_invocations` and `_ai_conversation` entity pages |
 
 ## AI-assisted development - Skills (Cursor & Claude)
 
