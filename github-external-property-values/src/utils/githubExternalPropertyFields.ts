@@ -1,4 +1,5 @@
 import type { Entity, GithubExternalPropertyFields } from "../types";
+import type { HostSubject } from "./resolveHostEntity";
 
 const REQUIRED_BLUEPRINT = "githubExternalCustomProperty";
 
@@ -21,11 +22,19 @@ function extractRelationIdentifier(raw: unknown): string | undefined {
  * Reads the sync-rule fields off the current `githubExternalCustomProperty`
  * host entity. Returns null when the widget isn't placed on that blueprint's
  * entity page, or the entity is missing a field the rule needs.
+ *
+ * Takes the already-resolved `host` (from `resolveHostSubject`) rather than
+ * re-deriving the blueprint from `entity.blueprint` alone — Port doesn't
+ * always populate that field; `resolveHostSubject` also falls back to
+ * `blueprintIdentifier` / `properties.$blueprint`. Checking `entity.blueprint`
+ * directly here would silently disagree with `host` and produce a
+ * misleading "missing blueprint_name" message instead of "wrong blueprint".
  */
 export function readGithubExternalPropertyFields(
-  entity: Entity | undefined
+  entity: Entity | undefined,
+  host: HostSubject | null
 ): GithubExternalPropertyFields | null {
-  if (!entity || entity.blueprint !== REQUIRED_BLUEPRINT) return null;
+  if (!entity || !host || host.blueprint !== REQUIRED_BLUEPRINT) return null;
 
   const props = entity.properties ?? {};
   const blueprintName = props.blueprint_name;

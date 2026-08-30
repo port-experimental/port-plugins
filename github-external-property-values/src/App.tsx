@@ -10,7 +10,7 @@ import { SyncedEntitiesTable } from "./components/SyncedEntitiesTable";
 export function App() {
   const { entity, portToken, portApiBaseUrl } = usePostMessageData();
   const host = resolveHostSubject(entity);
-  const fields = readGithubExternalPropertyFields(entity);
+  const fields = readGithubExternalPropertyFields(entity, host);
 
   // ALWAYS call — never behind a portToken/host guard (async host context).
   const query = useSyncedEntities(
@@ -60,7 +60,9 @@ export function App() {
           </p>
         )}
 
-        {query.isError && <ErrorBanner error={query.error} />}
+        {query.isError && (
+          <ErrorBanner error={query.error} onRetry={() => query.refetch()} />
+        )}
 
         {query.isSuccess && query.data.rows.length === 0 && (
           <p className="muted">

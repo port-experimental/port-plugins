@@ -4,7 +4,7 @@ Lists every entity (and current property value) that a GitHub External Property 
 
 ## Preview image
 
-<img width="820" height="420" alt="GitHub External Property Values plugin" src="https://github.com/port-experimental/port-plugins/blob/main/github-external-property-values/assets/preview.png" />
+<img width="777" height="417" alt="GitHub External Property Values plugin" src="https://github.com/port-experimental/port-plugins/blob/main/github-external-property-values/assets/preview.png" />
 
 ## Features
 
@@ -61,7 +61,7 @@ Each row's "Latest sync run" is the newer of two independently-resolved runs:
 
 Rows with neither kind of run show "No recent run found". This is a best-effort search relying on the run history containing a match — see **Known limitations**.
 
-## Plugin parameters
+## Widget parameters
 
 None — this is a zero-config, entity-page-only widget. Everything is read from `PLUGIN_DATA.entity` and the Port REST API.
 

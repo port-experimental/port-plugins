@@ -138,6 +138,30 @@ body {
   gap: 4px;
 }
 
+.error-banner__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.error-banner__retry {
+  border: 1px solid var(--red-text, #a3372a);
+  background: transparent;
+  color: var(--red-text);
+  border-radius: 6px;
+  padding: 2px 10px;
+  font-size: 0.85em;
+  font-weight: 500;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.error-banner__retry:hover {
+  background: var(--red-text, #a3372a);
+  color: var(--card, #fff);
+}
+
 .error-banner__body {
   white-space: pre-wrap;
   word-break: break-word;
