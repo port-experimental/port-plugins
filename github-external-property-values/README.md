@@ -1,5 +1,7 @@
 # GitHub External Property Values
 
+> This plugin exists to support the [Sync Port properties to GitHub external custom properties](https://docs.port.io/guides/all/sync-port-properties-to-github-external-custom-properties) guide's centrally managed setup (the `githubExternalCustomProperty` blueprint + `manage_sync_workflows`). It's not a standalone widget — don't install it unless you're following that guide.
+
 Lists every entity (and current property value) that a GitHub External Property sync rule covers — custom plugin for [Port](https://app.port.io). Must be placed on a `githubExternalCustomProperty` ("GitHub External Property") entity page; reads the sync rule off `PLUGIN_DATA.entity` and queries the catalog for every matching entity.
 
 ## Preview image
