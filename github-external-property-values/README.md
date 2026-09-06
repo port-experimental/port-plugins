@@ -26,7 +26,7 @@ Lists every entity (and current property value) that a GitHub External Property 
 
 ### Blueprints & properties
 
-No new blueprints required — this plugin only reads existing catalog data.
+Requires the `githubExternalCustomProperty` blueprint — this is a custom blueprint, not a Port default; see the guide linked above for how to create and configure it. Beyond that, this plugin only reads existing catalog data — no other new blueprints required.
 
 | Requirement | Details |
 |-------------|---------|
