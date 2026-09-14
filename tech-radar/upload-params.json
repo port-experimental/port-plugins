@@ -1,0 +1,7 @@
+{
+  "blueprint": {
+    "type": "blueprint",
+    "isRequired": false,
+    "label": "Blueprint (defaults to \"software\")"
+  }
+}
