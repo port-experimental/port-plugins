@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "github-external-property-values",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--prefix", "github-external-property-values"],
+      "port": 9000
+    },
+    {
+      "name": "leaderboard",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--prefix", "leaderboard"],
+      "port": 9000
+    }
+  ]
+}
