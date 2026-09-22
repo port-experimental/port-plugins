@@ -110,6 +110,27 @@ body {
   padding: 8px 0;
 }
 
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.retry-button {
+  font: inherit;
+  color: var(--text);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 6px 14px;
+  cursor: pointer;
+}
+
+.retry-button:hover {
+  background: var(--card2);
+}
+
 .leaderboard-list {
   list-style: none;
   display: flex;

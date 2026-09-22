@@ -53,6 +53,15 @@ Example uses on a skills-registry adoption dashboard:
 | `limit` | number | no | `10` | Max number of rows shown |
 | `filter` | object | no | (none) | Extra dataset filter merged into the entity search, same shape as a Port entities-search query (`{ combinator, rules }`) |
 
+Prefer dashboard **page filters** to scope entities — they apply automatically
+via `mergePageFilters`. Only set `filter` when this leaderboard needs a
+narrower or different subset of entities than the rest of the dashboard (a
+page filter applies to every widget on the page).
+
+The widget pages through the blueprint's entities (100 per request) up to
+1,000 total before ranking, so it stays correct for blueprints larger than a
+single search page; entities beyond that cap aren't considered.
+
 ## Local development
 
 ```bash
@@ -65,7 +74,8 @@ Outside Port's iframe, `usePostMessageData.ts` serves a mock "Top
 Contributors" config and `src/api/searchEntities.ts` returns a static
 sample entity list (`MOCK_CONTRIBUTORS`) instead of calling the Port API.
 Edit `MOCK_PARAMS` / `MOCK_CONTRIBUTORS` to preview a different
-leaderboard shape locally.
+leaderboard shape locally. Entity title links are built from mock data and
+won't resolve to a real Port entity page outside the iframe.
 
 ## Setup
 
@@ -127,9 +137,10 @@ leaderboard/
 
 | Symptom | Cause | Fix |
 |---------|-------|-----|
-| Blank white iframe (no text) | React hooks called after `if (!portToken) return` | Call all hooks before early returns; `useLeaderboardData` is gated with `enabled`, see the `port-dashboard-plugins` skill, Step 4 |
+| Blank white iframe (no text) | React hooks called after `if (!portToken) return` | Call all hooks before early returns; `useLeaderboardData` is gated with `enabled` — see this repo's `create-port-plugin` skill, `production-readiness.md` §1 |
 | Blank iframe, zero height | Missing `#plugin-root` flex / shell `min-height` | Layout is already copied from `template-App.css`; don't remove the `.shell` rules |
 | "Configure the blueprint and sortProperty..." | Missing required param | Set both `blueprint` and `sortProperty` when adding the widget |
 | All rows show "—" | `sortProperty` isn't a numeric property on this blueprint, or entities lack it | Verify the property identifier and that entities have a value |
 | Empty leaderboard | Dashboard page filters exclude all entities, or wrong blueprint | Check the page's filters and the `blueprint` param |
-| Port API error | Auth, wrong host, or malformed search body | Error includes response body; confirm nested `{ query: { combinator, rules } }` on entity search |
+| Rankings look wrong on a large blueprint | Entity count exceeds the 1,000-entity pool cap | Narrow with dashboard page filters or the `filter` param so the ranked set fits the cap |
+| Port API error | Auth, wrong host, or malformed search body | Error includes response body; confirm nested `{ query: { combinator, rules } }` on entity search; use **Retry** once the underlying issue is fixed |

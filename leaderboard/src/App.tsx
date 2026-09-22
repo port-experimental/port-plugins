@@ -96,9 +96,14 @@ export function App() {
             Loading…
           </p>
         ) : query.isError ? (
-          <p className="muted" role="alert">
-            Couldn't load the leaderboard: {(query.error as Error)?.message ?? "unknown error"}
-          </p>
+          <div className="error-state" role="alert">
+            <p className="muted">
+              Couldn't load the leaderboard: {(query.error as Error)?.message ?? "unknown error"}
+            </p>
+            <button type="button" className="retry-button" onClick={() => query.refetch()}>
+              Retry
+            </button>
+          </div>
         ) : !query.data || query.data.length === 0 ? (
           <p className="muted">
             No entities found for blueprint "{config.blueprint.identifier}". Check the

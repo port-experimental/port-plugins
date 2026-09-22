@@ -27,6 +27,7 @@ export function useLeaderboardData(
       config?.limit,
       config?.filter,
       page?.identifier,
+      page?.pageFilters,
     ],
     enabled: !!portToken && !!portApiBaseUrl && !!config,
     queryFn: async (): Promise<LeaderboardEntry[]> => {
@@ -36,7 +37,8 @@ export function useLeaderboardData(
         portToken,
         config.blueprint,
         page,
-        config.filter
+        config.filter,
+        config.sortProperty
       );
 
       const withValues = entities.map((entity) => ({

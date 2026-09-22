@@ -1,7 +1,27 @@
 {
   "blueprint": { "type": "blueprint", "isRequired": true, "label": "Entity blueprint" },
-  "sortProperty": { "type": "string", "isRequired": true, "label": "Property to rank by (identifier)" },
-  "sortDirection": { "type": "string", "isRequired": false, "label": "Sort direction: asc or desc (default desc)" },
-  "limit": { "type": "number", "isRequired": false, "label": "Max entries shown (default 10)" },
-  "filter": { "type": "object", "isRequired": false, "label": "Extra dataset filter (Port entities-search query object)" }
+  "sortProperty": {
+    "type": "string",
+    "isRequired": true,
+    "label": "Sort property",
+    "description": "Identifier of the numeric property to rank entities by"
+  },
+  "sortDirection": {
+    "type": "string",
+    "isRequired": false,
+    "label": "Sort direction",
+    "description": "\"asc\" or \"desc\" — defaults to \"desc\""
+  },
+  "limit": {
+    "type": "number",
+    "isRequired": false,
+    "label": "Max entries",
+    "description": "Max number of rows shown — defaults to 10"
+  },
+  "filter": {
+    "type": "object",
+    "isRequired": false,
+    "label": "Extra filter",
+    "description": "Extra dataset filter merged into the entity search, same shape as a Port entities-search query"
+  }
 }
