@@ -6,6 +6,8 @@ into the entity search, so the same widget can power multiple leaderboards
 (top contributors, top owning teams, top skills, ...) just by changing its
 parameters.
 
+## Preview image
+
 <img width="519" height="417" alt="Leaderboard widget showing top used skills ranked by invocation count, with gold/silver/bronze tiles for the top 3" src="https://github.com/port-experimental/port-plugins/blob/main/leaderboard/assets/preview.png" />
 
 ## Features
