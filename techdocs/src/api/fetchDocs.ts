@@ -7,6 +7,7 @@ import {
 } from "../utils/internalDocLinks";
 import { MOCK_DOCS } from "../utils/mocks";
 import { portFetch } from "./portFetch";
+import { buildSourceRule, matchesSourceFilter } from "../utils/sourceFilter";
 
 /** Matches Port entity scan / search pagination (`limit` + `from` cursor). */
 const TECH_DOCS_SCAN_LIMIT = 200;
@@ -53,6 +54,7 @@ export async function fetchTechDocsPage(
   token: string,
   techDocBlueprint: string,
   techdocsSourceBlueprint: string,
+  sources: string[],
   from?: string | null
 ): Promise<TechDocsPage> {
   if (DEV_MOCK) {
@@ -63,19 +65,23 @@ export async function fetchTechDocsPage(
         ? 0
         : Math.max(0, parseInt(from, 10) || 0);
     const start = pageIndex * PAGE_SIZE;
-    const slice = MOCK_DOCS.slice(start, start + PAGE_SIZE);
-    const more = start + PAGE_SIZE < MOCK_DOCS.length;
+    const docs = MOCK_DOCS.filter((d) =>
+      matchesSourceFilter(d.properties, sources)
+    );
+    const slice = docs.slice(start, start + PAGE_SIZE);
+    const more = start + PAGE_SIZE < docs.length;
     return {
       entities: slice,
       next: more ? String(pageIndex + 1) : null,
     };
   }
 
+  const sourceRule = buildSourceRule(sources);
   const path = `/v1/blueprints/${encodeURIComponent(techDocBlueprint)}/entities/search`;
   const body: Record<string, unknown> = {
     query: {
       combinator: "and",
-      rules: [],
+      rules: sourceRule ? [sourceRule] : [],
     },
     limit: TECH_DOCS_SCAN_LIMIT,
     ...(from && from.trim() ? { from: from.trim() } : {}),
@@ -115,7 +121,8 @@ export async function fetchTechDocByFilePath(
   techDocBlueprint: string,
   techdocsSourceBlueprint: string,
   repository: string,
-  filePath: string
+  filePath: string,
+  sources: string[] = []
 ): Promise<TechDocEntity | null> {
   const candidates = filePathSearchCandidates(filePath);
 
@@ -125,6 +132,7 @@ export async function fetchTechDocByFilePath(
       const found = MOCK_DOCS.find(
         (d) =>
           d.relations.repository === repository &&
+          matchesSourceFilter(d.properties, sources) &&
           normalizeRepoPath(d.properties.filePath ?? "") === fp
       );
       if (found) return found;
@@ -138,16 +146,19 @@ export async function fetchTechDocByFilePath(
     value: fp,
   }));
 
+  const sourceRule = buildSourceRule(sources);
   const path = `/v1/blueprints/${encodeURIComponent(techDocBlueprint)}/entities/search`;
   const response = await portFetch(baseUrl, token, path, {
     method: "POST",
     body: JSON.stringify({
       query: {
         combinator: "and",
-        rules:
-          filePathRules.length === 1
+        rules: [
+          ...(filePathRules.length === 1
             ? filePathRules
-            : [{ combinator: "or", rules: filePathRules }],
+            : [{ combinator: "or", rules: filePathRules }]),
+          ...(sourceRule ? [sourceRule] : []),
+        ],
       },
       limit: 20,
     }),

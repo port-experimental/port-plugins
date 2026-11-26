@@ -15,6 +15,7 @@ graph TD
 \`\`\`
 `,
       filePath: "hello.md",
+      source: "git",
       folderPath: "",
       url: "https://github.com/example/Node/blob/main/hello.md",
     },
@@ -45,6 +46,7 @@ These links stay inside TechDocs instead of opening in Port:
 External links still open via Port: [Port documentation](https://docs.port.io).
 `,
       filePath: "README.md",
+      source: "git",
       folderPath: "",
       url: "https://github.com/example/Node/blob/main/README.md",
       lastUpdated: "2026-01-10T09:00:00Z",
@@ -72,6 +74,7 @@ React application powering the UI.
 
 `,
       filePath: "apps/Frontend/README.md",
+      source: "git",
       folderPath: "apps/Frontend",
       url: "https://github.com/example/Node/blob/main/apps/Frontend/README.md",
     },
@@ -99,6 +102,7 @@ Express API server.
 - [Test area](/test/README2.md) — absolute from repo root (leading \`/\`)
 `,
       filePath: "apps/Backend/README.md",
+      source: "git",
       folderPath: "apps/Backend",
       url: "https://github.com/example/Node/blob/main/apps/Backend/README.md",
     },
@@ -120,6 +124,7 @@ Secondary markdown file under \`test/\` (not the default README name).
 - [Same-folder link](./README2.md) — stays on this page
 `,
       filePath: "test/README2.md",
+      source: "git",
       folderPath: "test",
       url: "https://github.com/example/Node/blob/main/test/README2.md",
     },
@@ -142,6 +147,7 @@ Set \`SLACK_TOKEN\` in your environment.
 This repo is **FlameBot**, not **Node**. A link like [Node root README](../README.md) resolves to \`FlameBot/README.md\` (this page), not the Node monorepo — internal links only match docs in the **same** \`repository\` relation.
 `,
       filePath: "README.md",
+      source: "git",
       folderPath: "",
       url: "https://github.com/example/FlameBot/blob/main/README.md",
     },

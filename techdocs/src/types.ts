@@ -39,6 +39,11 @@ export type PluginConfig = {
    * (`POST /v1/entities/search`).
    */
   relatedToDirection: RelatedToDirection;
+  /**
+   * Values of the tech doc `source` property to include (e.g. `git`, `confluence`).
+   * Empty means all sources.
+   */
+  sources: string[];
 };
 
 export type TechDocEntity = {

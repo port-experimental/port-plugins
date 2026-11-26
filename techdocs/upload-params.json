@@ -8,5 +8,10 @@
     "type": "blueprint",
     "isRequired": false,
     "label": "Tech Doc related blueprint"
+  },
+  "techDocSources": {
+    "type": "string",
+    "isRequired": false,
+    "label": "Tech Doc sources (e.g. git,confluence; empty = all)"
   }
 }

@@ -38,6 +38,7 @@ const mockEntity: Entity | undefined =
 export const usePostMessageData = () => {
   const sdk = usePortPluginData();
 
+  // e.g. { techDocSources: { value: "git" } } to exercise the source filter
   const [mockParams] = useState<Params>({});
   const [mockPage] = useState<Page | undefined>();
   const [mockUser] = useState<User | undefined>(

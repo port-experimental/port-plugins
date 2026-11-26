@@ -3,7 +3,7 @@
 A [Port](https://app.port.io) plugin that provides a documentation browser for your repositories. It fetches `techDoc` entities from your Port catalog and renders their markdown content in a two-pane layout with sidebar navigation grouped by repository and folder. 
 Look at the following [guide](https://docs.port.io/guides/all/manage-and-surface-technical-docs/) for more context. 
 
-![Version](https://img.shields.io/badge/version-0.3.0-blue)
+![Version](https://img.shields.io/badge/version-0.4.0-blue)
 ![Widget Type](https://img.shields.io/badge/type-dashboard%20widget-blue)
 ![React](https://img.shields.io/badge/react-19-blue)
 ![TypeScript](https://img.shields.io/badge/typescript-5.7-blue)
@@ -21,6 +21,7 @@ Look at the following [guide](https://docs.port.io/guides/all/manage-and-surface
 - Copy file URL (GitHub) from the **View source** control in the header
 - Inherits Port's theme (light/dark mode) automatically
 - Configurable blueprint identifiers via widget parameters
+- **Source filter** — render docs from every source, or only some (e.g. `git`, `confluence`) via the tech doc `source` property
 
 ## Images in ingested READMEs
 
@@ -140,6 +141,23 @@ port-plugins upload \
 2. Click **+ Widget** → **Custom Widget**
 3. Select **TechDocs Viewer**
 4. Optionally set **Tech Doc blueprint** and **Tech Doc related blueprint** (defaults: `techDoc` and `githubRepository`)
+5. Optionally set **Tech Doc sources** to limit the view to specific sources (see [Filtering by source](#filtering-by-source))
+
+### Filtering by source
+
+Tech docs from several places (Git, Confluence, Notion, …) can live in the same `techDoc` blueprint. Each entity's **`source`** property records where it came from; the GitHub mapping in [`integration-mapping.yaml`](./blueprints/integration-mapping.yaml) sets it to `git`, and other integrations should set their own value (e.g. `confluence`).
+
+The **Tech Doc sources** widget parameter (`techDocSources`) controls which ones the widget shows:
+
+| Value | Result |
+|-------|--------|
+| *(empty)* or `all` | All tech docs, whatever their source (default) |
+| `git` | Only docs with `source = git` |
+| `git, confluence` | Docs from Git **or** Confluence |
+
+The value is a comma-separated list (a JSON array such as `["git","confluence"]` also works). Matching is **exact and case-sensitive**, so use the same values your mappings write. The filter applies on dashboards, on entity pages, and when resolving internal markdown links.
+
+> **Existing entities:** docs ingested before `source` was added have no value and are excluded whenever a filter is set. Resync the integration after adding `source` to its mapping.
 
 ### Entity page behaviour
 
@@ -156,6 +174,7 @@ Configured via `upload-params.json`:
 |-----------------|---------------|------|----------|---------|-------------|
 | Tech Doc blueprint | `techDocBlueprint` | blueprint | No | `techDoc` | Blueprint for documentation entities |
 | Tech Doc related blueprint | `techdocsSourceBlueprint` | blueprint | No | `githubRepository` | Blueprint for related repository entities (sidebar grouping) |
+| Tech Doc sources | `techDocSources` | string | No | *(all)* | Comma-separated `source` values to include, e.g. `git,confluence`. Empty or `all` shows every source |
 
 ## Local Development
 
@@ -211,6 +230,7 @@ techdocs/
 │   └── utils/
 │       ├── internalDocLinks.ts      # Relative path resolution + doc lookup
 │       ├── mocks.ts                 # Dev mock entities (incl. link examples)
+│       ├── sourceFilter.ts          # `techDocSources` param parsing + search rule
 │       └── …                        # column widths, relation id helpers, etc.
 ├── package.json
 ├── upload-params.json            # Widget parameter definitions
@@ -231,5 +251,6 @@ techdocs/
 | Widget ignores Port theme | `applyThemeCss()` not called | Ensure `usePostMessageData` hook calls `sdk.applyThemeCss()` on mount |
 | Broken images in doc body | README uses `https://…` image URLs | Port plugin CSP blocks external media; see [Images in ingested READMEs](#images-in-ingested-readmes) |
 | Internal markdown link does nothing | Wrong relative path, different `repository`, or target doc not loaded yet | Fix path (e.g. `../../README.md` from `apps/Frontend/`, not `../README.md`); ensure both docs share the same repo relation; scroll sidebar to load more entities |
+| Docs from a source are missing | `techDocSources` excludes them, or their `source` value differs (case, spelling) or is empty | Clear the parameter to show all, or match the exact `source` values; resync older entities so they get `source` |
 | Internal link opens Port / new tab | Link treated as external | Only same-repo relative paths matching an ingested `filePath` stay in-widget; `https://` links always use the SDK bridge |
 | External link fails in Port | Outdated SDK | Use `@port-labs/plugins-sdk` ≥ 0.1.1 (see [Internal and external markdown links](#internal-and-external-markdown-links)) |
