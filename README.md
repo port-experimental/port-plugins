@@ -23,6 +23,7 @@ This repository contains plugins contributed by [Port.io](https://www.port.io).
 | [GitHub External Property Values](./github-external-property-values) | 0.1.0 | Lists every entity (and current property value) that a GitHub External Property sync rule covers |
 | [My Favorites](./favorites) | 0.1.0 | Bookmark your most-used Port Pages, self-service actions, and entities; instant access from the widget on any dashboard |
 | [Leaderboard](./leaderboard) | 0.1.0 | A ranked leaderboard of entities by a sortable property, a custom plugin for Port |
+| [Self Learning](./self-learning) | 0.1.0 | Admin page for Self Learning: review the lessons Port learns from finished work, browse active lessons, and add, pause and resume lesson sources |
 
 ## AI-assisted development - Skills (Cursor & Claude)
 
