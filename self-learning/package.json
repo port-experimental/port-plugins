@@ -1,0 +1,12 @@
+{
+  "name": "self-learning",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Self Learning admin page: review the lessons Port learns from finished work, see active lessons, and create each source's pipeline. Port custom plugin.",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "build": "echo 'dist/index.html is prebuilt. It is built from the Self Learning guide package with node plugin/build.mjs (no npm dependencies); upload dist/index.html as is.'"
+  }
+}
