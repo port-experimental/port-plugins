@@ -22,6 +22,7 @@ import {
 } from "./utils/internalDocLinks";
 import { LoadingDocsView } from "./components/DocViewer/LoadingDocsView";
 import { ErrorDocView } from "./components/DocViewer/ErrorDocView";
+import { parseSourceFilter } from "./utils/sourceFilter";
 
 function blueprintParamValue(value: unknown, fallback: string): string {
   if (value == null || value === "") return fallback;
@@ -49,6 +50,7 @@ function configFromParams(params: Params): PluginConfig {
     techDocBlueprint,
     techdocsSourceBlueprint,
     relatedToDirection: "downstream",
+    sources: parseSourceFilter(params["techDocSources"]?.value),
   };
 }
 
@@ -102,7 +104,8 @@ export function App() {
         config.techDocBlueprint,
         config.techdocsSourceBlueprint,
         repository,
-        spec.filePath
+        spec.filePath,
+        config.sources
       );
       if (!fetched) return null;
 

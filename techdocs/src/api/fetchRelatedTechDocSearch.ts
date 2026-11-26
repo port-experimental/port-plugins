@@ -11,6 +11,7 @@ import {
 import { mapSearchEntity, type TechDocsPage } from "./fetchDocs";
 import { fetchBlueprintEntity } from "./fetchEntity";
 import { portFetch } from "./portFetch";
+import { buildSourceRule, matchesSourceFilter } from "../utils/sourceFilter";
 
 const RELATED_DOCS_PAGE_LIMIT = 200;
 
@@ -59,6 +60,8 @@ export type RelatedTechDocSearchParams = {
   techDocBlueprint: string;
   techdocsSourceBlueprint: string;
   direction: RelatedToDirection;
+  /** `source` values to include; empty means all sources. */
+  sources: string[];
 };
 
 type SearchRule = Record<string, unknown>;
@@ -292,7 +295,9 @@ export async function fetchTechDocsRelatedToEntityPage(
       }
       return false;
     });
-    const docs = matched.length > 0 ? matched : MOCK_DOCS;
+    const docs = (matched.length > 0 ? matched : MOCK_DOCS).filter((d) =>
+      matchesSourceFilter(d.properties, params.sources)
+    );
     const PAGE_SIZE = 2;
     const pageIndex =
       from == null || from === ""
@@ -304,7 +309,9 @@ export async function fetchTechDocsRelatedToEntityPage(
     return { entities: slice, next: more ? String(pageIndex + 1) : null };
   }
 
-  const rules = await getRelatedSearchRules(baseUrl, token, params);
+  const relatedRules = await getRelatedSearchRules(baseUrl, token, params);
+  const sourceRule = buildSourceRule(params.sources);
+  const rules = sourceRule ? [...relatedRules, sourceRule] : relatedRules;
 
   const searchPath = `/v1/blueprints/${encodeURIComponent(params.techDocBlueprint)}/entities/search`;
   const body: Record<string, unknown> = {
